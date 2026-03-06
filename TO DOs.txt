@@ -1,0 +1,8 @@
+TO DOs - simulation implementation
+- Generation of target trajectory
+- Simulation of data - camera + encoders + imu + lidar readings (output of prev. MPC step)
+- Every limo uses EKF to estimate its position 
+- Every limo computes the global position of the target
+- Consensus algorithm to estimate the target position
+- Calculation of central position (projection of the old center onto the circumference around target) 
+- Control algorithm using MPC to move to the desired position -> weight on the distance from the circumference around center of the formation and weight on the distance between each other
