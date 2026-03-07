@@ -5,4 +5,9 @@ TO DOs - simulation implementation
 - Every limo computes the global position of the target
 - Consensus algorithm to estimate the target position
 - Calculation of central position (projection of the old center onto the circumference around target) 
-- Control algorithm using MPC to move to the desired position -> weight on the distance from the circumference around center of the formation and weight on the distance between each other
+- Control algorithm using MPC to move to the desired position
+
+MPC TODOS:
+- weight on the distance from the circumference around center of the formation
+- weight on the distance between each other
+- weigth on the distance to obstacles
