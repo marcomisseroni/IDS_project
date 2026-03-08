@@ -5,6 +5,8 @@
 # | |____ _| |_| |  | | |__| |    | |__| / ____ \| |/ ____ \ 
 # |______|_____|_|  |_|\____/     |_____/_/    \_\_/_/    \_\
 
+import numpy as np
+
 # limo wheel radius
 r = 0.033
 # limo baseline (175mm?)
@@ -19,3 +21,7 @@ v_min = -1
 # limo max yaw rate 2*v_max/(b/2)
 w_max = 4*v_max/b
 w_min = -4*v_max/b
+# lidar covariance
+R = np.identity(3) * 0.01
+# model covariance
+Q = np.identity(3) * 0.001
