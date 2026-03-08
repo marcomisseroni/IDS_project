@@ -193,7 +193,7 @@ N_sim = 500
 r = 0.5
 
 # limo 0
-x0_init = [-r,0,0]
+x0_init = [r,0,0]
 limo_0 = MPC(x0_init)
 x_sol_0 = np.zeros((limo_0.nx,N_sim))
 u_sol_0 = np.zeros((limo_0.nu,N_sim))
