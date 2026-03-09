@@ -28,13 +28,10 @@ class data_sim:
                 self.x_pos[i] = 0.3 * i * self.dt
                 self.y_pos[i] = 0.1 * i * self.dt
 
-        if traj_type == "sin_x":
-            for i in range(1, N):
-                self.x_pos[i] = 0.2 * np.sin(3 * i * self.dt)
-
-        if traj_type == "sin_y":
+        if traj_type == "sin":
             for i in range(1, N):
                 self.y_pos[i] = 0.2 * np.sin(3 * i * self.dt)
+                self.x_pos[i] = 0.1 * i * self.dt
 
     def relative_target_pos(self, state, i, flag):
         target_pos = np.zeros(2)
@@ -75,6 +72,12 @@ class data_sim:
     def ext_sensors(self, state):
         noise = np.random.normal(0, self.std, 3)
         return state + noise
+    
+    def sensors_from_input(self, v, w):
+        noise = np.random.normal(0, self.std)
+        w_l = np.round((v - w * self.b / 2) / self.r)
+        w_r = np.round((v + w * self.b / 2) / self.r)
+        return np.array([w_l, w_r]) + np.array([0, 0, noise])
     
 
 
