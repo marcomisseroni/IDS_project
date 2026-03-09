@@ -64,6 +64,14 @@ class data_sim:
         w_r = np.round((v + w * self.b / 2) / self.r)
         return np.array([w_l, w_r, w]) + np.array([0, 0, noise])
     
+    def input(self, state, des_pos):
+        noise = np.random.normal(0, self.std, 2)
+        dtheta = np.atan2(des_pos[1] - state[1], des_pos[0] - state[0]) - state[2]
+        delta = np.sqrt((des_pos[0] - state[0]) ** 2 + (des_pos[1] - state[1]) ** 2)
+        v = delta / self.dt
+        w = dtheta / self.dt
+        return np.array([v, w]) + noise
+    
     def ext_sensors(self, state):
         noise = np.random.normal(0, self.std, 3)
         return state + noise
@@ -99,4 +107,5 @@ if __name__ == "__main__":
     print("Relative target position: ", ds.relative_target_pos(initial_state, 999, "xy"))
     print("Absolute target position: ", ds.absolute_target_pos(999))
     print("Proprieceptive sensors: ", ds.prop_sensors(initial_state, des_pos))
-    print("Exteroceptive sensors: ", des_pos)
+    print("Exteroceptive sensors: ", ds.ext_sensors(des_pos))
+    print("Input: ", ds.input(initial_state, des_pos))
