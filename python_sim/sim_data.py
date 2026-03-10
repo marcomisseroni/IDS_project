@@ -30,8 +30,8 @@ class data_sim:
 
         if traj_type == "sin":
             for i in range(1, N):
-                self.y_pos[i] = 0.2 * np.sin(3 * i * self.dt)
-                self.x_pos[i] = 0.1 * i * self.dt
+                self.y_pos[i] = 2 + 0.2 * np.sin(2 * i * self.dt)
+                self.x_pos[i] = 2 + 0.8 * i * self.dt
 
     def relative_target_pos(self, state, i, flag):
         target_pos = np.zeros(2)

@@ -3,43 +3,52 @@ import Limo
 import sim_data
 import conf_limo
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib.patches import Circle
 
 N_sim = 100
-limo0 = Limo(np.array([0,0,0]), np.array([2,2]))
-sim = sim_data("sin", N_sim, conf_limo.dt, 0.01)
+dt = 0.1
+limo0 = Limo.Limo(np.array([0,0,0]), np.array([2,2]))
+sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
+
+p0 = np.zeros((2, N_sim))
+p1 = np.zeros((2, N_sim))
+p2 = np.zeros((2, N_sim))
+t = np.zeros((2, N_sim))
+c = np.zeros((2, N_sim))
+
 for i in range(N_sim):
     # sim of the three target measures
     target0 = sim.absolute_target_pos(i)
     target1 = sim.absolute_target_pos(i)
     target2 = sim.absolute_target_pos(i)
+    t[:,i] = (target0 + target1 + target2) / 3
     # computation of the desired limo position
-    limo0.desired_pos()
+    p0[:,i], p1[:,i], p2[:,i], c[:,i] = limo0.desired_pos(target0, target1, target2, 0, 0)
 
-'''
+
 # PLOT
 fig, ax = plt.subplots(figsize=(10, 4))
 def draw_static():
-    ax.plot(x_sol_0[0,:], x_sol_0[1,:], 'x-', label='x0', alpha=0.7)
-    ax.plot(x_sol_1[0,:], x_sol_1[1,:], 'x-', label='x1', alpha=0.7)
-    ax.plot(x_sol_2[0,:], x_sol_2[1,:], 'x-', label='x2', alpha=0.7)
-    ax.plot(x_des_center[0,:], x_des_center[1,:], 'x-', label='x_des_center', alpha=0.7)
+    ax.plot(t[0,:], t[1,:], 'x-', alpha=0.7)
     ax.legend()
 
 def update(frame):
     ax.cla()
     draw_static()
-    limo_0.plot_robot(x_sol_0[:,frame], limo_0.robot_ray, 'b', fill=0)
-    limo_1.plot_robot(x_sol_1[:,frame], limo_1.robot_ray, 'y', fill=0)
-    limo_2.plot_robot(x_sol_2[:,frame], limo_2.robot_ray, 'g', fill=0)
-    if frame>limo_0.N:
-        ax.plot(x_des_center[0,frame-limo_0.N], x_des_center[1,frame-limo_0.N], 'x-')
-        circle = Circle(x_des_center[:2,frame-limo_0.N], r, fill=False)
-        ax.add_patch(circle)
+    ax.plot(t[0,frame],  t[1,frame],  'o-', label='target', alpha=1)
+    ax.plot(c[0,frame],  c[1,frame],  'x-', alpha=0.5)
+    ax.plot(p0[0,frame], p0[1,frame], 'o-', label='limo 0', alpha=0.5)
+    ax.plot(p1[0,frame], p1[1,frame], 'o-', label='limo 1', alpha=0.5)
+    ax.plot(p2[0,frame], p2[1,frame], 'o-', label='limo 2', alpha=0.5)
+    circle = Circle(c[:2,frame], conf_limo.r_circle, fill=False)
+    ax.add_patch(circle)
+    ax.set_xlim([1, 10])
+    ax.set_ylim([-1, 3])
+    plt.grid(True)
+    ax.legend()
+    plt.gca().set_aspect('equal')
 
 draw_static()
-limo_0.plot_robot(limo_0.x_init, limo_0.robot_ray, 'b')
-limo_1.plot_robot(limo_1.x_init, limo_1.robot_ray, 'b')
-limo_2.plot_robot(limo_2.x_init, limo_2.robot_ray, 'b')
 ani = FuncAnimation(fig, update, frames=N_sim, interval=100)
 plt.show()
-'''

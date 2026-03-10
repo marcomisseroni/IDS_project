@@ -184,91 +184,92 @@ class MPC:
 #    | |  __/\__ \ |_ 
 #    |_|\___||___/\__|
 
+if __name__ == "__main__":
 
-N_sim = 500
-# raidus of the circle around the central position
-r = limo.r_circle
-dt = 0.01
+    N_sim = 500
+    # raidus of the circle around the central position
+    r = limo.r_circle
+    dt = 0.01
 
-# limo 0
-x0_init = [-r,0,0]
-limo_0 = MPC(x0_init,dt)
-x_sol_0 = np.zeros((limo_0.nx,N_sim))
-u_sol_0 = np.zeros((limo_0.nu,N_sim))
-limo_0.create_OCP_problem()
+    # limo 0
+    x0_init = [-r,0,0]
+    limo_0 = MPC(x0_init,dt)
+    x_sol_0 = np.zeros((limo_0.nx,N_sim))
+    u_sol_0 = np.zeros((limo_0.nu,N_sim))
+    limo_0.create_OCP_problem()
 
-# limo 1
-x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
-limo_1 = MPC(x1_init,dt)
-x_sol_1 = np.zeros((limo_1.nx,N_sim))
-u_sol_1 = np.zeros((limo_1.nu,N_sim))
-limo_1.create_OCP_problem()
+    # limo 1
+    x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
+    limo_1 = MPC(x1_init,dt)
+    x_sol_1 = np.zeros((limo_1.nx,N_sim))
+    u_sol_1 = np.zeros((limo_1.nu,N_sim))
+    limo_1.create_OCP_problem()
 
-# limo 2
-x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
-limo_2 = MPC(x2_init,dt)
-x_sol_2 = np.zeros((limo_2.nx,N_sim))
-u_sol_2 = np.zeros((limo_2.nu,N_sim))
-limo_2.create_OCP_problem()
+    # limo 2
+    x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
+    limo_2 = MPC(x2_init,dt)
+    x_sol_2 = np.zeros((limo_2.nx,N_sim))
+    u_sol_2 = np.zeros((limo_2.nu,N_sim))
+    limo_2.create_OCP_problem()
 
-# first desired positions and warm start
-x_des_0_init = [x0_init[0]+0.1, x0_init[1], 0]
-x_des_1_init = [x1_init[0]+0.1, x1_init[1], 0]
-x_des_2_init = [x2_init[0]+0.1, x2_init[1], 0]
-sol0 = limo_0.warm_start(x_des_0_init, x1_init, x2_init, r)
-sol1 = limo_1.warm_start(x_des_1_init, x0_init, x2_init, r)
-sol2 = limo_2.warm_start(x_des_2_init, x0_init, x1_init, r)
+    # first desired positions and warm start
+    x_des_0_init = [x0_init[0]+0.1, x0_init[1], 0]
+    x_des_1_init = [x1_init[0]+0.1, x1_init[1], 0]
+    x_des_2_init = [x2_init[0]+0.1, x2_init[1], 0]
+    sol0 = limo_0.warm_start(x_des_0_init, x1_init, x2_init, r)
+    sol1 = limo_1.warm_start(x_des_1_init, x0_init, x2_init, r)
+    sol2 = limo_2.warm_start(x_des_2_init, x0_init, x1_init, r)
 
-# initializing the states
-x0 = x0_init
-x1 = x1_init
-x2 = x2_init
+    # initializing the states
+    x0 = x0_init
+    x1 = x1_init
+    x2 = x2_init
 
-x_des_center = np.zeros((3,N_sim))
+    x_des_center = np.zeros((3,N_sim))
 
-# MPC loop
-for i in range(N_sim):
-    # desired central position
-    x_des_center[:,i] = [0.1+0.005*i, 0.2*np.cos(i/50), 0]
+    # MPC loop
+    for i in range(N_sim):
+        # desired central position
+        x_des_center[:,i] = [0.1+0.005*i, 0.2*np.cos(i/50), 0]
 
-    #solving the MPC step
-    sol0, x0 = limo_0.MPC_step(sol0, x0, x_des_center[:,i], x1, x2, r)
-    sol1, x1 = limo_1.MPC_step(sol1, x1, x_des_center[:,i], x0, x2, r)
-    sol2, x2 = limo_2.MPC_step(sol2, x2, x_des_center[:,i], x0, x1, r)
+        #solving the MPC step
+        sol0, x0 = limo_0.MPC_step(sol0, x0, x_des_center[:,i], x1, x2, r)
+        sol1, x1 = limo_1.MPC_step(sol1, x1, x_des_center[:,i], x0, x2, r)
+        sol2, x2 = limo_2.MPC_step(sol2, x2, x_des_center[:,i], x0, x1, r)
 
-    # saving the results for plotting
-    x_sol_0[:,i] = sol0.value(limo_0.X[0])
-    u_sol_0[:,i] = sol0.value(limo_0.U[0])
-    x_sol_1[:,i] = sol1.value(limo_1.X[0])
-    u_sol_1[:,i] = sol1.value(limo_1.U[0])
-    x_sol_2[:,i] = sol2.value(limo_2.X[0])
-    u_sol_2[:,i] = sol2.value(limo_2.U[0])
-    print("step",i,"inputs:",u_sol_0[:,i],u_sol_1[:,i],u_sol_2[:,i])
+        # saving the results for plotting
+        x_sol_0[:,i] = sol0.value(limo_0.X[0])
+        u_sol_0[:,i] = sol0.value(limo_0.U[0])
+        x_sol_1[:,i] = sol1.value(limo_1.X[0])
+        u_sol_1[:,i] = sol1.value(limo_1.U[0])
+        x_sol_2[:,i] = sol2.value(limo_2.X[0])
+        u_sol_2[:,i] = sol2.value(limo_2.U[0])
+        print("step",i,"inputs:",u_sol_0[:,i],u_sol_1[:,i],u_sol_2[:,i])
 
 
-# PLOT
-fig, ax = plt.subplots(figsize=(10, 4))
-def draw_static():
-    ax.plot(x_sol_0[0,:], x_sol_0[1,:], 'x-', label='x0', alpha=0.7)
-    ax.plot(x_sol_1[0,:], x_sol_1[1,:], 'x-', label='x1', alpha=0.7)
-    ax.plot(x_sol_2[0,:], x_sol_2[1,:], 'x-', label='x2', alpha=0.7)
-    ax.plot(x_des_center[0,:], x_des_center[1,:], 'x-', label='x_des_center', alpha=0.7)
-    ax.legend()
+    # PLOT
+    fig, ax = plt.subplots(figsize=(10, 4))
+    def draw_static():
+        ax.plot(x_sol_0[0,:], x_sol_0[1,:], 'x-', label='x0', alpha=0.7)
+        ax.plot(x_sol_1[0,:], x_sol_1[1,:], 'x-', label='x1', alpha=0.7)
+        ax.plot(x_sol_2[0,:], x_sol_2[1,:], 'x-', label='x2', alpha=0.7)
+        ax.plot(x_des_center[0,:], x_des_center[1,:], 'x-', label='x_des_center', alpha=0.7)
+        ax.legend()
 
-def update(frame):
-    ax.cla()
+    def update(frame):
+        ax.cla()
+        draw_static()
+        limo_0.plot_robot(x_sol_0[:,frame], limo_0.robot_ray, 'b', fill=0)
+        limo_1.plot_robot(x_sol_1[:,frame], limo_1.robot_ray, 'y', fill=0)
+        limo_2.plot_robot(x_sol_2[:,frame], limo_2.robot_ray, 'g', fill=0)
+        if frame>limo_0.N:
+            ax.plot(x_des_center[0,frame-limo_0.N], x_des_center[1,frame-limo_0.N], 'x-')
+            circle = Circle(x_des_center[:2,frame-limo_0.N], r, fill=False)
+            ax.add_patch(circle)
+
     draw_static()
-    limo_0.plot_robot(x_sol_0[:,frame], limo_0.robot_ray, 'b', fill=0)
-    limo_1.plot_robot(x_sol_1[:,frame], limo_1.robot_ray, 'y', fill=0)
-    limo_2.plot_robot(x_sol_2[:,frame], limo_2.robot_ray, 'g', fill=0)
-    if frame>limo_0.N:
-        ax.plot(x_des_center[0,frame-limo_0.N], x_des_center[1,frame-limo_0.N], 'x-')
-        circle = Circle(x_des_center[:2,frame-limo_0.N], r, fill=False)
-        ax.add_patch(circle)
-
-draw_static()
-limo_0.plot_robot(limo_0.x_init, limo_0.robot_ray, 'b')
-limo_1.plot_robot(limo_1.x_init, limo_1.robot_ray, 'b')
-limo_2.plot_robot(limo_2.x_init, limo_2.robot_ray, 'b')
-ani = FuncAnimation(fig, update, frames=N_sim, interval=100)
-plt.show()
+    limo_0.plot_robot(limo_0.x_init, limo_0.robot_ray, 'b')
+    limo_1.plot_robot(limo_1.x_init, limo_1.robot_ray, 'b')
+    limo_2.plot_robot(limo_2.x_init, limo_2.robot_ray, 'b')
+    ani = FuncAnimation(fig, update, frames=N_sim, interval=100)
+    plt.show()
