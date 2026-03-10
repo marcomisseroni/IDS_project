@@ -16,13 +16,13 @@ class MPC:
 #  _| |_| | | | | |_| | (_| | | |/ / (_| | |_| | (_) | | | |
 # |_____|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_|                                                          
                                                                                                        
-    def __init__(self, x_init):
+    def __init__(self, x_init, dt):
         # states and inputs size
         self.nx = 3 # size of state vector x = [x,y,theta]
         self.nu = 2 # size of control vector u = [v, w]
 
         # MPC settings
-        self.dt_MPC = 0.010 # time step MPC
+        self.dt_MPC = dt # time step MPC
         self.N = 10  # time horizon MPC
 
         # create the dynamics function
@@ -82,11 +82,8 @@ class MPC:
             # dynamics contraint
             self.opti.subject_to(self.X[k+1] == self.X[k] + self.dt_MPC * self.f(self.X[k], self.U[k]))
 
-        # Terminal cost on the desired position (only x and y components)
-        #cost += self.w_p * (self.X[-1][:2] - self.param_x_des[:2]).T @ (self.X[-1][:2] - self.param_x_des[:2])
-
-        # terminal cost on the distance from the central position (only x and y components)
-        cost += self.w_p * ( (self.X[-1][0]-self.param_x_des[0])**2 + (self.X[-1][1]-self.param_x_des[1])**2 - self.param_r**2 )
+        # cost on the desired position (only x and y components)
+        cost += self.w_p * (self.X[k][:2] - self.param_x_des[:2]).T @ (self.X[k][:2] - self.param_x_des[:2])  
 
         # Final velocity cost
         cost += self.w_final_v * self.X[-1].T @ self.X[-1]
@@ -190,25 +187,26 @@ class MPC:
 
 N_sim = 500
 # raidus of the circle around the central position
-r = 0.5
+r = limo.r_circle
+dt = 0.01
 
 # limo 0
-x0_init = [r,0,0]
-limo_0 = MPC(x0_init)
+x0_init = [-r,0,0]
+limo_0 = MPC(x0_init,dt)
 x_sol_0 = np.zeros((limo_0.nx,N_sim))
 u_sol_0 = np.zeros((limo_0.nu,N_sim))
 limo_0.create_OCP_problem()
 
 # limo 1
 x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
-limo_1 = MPC(x1_init)
+limo_1 = MPC(x1_init,dt)
 x_sol_1 = np.zeros((limo_1.nx,N_sim))
 u_sol_1 = np.zeros((limo_1.nu,N_sim))
 limo_1.create_OCP_problem()
 
 # limo 2
 x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
-limo_2 = MPC(x2_init)
+limo_2 = MPC(x2_init,dt)
 x_sol_2 = np.zeros((limo_2.nx,N_sim))
 u_sol_2 = np.zeros((limo_2.nu,N_sim))
 limo_2.create_OCP_problem()

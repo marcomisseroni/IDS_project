@@ -42,7 +42,7 @@ class data_sim:
 
         if flag == "dth":
             target_pos[0] = np.sqrt((self.x_pos[i] - state[0]) ** 2 + (self.y_pos[i] - state[1]) ** 2)
-            target_pos[1] = np.atan2(self.y_pos[i] - state[1], self.x_pos[i] - state[0])
+            target_pos[1] = np.arctan2(self.y_pos[i] - state[1], self.x_pos[i] - state[0])
 
         return target_pos + noise
 
@@ -53,7 +53,7 @@ class data_sim:
 
     def prop_sensors(self, state, des_pos):
         noise = np.random.normal(0, self.std)
-        dtheta = np.atan2(des_pos[1] - state[1], des_pos[0] - state[0]) - state[2]
+        dtheta = np.arctan2(des_pos[1] - state[1], des_pos[0] - state[0]) - state[2]
         delta = np.sqrt((des_pos[0] - state[0]) ** 2 + (des_pos[1] - state[1]) ** 2)
         v = delta / self.dt
         w = dtheta / self.dt
@@ -63,7 +63,7 @@ class data_sim:
     
     def input(self, state, des_pos):
         noise = np.random.normal(0, self.std, 2)
-        dtheta = np.atan2(des_pos[1] - state[1], des_pos[0] - state[0]) - state[2]
+        dtheta = np.arctan2(des_pos[1] - state[1], des_pos[0] - state[0]) - state[2]
         delta = np.sqrt((des_pos[0] - state[0]) ** 2 + (des_pos[1] - state[1]) ** 2)
         v = delta / self.dt
         w = dtheta / self.dt
@@ -77,7 +77,7 @@ class data_sim:
         noise = np.random.normal(0, self.std)
         w_l = np.round((v - w * self.b / 2) / self.r)
         w_r = np.round((v + w * self.b / 2) / self.r)
-        return np.array([w_l, w_r]) + np.array([0, 0, noise])
+        return np.array([w_l, w_r])
     
 
 

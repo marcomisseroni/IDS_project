@@ -25,3 +25,7 @@ w_min = -4*v_max/b
 R = np.identity(3) * 0.01
 # model covariance
 Q = np.identity(3) * 0.001
+# distance between target and center
+dist = 1.5
+# raidus of the circle around the central position
+r_circle = 0.5

@@ -8,7 +8,7 @@ TO DOs - simulation implementation
 - Control algorithm using MPC to move to the desired position
 
 MPC TODOS:
-- Obstacle avoidance
+- Obstacle avoidance (with the other limos too)
 - real time function implementation
 
 
@@ -20,3 +20,6 @@ ACTUAL FLOW FOR SIMULATION:
     - Solve MPC step (using last step measurements)-> each limo obtain its target position and the inputs [v, w] to reach it
     - Convert [v, w] in [w_r, w_l, w_imu] and apply the prediction step of the EKF
     - Collect lidar reading [x, y, theta] for each limo and compute the update step of the EKF
+
+TO ASK:
+    - Jacobian of f in respect to the noises (noise of the encoders on on differentiated values)
