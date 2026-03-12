@@ -14,12 +14,19 @@ MPC TODOS:
 
 ACTUAL FLOW FOR SIMULATION:
 - Before the cycle generate the target trajectory, then repeat:
-    - Collect data from camera to locate target 
-    - Calculate the average of the 3 positions of the target (maybe not simple average but weighted on the P matrix of each limo)
-    - Compute the center of the formation (point on the line from old center to target position at a decided distance)
-    - Solve MPC step (using last step measurements)-> each limo obtain its target position and the inputs [v, w] to reach it
-    - Convert [v, w] in [w_r, w_l, w_imu] and apply the prediction step of the EKF
-    - Collect lidar reading [x, y, theta] for each limo and compute the update step of the EKF
+    1) Collect data from camera to locate target 
+    2) Calculate the average of the 3 positions of the target (maybe not simple average but weighted on the P matrix of each limo)
+    3) Compute the center of the formation (point on the line from old center to target position at a decided distance)
+    4) Compute the 3 available positions for each limo
+    5) Assign the desired position to each limo
+    6) Solve MPC step (using last step measurements)-> each limo obtain its target position and the inputs [v, w] to reach it
+    7) Convert [v, w] in [w_r, w_l, w_imu] and apply the prediction step of the EKF
+    8) Collect lidar reading [x, y, theta] for each limo and compute the update step of the EKF
+
+OPERATIONS FROM MAIN:
+- 1
+- 2-3-4-5 using desires_pos method of Limo's class
+- 6-7-8 using update method of Limo's class
 
 TO ASK:
     - Jacobian of f in respect to the noises (noise of the encoders on on differentiated values)
