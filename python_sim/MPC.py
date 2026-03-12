@@ -186,7 +186,7 @@ class MPC:
 
 if __name__ == "__main__":
 
-    N_sim = 500
+    N_sim = limo.N_sim
     # raidus of the circle around the central position
     r = limo.r_circle
     dt = 0.01

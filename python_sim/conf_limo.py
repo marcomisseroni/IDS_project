@@ -29,3 +29,5 @@ Q = np.identity(3) * 0.001
 dist = 1.5
 # raidus of the circle around the central position
 r_circle = 0.5
+# simulation steps for MPC
+N_sim = 500

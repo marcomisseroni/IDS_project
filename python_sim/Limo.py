@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import time
 import conf_limo
@@ -20,6 +21,8 @@ class Limo:
         # create the MPC object
         self.mpc = MPC.MPC(state_init,self.dt)
         self.mpc.create_OCP_problem()
+        self.sol = np.zeros(conf_limo.N_sim)
+        self.r = conf_limo.r
 
     def desired_pos(self, target_meas, target_1, target_2, state_1, state_2):
         # best target estimation --> to improve with the variances
@@ -44,13 +47,30 @@ class Limo:
         # - p2: rotated by 120° counterclockwise
         alpha2 = alpha0 - np.pi*2/3
         p2 = np.array([self.center[0]+conf_limo.r_circle*np.cos(alpha2), self.center[1]+conf_limo.r_circle*np.sin(alpha2)])
-        return p0, p1, p2, self.center
+
+        # -------------- choice of the position of each limo -----------------
+        positions = np.array([p0, p1, p2])
+        limo_positions = np.array([self.ekf.state[:2], state_1[:2], state_2[:2]])
+        cost_matrix = np.zeros((3, 3))
+        for i in range(3):
+            for j in range(3):
+                cost_matrix[i, j] = np.linalg.norm(limo_positions[i] - positions[j])
+
+        # solve the assignment problem: rows vector contains the limo indices, cols vector contains the position indices
+        # example: rows = [0, 1, 2], cols = [2, 0, 1] so limo0 --> p2, limo1 --> p0, limo2 --> p1
+        rows, cols = linear_sum_assignment(cost_matrix)
+
+        return p0, p1, p2, self.center, positions[cols[0]]
 
 
-    #def update(self, state_1, state_2):
+    def mpc_sim(self, state_1, state_2, desired_state):
+        self.sol, state = self.mpc.MPC_step(self.sol, self.ekf.state, desired_state, state_1, state_2, self.r)
+        inputs = self.sol.value(self.mpc.U[0])
+        return inputs
+    
+    def ekf_step(self, w_enc_r, w_enc_l, w_imu, lidar_meas):
+        self.ekf.predict(w_enc_r, w_enc_l, w_imu)
+        self.ekf.update(lidar_meas)
+        return self.ekf.state
 
         
-
- 
-
-

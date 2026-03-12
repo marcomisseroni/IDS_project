@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
 
-N_sim = 100
+N_sim = conf_limo.N_sim
 dt = 0.1
 limo0 = Limo.Limo(np.array([0,0,0]), np.array([2,2]))
 sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
@@ -24,7 +24,7 @@ for i in range(N_sim):
     target2 = sim.absolute_target_pos(i)
     t[:,i] = (target0 + target1 + target2) / 3
     # computation of the desired limo position
-    p0[:,i], p1[:,i], p2[:,i], c[:,i] = limo0.desired_pos(target0, target1, target2, 0, 0)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], s_des = limo0.desired_pos(target0, target1, target2, np.array([0, 0]), np.array([0, 0]))
 
 
 # PLOT
