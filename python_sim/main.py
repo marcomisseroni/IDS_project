@@ -6,11 +6,15 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
 
+print("Starting simulation...")
+
 N_sim = conf_limo.N_sim
 dt = 0.1
 r = conf_limo.r_circle
 sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
 target_init = np.array([sim.absolute_target_pos(0)])
+
+print("Initializing limo 0...")
 
 # limo 0
 x0_init = [r,0,0]
@@ -19,6 +23,8 @@ x_sol_0 = np.zeros((limo_0.mpc.nx,N_sim))
 u_sol_0 = np.zeros((limo_0.mpc.nu,N_sim))
 limo_0.mpc.create_OCP_problem()
 
+print("Initializing limo 1...")
+
 # limo 1
 x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
 limo_1 = Limo.Limo(x1_init, target_init)
@@ -26,12 +32,16 @@ x_sol_1 = np.zeros((limo_1.mpc.nx,N_sim))
 u_sol_1 = np.zeros((limo_1.mpc.nu,N_sim))
 limo_1.mpc.create_OCP_problem()
 
+print("Initializing limo 2...")
+
 # limo 2
 x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
 limo_2 = Limo.Limo(x2_init, target_init)
 x_sol_2 = np.zeros((limo_2.mpc.nx,N_sim))
 u_sol_2 = np.zeros((limo_2.mpc.nu,N_sim))
 limo_2.mpc.create_OCP_problem()
+
+print("Warm start for the MPC")
 
 # Warm start
 limo_0.sol = limo_0.mpc.warm_start(x0_init, x1_init, x2_init, conf_limo.r_collision)
@@ -47,25 +57,32 @@ state0 = np.zeros((3, N_sim))
 state1 = np.zeros((3, N_sim))
 state2 = np.zeros((3, N_sim))
 
+print("Starting MPC loop...")
+
 for i in range(N_sim):
-    print(i)
+    print("iteration ", i, " / ", N_sim)
+    print("Simulate camera readings...")
     # sim of the three target measures
     target0 = sim.absolute_target_pos(i)
     target1 = sim.absolute_target_pos(i)
     target2 = sim.absolute_target_pos(i)
     t[:,i] = (target0 + target1 + target2) / 3
+    print("Compute desired positions for each limo...")
     # computation of the desired limo position
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target0, target1, target2, limo_1.ekf.state, limo_2.ekf.state)
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target1, target0, target2, limo_0.ekf.state, limo_2.ekf.state)
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target2, target0, target1, limo_0.ekf.state, limo_1.ekf.state)
+    print("Perform MPC step...")
     # MPC for each limo to compute inputs for desired position
     in0 = limo_0.mpc_sim(limo_1.ekf.state, limo_2.ekf.state, x0_des)
     in1 = limo_1.mpc_sim(limo_0.ekf.state, limo_2.ekf.state, x1_des)
     in2 = limo_2.mpc_sim(limo_0.ekf.state, limo_1.ekf.state, x2_des)
     # ekf
+    print("Simulate encoder readings...")
     enc0 = sim.sensors_from_input(in0)
     enc1 = sim.sensors_from_input(in1)
     enc2 = sim.sensors_from_input(in2)
+    print("Simulate lidar readings and perform EKF step...")
     lid_meas0 = sim.ext_sensors(limo_0.ekf.state)
     lid_meas1 = sim.ext_sensors(limo_1.ekf.state)
     lid_meas2 = sim.ext_sensors(limo_2.ekf.state)
@@ -98,8 +115,8 @@ def update(frame):
     limo_0.mpc.plot_robot(state0[:,frame], limo_0.mpc.robot_ray, 'b', fill=0)
     limo_1.mpc.plot_robot(state1[:,frame], limo_1.mpc.robot_ray, 'y', fill=0)
     limo_2.mpc.plot_robot(state2[:,frame], limo_2.mpc.robot_ray, 'g', fill=0)
-    ax.set_xlim([-2, 10])
-    ax.set_ylim([-1, 3])
+    ax.set_xlim([-1, 10])
+    ax.set_ylim([-3, 3])
     plt.grid(True)
     ax.legend()
     plt.gca().set_aspect('equal')
