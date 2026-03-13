@@ -73,7 +73,9 @@ class data_sim:
         noise = np.random.normal(0, self.std, 3)
         return state + noise
     
-    def sensors_from_input(self, v, w):
+    def sensors_from_input(self, inputs):
+        v = inputs[0]
+        w = inputs[1]
         noise = np.random.normal(0, self.std)
         w_l = np.round((v - w * self.b / 2) / self.r)
         w_r = np.round((v + w * self.b / 2) / self.r)

@@ -68,7 +68,9 @@ class Limo:
         inputs = self.sol.value(self.mpc.U[0])
         return inputs
     
-    def ekf_step(self, w_enc_r, w_enc_l, w_imu, lidar_meas):
+    def ekf_step(self, w_enc, w_imu, lidar_meas):
+        w_enc_r = w_enc[1]
+        w_enc_l = w_enc[0]
         self.ekf.predict(w_enc_r, w_enc_l, w_imu)
         self.ekf.update(lidar_meas)
         return self.ekf.state
