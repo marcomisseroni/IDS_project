@@ -13,23 +13,23 @@ r = conf_limo.r_circle
 # limo 0
 x0_init = [-r,0,0]
 limo_0 = Limo.Limo(x0_init, np.array([2,2]))
-x_sol_0 = np.zeros((limo_0.nx,N_sim))
-u_sol_0 = np.zeros((limo_0.nu,N_sim))
-limo_0.create_OCP_problem()
+x_sol_0 = np.zeros((limo_0.mpc.nx,N_sim))
+u_sol_0 = np.zeros((limo_0.mpc.nu,N_sim))
+limo_0.mpc.create_OCP_problem()
 
 # limo 1
 x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
 limo_1 = Limo.Limo(x1_init, np.array([2,2]))
-x_sol_1 = np.zeros((limo_1.nx,N_sim))
-u_sol_1 = np.zeros((limo_1.nu,N_sim))
-limo_1.create_OCP_problem()
+x_sol_1 = np.zeros((limo_1.mpc.nx,N_sim))
+u_sol_1 = np.zeros((limo_1.mpc.nu,N_sim))
+limo_1.mpc.create_OCP_problem()
 
 # limo 2
 x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
 limo_2 = Limo.Limo(x2_init, np.array([2,2]))
-x_sol_2 = np.zeros((limo_2.nx,N_sim))
-u_sol_2 = np.zeros((limo_2.nu,N_sim))
-limo_2.create_OCP_problem()
+x_sol_2 = np.zeros((limo_2.mpc.nx,N_sim))
+u_sol_2 = np.zeros((limo_2.mpc.nu,N_sim))
+limo_2.mpc.create_OCP_problem()
 
 sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
 
