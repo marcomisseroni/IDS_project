@@ -17,10 +17,10 @@ w = 0.2
 r_collision = 0.2
 # limo max speed (in datasheet 1m/s)
 v_max = 1
-v_min = -1
+v_min = -0.1
 # limo max yaw rate 2*v_max/(b/2)
-w_max = 4*v_max/b
-w_min = -4*v_max/b
+w_max = 0.1*4*v_max/b
+w_min = -0.1*4*v_max/b
 # lidar covariance
 R = np.identity(3) * 0.01
 # model covariance
@@ -30,4 +30,4 @@ dist = 1.5
 # raidus of the circle around the central position
 r_circle = 0.5
 # simulation steps for MPC
-N_sim = 500
+N_sim = 100

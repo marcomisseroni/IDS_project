@@ -40,10 +40,10 @@ class MPC:
         self.robot_ray = limo.r_collision       # ray of the robot used for visualization
 
         # OCP weigths
-        self.w_p = 1e5 # final position weigth
+        self.w_p = 1e4 # final position weigth
         self.w_v = 1e-2 # velocity weight
         self.w_final_v = 1e-2 # final velocity cost weight
-        self.w_dist = 0 # weigth on the limo distance
+        self.w_a = 1e1 # weigth on the angle of the limo in respect to the target
 
 #   ____   _____ _____             _               
 #  / __ \ / ____|  __ \           | |              
@@ -83,14 +83,14 @@ class MPC:
             self.opti.subject_to(self.X[k+1] == self.X[k] + self.dt_MPC * self.f(self.X[k], self.U[k]))
 
         # cost on the desired position (only x and y components)
-        cost += self.w_p * (self.X[k][:2] - self.param_x_des[:2]).T @ (self.X[k][:2] - self.param_x_des[:2])  
-
+        cost += self.w_p * (self.X[k][:2] - self.param_x_des[:2]).T @ (self.X[k][:2] - self.param_x_des[:2])
+        
         # Final velocity cost
         cost += self.w_final_v * self.X[-1].T @ self.X[-1]
 
-        # distance from the other two limo cost
-        cost -= self.w_dist * ( (self.X[1][0]-self.param_x1[0])**2 + (self.X[1][1]-self.param_x1[1])**2 )
-        cost -= self.w_dist * ( (self.X[1][0]-self.param_x2[0])**2 + (self.X[1][1]-self.param_x2[1])**2 )
+        # no collision constraint
+        self.opti.subject_to((self.X[1][0]-self.param_x1[0])**2 + (self.X[1][1]-self.param_x1[1])**2 > (2*self.param_r)**2)
+        self.opti.subject_to((self.X[1][0]-self.param_x2[0])**2 + (self.X[1][1]-self.param_x2[1])**2 > (2*self.param_r)**2)
 
         self.opti.minimize(cost)
 
@@ -118,7 +118,7 @@ class MPC:
         self.opti.set_value(self.param_x2, x2)
         sol = self.opti.solve()
         # setting the max iter to the lower number for all other optimizations
-        self.opts["ipopt.max_iter"] = 5
+        self.opts["ipopt.max_iter"] = 10
         self.opti.solver("ipopt", self.opts)
         return sol
 
