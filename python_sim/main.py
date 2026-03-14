@@ -5,6 +5,7 @@ import conf_limo
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
+from matplotlib.patches import Rectangle
 
 print("Starting simulation...")
 
@@ -44,9 +45,9 @@ limo_2.mpc.create_OCP_problem()
 print("Warm start for the MPC")
 
 # Warm start
-limo_0.sol = limo_0.mpc.warm_start(x0_init, x1_init, x2_init, conf_limo.r_collision)
-limo_1.sol = limo_1.mpc.warm_start(x1_init, x0_init, x2_init, conf_limo.r_collision)
-limo_2.sol = limo_2.mpc.warm_start(x2_init, x0_init, x1_init, conf_limo.r_collision)
+limo_0.sol = limo_0.mpc.warm_start(x0_init, x1_init, x2_init, conf_limo.r_collision, target_init)
+limo_1.sol = limo_1.mpc.warm_start(x1_init, x0_init, x2_init, conf_limo.r_collision, target_init)
+limo_2.sol = limo_2.mpc.warm_start(x2_init, x0_init, x1_init, conf_limo.r_collision, target_init)
 
 p0 = np.zeros((2, N_sim))
 p1 = np.zeros((2, N_sim))
@@ -56,6 +57,9 @@ c = np.zeros((2, N_sim))
 state0 = np.zeros((3, N_sim))
 state1 = np.zeros((3, N_sim))
 state2 = np.zeros((3, N_sim))
+input0 = np.zeros((2, N_sim))
+input1 = np.zeros((2, N_sim))
+input2 = np.zeros((2, N_sim))
 
 print("Starting MPC loop...")
 
@@ -82,7 +86,7 @@ for i in range(N_sim):
     enc0 = sim.sensors_from_input(in0)
     enc1 = sim.sensors_from_input(in1)
     enc2 = sim.sensors_from_input(in2)
-    print("Simulate lidar readings and perform EKF step...")
+    print("Simulate lidar readings and perform EKF step...\n")
     lid_meas0 = sim.ext_sensors(limo_0.ekf.state)
     lid_meas1 = sim.ext_sensors(limo_1.ekf.state)
     lid_meas2 = sim.ext_sensors(limo_2.ekf.state)
@@ -94,10 +98,16 @@ for i in range(N_sim):
     state0[:,i] = limo_0.ekf.state
     state1[:,i] = limo_1.ekf.state
     state2[:,i] = limo_2.ekf.state
-
+    # inputs
+    input0[:,i] = in0
+    input1[:,i] = in1
+    input2[:,i] = in2
 
 # PLOT
 fig, ax = plt.subplots(figsize=(10, 4))
+txt0 = ax.text(0.02, 0.95, '', transform=ax.transAxes)
+txt1 = ax.text(0.02, 0.90, '', transform=ax.transAxes)
+txt2 = ax.text(0.02, 0.85, '', transform=ax.transAxes)
 def draw_static():
     ax.plot(t[0,:], t[1,:], 'x-', alpha=0.7)
 
@@ -106,17 +116,19 @@ def update(frame):
     draw_static()
     ax.plot(t[0,frame],  t[1,frame],  'o-', label='target', alpha=1)
     ax.plot(c[0,frame],  c[1,frame],  'x-', alpha=0.5)
-    ax.plot(p0[0,frame], p0[1,frame], 'o-', label='p 0', alpha=0.5)
-    ax.plot(p1[0,frame], p1[1,frame], 'o-', label='p 1', alpha=0.5)
-    ax.plot(p2[0,frame], p2[1,frame], 'o-', label='p 2', alpha=0.5)
+    ax.plot(p0[0,frame], p0[1,frame], 'o-', alpha=0.5)
+    ax.plot(p1[0,frame], p1[1,frame], 'o-', alpha=0.5)
+    ax.plot(p2[0,frame], p2[1,frame], 'o-', alpha=0.5)
     circle = Circle(c[:2,frame], conf_limo.r_circle, fill=False)
     ax.add_patch(circle)
     # robot positions
     limo_0.mpc.plot_robot(state0[:,frame], limo_0.mpc.robot_ray, 'b', fill=0)
     limo_1.mpc.plot_robot(state1[:,frame], limo_1.mpc.robot_ray, 'y', fill=0)
     limo_2.mpc.plot_robot(state2[:,frame], limo_2.mpc.robot_ray, 'g', fill=0)
-    ax.set_xlim([-1, 10])
-    ax.set_ylim([-3, 3])
+    # text with input results
+    txt0 = ax.text(0.02, 0.95, f'u0 = {input0[0,frame]:.2f}', transform=ax.transAxes)
+    txt1 = ax.text(0.02, 0.90, f'u1 = {input1[0,frame]:.2f}', transform=ax.transAxes)
+    txt2 = ax.text(0.02, 0.85, f'u2 = {input2[0,frame]:.2f}', transform=ax.transAxes)
     plt.grid(True)
     ax.legend()
     plt.gca().set_aspect('equal')

@@ -64,7 +64,7 @@ class Limo:
 
 
     def mpc_sim(self, state_1, state_2, desired_state):
-        self.sol, state = self.mpc.MPC_step(self.sol, self.ekf.state, desired_state, state_1, state_2, self.r)
+        self.sol, state = self.mpc.MPC_step(self.sol, self.ekf.state, desired_state, state_1, state_2, self.r, self.target)
         inputs = self.sol.value(self.mpc.U[0])
         return inputs
     

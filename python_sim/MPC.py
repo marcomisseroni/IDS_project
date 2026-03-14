@@ -43,7 +43,7 @@ class MPC:
         self.w_p = 1e4 # final position weigth
         self.w_v = 1e-2 # velocity weight
         self.w_final_v = 1e-2 # final velocity cost weight
-        self.w_a = 1e1 # weigth on the angle of the limo in respect to the target
+        self.w_a = 1e-1 # weigth on the angle of the limo in respect to the target
 
 #   ____   _____ _____             _               
 #  / __ \ / ____|  __ \           | |              
@@ -58,6 +58,7 @@ class MPC:
         self.opti = cs.Opti()
         self.param_x_init = self.opti.parameter(self.nx)
         self.param_x_des = self.opti.parameter(self.nx)
+        self.param_x_target = self.opti.parameter(2)
         self.param_r = self.opti.parameter(1)
         # parameters for the other two limo positions
         self.param_x1 = self.opti.parameter(self.nx)
@@ -84,6 +85,8 @@ class MPC:
 
         # cost on the desired position (only x and y components)
         cost += self.w_p * (self.X[k][:2] - self.param_x_des[:2]).T @ (self.X[k][:2] - self.param_x_des[:2])
+        # cost on the desired angle
+        cost += self.w_a * (np.arctan2(self.param_x_target[1] - self.X[1][1], self.param_x_target[0] - self.X[1][0]) - self.X[1][2])**2
         
         # Final velocity cost
         cost += self.w_final_v * self.X[-1].T @ self.X[-1]
@@ -108,10 +111,11 @@ class MPC:
         self.opti.solver("ipopt", self.opts)
 
     # warm starting the solver to 
-    def warm_start(self, x_des, x1, x2, r):
+    def warm_start(self, x_des, x1, x2, r, target):
         # Solve the problem to convergence the first time
         self.opti.set_value(self.param_x_des, x_des)
         self.opti.set_value(self.param_x_init, self.x_init)
+        self.opti.set_value(self.param_x_target, target)
         self.opti.set_value(self.param_r, r)
         # other two limo initial position
         self.opti.set_value(self.param_x1, x1)
@@ -123,7 +127,7 @@ class MPC:
         return sol
 
                                                                                                    
-    def MPC_step(self, sol, x, x_des, x1, x2, r):
+    def MPC_step(self, sol, x, x_des, x1, x2, r, target):
         # use current solution as initial guess for next problem
         for t in range(self.N):
             # the values are shifted by 1 timestep
@@ -140,6 +144,7 @@ class MPC:
         
         self.opti.set_value(self.param_x_init, x)
         self.opti.set_value(self.param_x_des, x_des)
+        self.opti.set_value(self.param_x_target, target)
         self.opti.set_value(self.param_r, r)
         self.opti.set_value(self.param_x1, x1)
         self.opti.set_value(self.param_x2, x2)

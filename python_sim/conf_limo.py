@@ -17,7 +17,7 @@ w = 0.2
 r_collision = 0.2
 # limo max speed (in datasheet 1m/s)
 v_max = 1
-v_min = -0.1
+v_min = -1
 # limo max yaw rate 2*v_max/(b/2)
 w_max = 0.1*4*v_max/b
 w_min = -0.1*4*v_max/b
