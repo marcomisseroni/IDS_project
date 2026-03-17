@@ -56,7 +56,7 @@ class data_sim:
 
         return target_pos + noise
 
-    def absolute_target_pos(self, i):
+    def global_target_pos(self, i):
         target_pos = np.array([self.x_pos[i], self.y_pos[i]])
         noise = np.random.normal(0, self.std, 2)
         return target_pos + noise
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
     # Print for test
     print("Relative target position: ", ds.relative_target_pos(initial_state, 999, "xy"))
-    print("Absolute target position: ", ds.absolute_target_pos(999))
+    print("Absolute target position: ", ds.global_target_pos(999))
     print("Proprieceptive sensors: ", ds.prop_sensors(initial_state, des_pos))
     print("Exteroceptive sensors: ", ds.ext_sensors(des_pos))
     print("Input: ", ds.input(initial_state, des_pos))

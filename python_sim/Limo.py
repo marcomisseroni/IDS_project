@@ -23,6 +23,7 @@ class Limo:
         self.mpc.create_OCP_problem()
         self.sol = np.zeros(conf_limo.N_sim)
         self.r = conf_limo.r_collision
+        self.frame_movement = np.array([0,0])
 
     def desired_pos(self, target_meas, target_1, target_2, state_1, state_2):
         # best target estimation --> to improve with the variances
@@ -34,7 +35,10 @@ class Limo:
         # distance to move the center
         d = np.sqrt( (self.target[1]-self.center[1])**2 + (self.target[0]-self.center[0])**2 ) - conf_limo.dist
         # new center
+        old_center = self.center
         self.center = np.array([self.center[0]+d*np.cos(alpha), self.center[1]+d*np.sin(alpha)])
+
+        self.frame_movement = self.center[:2] - old_center[:2]
 
         # -------------- position of each limo -----------------
         # three possible positions
@@ -68,11 +72,8 @@ class Limo:
         inputs = self.sol.value(self.mpc.U[0])
         return inputs
     
-    def ekf_step(self, w_enc, w_imu, lidar_meas):
-        w_enc_r = w_enc[1]
-        w_enc_l = w_enc[0]
-        self.ekf.prediction_step(w_enc_r, w_enc_l, w_imu)
-        self.ekf.update_step(lidar_meas)
-        return self.ekf.state
+    def frame_update(self):
+        self.ekf.state[:2] -= self.frame_movement
+        self.center -= self.frame_movement
 
         

@@ -13,7 +13,8 @@ N_sim = conf_limo.N_sim
 dt = 0.1
 r = conf_limo.r_circle
 sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
-target_init = np.array([sim.absolute_target_pos(0)])
+target_init = np.array([sim.global_target_pos(0)])
+center_global = np.array([0.0 ,0.0])
 
 print("Initializing limo 0...")
 
@@ -67,15 +68,16 @@ for i in range(N_sim):
     print("iteration ", i, " / ", N_sim)
     print("Simulate camera readings...")
     # sim of the three target measures
-    target0 = sim.absolute_target_pos(i)
-    target1 = sim.absolute_target_pos(i)
-    target2 = sim.absolute_target_pos(i)
+    target0 = sim.global_target_pos(i)
+    target1 = sim.global_target_pos(i)
+    target2 = sim.global_target_pos(i)
     t[:,i] = (target0 + target1 + target2) / 3
     print("Compute desired positions for each limo...")
     # computation of the desired limo position
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target0, target1, target2, limo_1.ekf.state, limo_2.ekf.state)
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target1, target0, target2, limo_0.ekf.state, limo_2.ekf.state)
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target2, target0, target1, limo_0.ekf.state, limo_1.ekf.state)
+    center_global += limo_0.frame_movement
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target0-center_global, target1-center_global, target2-center_global, limo_1.ekf.state, limo_2.ekf.state)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target1-center_global, target0-center_global, target2-center_global, limo_0.ekf.state, limo_2.ekf.state)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target2-center_global, target0-center_global, target1-center_global, limo_0.ekf.state, limo_1.ekf.state)
     print("Perform MPC step...")
     # MPC for each limo to compute inputs for desired position
     in0 = limo_0.mpc_sim(limo_1.ekf.state, limo_2.ekf.state, x0_des)
@@ -86,18 +88,41 @@ for i in range(N_sim):
     enc0 = sim.sensors_from_input(in0)
     enc1 = sim.sensors_from_input(in1)
     enc2 = sim.sensors_from_input(in2)
+    print("Prediction step of the EKF...")
+    limo_0.ekf.prediction_step(enc0[1], enc0[0], in0[1])
+    limo_1.ekf.prediction_step(enc1[1], enc1[0], in1[1])
+    limo_2.ekf.prediction_step(enc2[1], enc2[0], in2[1])
     print("Simulate lidar readings and perform EKF step...\n")
     lid_meas0 = sim.ext_sensors(limo_0.ekf.state)
     lid_meas1 = sim.ext_sensors(limo_1.ekf.state)
     lid_meas2 = sim.ext_sensors(limo_2.ekf.state)
-    limo_0.ekf_step(enc0, in0[1], lid_meas0)
-    limo_1.ekf_step(enc1, in1[1], lid_meas1)
-    limo_2.ekf_step(enc2, in2[1], lid_meas2)
+    limo_0.ekf.update_step(lid_meas0)
+    limo_1.ekf.update_step(lid_meas1)
+    limo_2.ekf.update_step(lid_meas2)
+
+    # frame update
+    limo_0.frame_update()
+    limo_1.frame_update()
+    limo_2.frame_update()
 
     # data to plot
-    state0[:,i] = limo_0.ekf.state
-    state1[:,i] = limo_1.ekf.state
-    state2[:,i] = limo_2.ekf.state
+    p0[:,i] += center_global
+    p1[:,i] += center_global
+    p2[:,i] += center_global
+    c[:,i] += center_global
+    x0 = limo_0.ekf.state[0] + center_global[0]
+    y0 = limo_0.ekf.state[1] + center_global[1]
+    theta0 = limo_0.ekf.state[2]
+    x1 = limo_1.ekf.state[0] + center_global[0]
+    y1 = limo_1.ekf.state[1] + center_global[1]
+    theta1 = limo_1.ekf.state[2]
+    x2 = limo_2.ekf.state[0] + center_global[0]
+    y2 = limo_2.ekf.state[1] + center_global[1]
+    theta2 = limo_2.ekf.state[2]
+
+    state0[:,i] = np.array([x0, y0, theta0])
+    state1[:,i] = np.array([x1, y1, theta1])
+    state2[:,i] = np.array([x2, y2, theta2])
     # inputs
     input0[:,i] = in0
     input1[:,i] = in1
