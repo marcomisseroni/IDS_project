@@ -28,6 +28,3 @@ OPERATIONS FROM MAIN:
 - 2-3-4-5 using desires_pos method of Limo's class
 - 6 using mpc_sim
 - 7-8 in the main the conversion and both prediction and update step in ekf_step
-
-TO ASK:
-    - Jacobian of f in respect to the noises (noise of the encoders on on differentiated values)
