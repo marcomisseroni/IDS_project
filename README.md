@@ -1,2 +1,2 @@
 # IDS_project
-Project for the course of intelligent distributed systems
+Python simulation for the project of the course of intelligent distributed systems.
