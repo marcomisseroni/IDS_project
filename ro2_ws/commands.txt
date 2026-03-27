@@ -1,5 +1,5 @@
 To display the model generate by urdf file (not xacro) :
-ros2 launch urdf_tutorial display.launch.py model:=/home/marco/marco/uni/magistrale/ro2_ws/src/limo_robot/urdf/limo.urdf
+ros2 launch urdf_tutorial display.launch.py model:=<absolute_path/file_name.urdf>
 
 To create a PDF containing the frames of the robot:
 ros2 run tf2_tools view_frames
@@ -7,5 +7,5 @@ ros2 run tf2_tools view_frames
 To display the model generate by xacro file and urdf.xacro (execute in ros2_ws):
 1) Converts the xacro into a urdf file, giving the path to the urdf.xacro file
 2) Launch rviz using the urdf file generated before
-ros2 run xacro xacro -o /tmp/limo.urdf src/limo_robot/urdf/limo.urdf.xacro 
+ros2 run xacro xacro -o /tmp/limo.urdf <relative path/file_name.urdf.xacro>
 ros2 launch urdf_tutorial display.launch.py model:=/tmp/limo.urdf

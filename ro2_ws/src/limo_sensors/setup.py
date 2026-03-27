@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'limo_robot'
+package_name = 'limo_sensors'
 
 setup(
     name=package_name,
@@ -14,7 +14,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='marco',
-    maintainer_email='marco@todo.todo',
+    maintainer_email='marco.misseroni@studenti.unitn.it',
     description='TODO: Package description',
     license='TODO: License declaration',
     extras_require={
