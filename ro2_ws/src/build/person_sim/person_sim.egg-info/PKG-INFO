@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: person-sim
+Version: 0.0.0
+Summary: Node that simulates the position of a person
+Home-page: UNKNOWN
+Maintainer: marco
+Maintainer-email: marco.misseroni@studenti.unitn.it
+License: Apache-2.0
+Platform: UNKNOWN
+Provides-Extra: test
+
+UNKNOWN
+

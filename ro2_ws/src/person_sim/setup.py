@@ -15,8 +15,8 @@ setup(
     zip_safe=True,
     maintainer='marco',
     maintainer_email='marco.misseroni@studenti.unitn.it',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Node that simulates the position of a person',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'person_sim_node = person_sim.person_sim_node:main',
         ],
     },
 )
