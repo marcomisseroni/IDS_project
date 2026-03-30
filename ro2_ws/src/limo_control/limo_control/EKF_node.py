@@ -31,6 +31,7 @@ class EKF(Node):
         else:
             self.weight_enc = enc_weight
             self.weight_imu = imu_weight
+        # Define parameters
         self.v = 0
         self.yaw_rate = 0
         self.state = initial_state.copy()
@@ -44,6 +45,7 @@ class EKF(Node):
         self.R = R
         self.Q = Q
         self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
+        # Communication stuff
         self.publisher = self.create_publisher(Float64MultiArray, 'ekf_state', 10)
         self.subscription_e = self.create_subscription(Float64MultiArray, 'enc', self.enc_listener_callback, 10)
         self.subscription_i = self.create_subscription(Float64MultiArray, 'imu', self.imu_listener_callback, 10)
@@ -68,11 +70,12 @@ class EKF(Node):
         if not self.start:
             return
         msg = Float64MultiArray()
-        if self.new_enc_data and self.new_imu_data and self.new_lidar_data:
+        if self.new_enc_data and self.new_imu_data:
             self.prediction_step(self.enc_w, self.enc_v, self.imu_w)
-            self.update_step(self.lidar_meas)
             self.new_enc_data = False
             self.new_imu_data = False
+        if self.new_lidar_data:
+            self.update_step(self.lidar_meas)
             self.new_lidar_data = False
         msg.data = [self.state[0], self.state[1], self.state[2]]
         self.publisher.publish(msg)
@@ -149,7 +152,7 @@ def main(args=None):
     rclpy.init(args=args)
     R = np.diag([1, 1, 1])
     Q = np.diag([0.1, 0.1, 0.05])
-    ekf = EKF(enc_weight=0.5, imu_weight=0.5, initial_state=np.zeros(3), R=R, Q=Q)
+    ekf = EKF(enc_weight=0.5, imu_weight=0.5, initial_state=np.zeros(3), R=R, Q=Q, dt=0.3)
     rclpy.spin(ekf)
     ekf.destroy_node()
     rclpy.shutdown()
