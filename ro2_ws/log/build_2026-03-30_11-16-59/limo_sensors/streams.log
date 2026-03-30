@@ -1,0 +1,33 @@
+[1.204s] Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data
+[1.429s] running egg_info
+[1.430s] creating ../../build/limo_sensors/limo_sensors.egg-info
+[1.430s] writing ../../build/limo_sensors/limo_sensors.egg-info/PKG-INFO
+[1.431s] writing dependency_links to ../../build/limo_sensors/limo_sensors.egg-info/dependency_links.txt
+[1.431s] writing entry points to ../../build/limo_sensors/limo_sensors.egg-info/entry_points.txt
+[1.431s] writing requirements to ../../build/limo_sensors/limo_sensors.egg-info/requires.txt
+[1.431s] writing top-level names to ../../build/limo_sensors/limo_sensors.egg-info/top_level.txt
+[1.431s] writing manifest file '../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt'
+[1.433s] reading manifest file '../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt'
+[1.435s] writing manifest file '../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt'
+[1.435s] running build
+[1.435s] running build_py
+[1.435s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build
+[1.435s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build/lib
+[1.435s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build/lib/limo_sensors
+[1.435s] copying limo_sensors/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build/lib/limo_sensors
+[1.435s] running install
+[1.436s] running install_lib
+[1.437s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages/limo_sensors
+[1.437s] copying /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build/lib/limo_sensors/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages/limo_sensors
+[1.437s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages/limo_sensors/__init__.py to __init__.cpython-310.pyc
+[1.437s] running install_data
+[1.438s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/ament_index
+[1.438s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/ament_index/resource_index
+[1.438s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/ament_index/resource_index/packages
+[1.438s] copying resource/limo_sensors -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/ament_index/resource_index/packages
+[1.438s] copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors
+[1.438s] running install_egg_info
+[1.441s] Copying ../../build/limo_sensors/limo_sensors.egg-info to /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages/limo_sensors-0.0.0-py3.10.egg-info
+[1.442s] running install_scripts
+[1.469s] writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/install.log'
+[1.512s] Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data

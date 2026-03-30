@@ -1,0 +1,337 @@
+[0.071s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.071s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=8, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7997ef7526e0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7997ef8d7eb0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7997ef8d7eb0>>, mixin_verb=('build',))
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.176s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.176s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws'
+[0.176s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.177s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.184s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) by extensions ['ignore', 'ignore_ament_install']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) by extension 'ignore'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) ignored
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) by extensions ['ignore', 'ignore_ament_install']
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) by extension 'ignore'
+[0.185s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) ignored
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extensions ['ignore', 'ignore_ament_install']
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extension 'ignore'
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extension 'ignore_ament_install'
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extensions ['colcon_pkg']
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extension 'colcon_pkg'
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extensions ['colcon_meta']
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extension 'colcon_meta'
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extensions ['ros']
+[0.186s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_control) by extension 'ros'
+[0.188s] DEBUG:colcon.colcon_core.package_identification:Package 'src/limo_control' with type 'ros.ament_python' and name 'limo_control'
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extensions ['ignore', 'ignore_ament_install']
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extension 'ignore'
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extension 'ignore_ament_install'
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extensions ['colcon_pkg']
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extension 'colcon_pkg'
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extensions ['colcon_meta']
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extension 'colcon_meta'
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extensions ['ros']
+[0.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_description) by extension 'ros'
+[0.188s] DEBUG:colcon.colcon_core.package_identification:Package 'src/limo_description' with type 'ros.ament_python' and name 'limo_description'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extensions ['ignore', 'ignore_ament_install']
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extension 'ignore'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extension 'ignore_ament_install'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extensions ['colcon_pkg']
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extension 'colcon_pkg'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extensions ['colcon_meta']
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extension 'colcon_meta'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extensions ['ros']
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_gazebo) by extension 'ros'
+[0.189s] DEBUG:colcon.colcon_core.package_identification:Package 'src/limo_gazebo' with type 'ros.ament_python' and name 'limo_gazebo'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extensions ['ignore', 'ignore_ament_install']
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extension 'ignore'
+[0.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extension 'ignore_ament_install'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extensions ['colcon_pkg']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extension 'colcon_pkg'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extensions ['colcon_meta']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extension 'colcon_meta'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extensions ['ros']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/limo_sensors) by extension 'ros'
+[0.190s] DEBUG:colcon.colcon_core.package_identification:Package 'src/limo_sensors' with type 'ros.ament_python' and name 'limo_sensors'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) by extensions ['ignore', 'ignore_ament_install']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) by extension 'ignore'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) ignored
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extensions ['ignore', 'ignore_ament_install']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extension 'ignore'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extension 'ignore_ament_install'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extensions ['colcon_pkg']
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extension 'colcon_pkg'
+[0.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extensions ['colcon_meta']
+[0.191s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extension 'colcon_meta'
+[0.191s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extensions ['ros']
+[0.191s] Level 1:colcon.colcon_core.package_identification:_identify(src/person_sim) by extension 'ros'
+[0.191s] DEBUG:colcon.colcon_core.package_identification:Package 'src/person_sim' with type 'ros.ament_python' and name 'person_sim'
+[0.191s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.191s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.191s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.191s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.191s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.212s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.212s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.213s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 5 installed packages in /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install
+[0.214s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 0 installed packages in /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim/person_sim/install
+[0.215s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 292 installed packages in /opt/ros/humble
+[0.216s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_args' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_target' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_clean_cache' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_clean_first' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'cmake_force_configure' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'ament_cmake_args' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'catkin_cmake_args' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_control' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.241s] DEBUG:colcon.colcon_core.verb:Building package 'limo_control' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control', 'merge_install': False, 'path': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_control', 'symlink_install': False, 'test_result_base': None}
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_args' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_target' from command line to 'None'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_clean_cache' from command line to 'False'
+[0.241s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_clean_first' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'cmake_force_configure' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'ament_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'catkin_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_description' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.242s] DEBUG:colcon.colcon_core.verb:Building package 'limo_description' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description', 'merge_install': False, 'path': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_description', 'symlink_install': False, 'test_result_base': None}
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_target' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_clean_cache' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_clean_first' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'cmake_force_configure' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'ament_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'catkin_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_gazebo' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.242s] DEBUG:colcon.colcon_core.verb:Building package 'limo_gazebo' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo', 'merge_install': False, 'path': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo', 'symlink_install': False, 'test_result_base': None}
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_target' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_clean_cache' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_clean_first' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'cmake_force_configure' from command line to 'False'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'ament_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'catkin_cmake_args' from command line to 'None'
+[0.242s] Level 5:colcon.colcon_core.verb:set package 'limo_sensors' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.242s] DEBUG:colcon.colcon_core.verb:Building package 'limo_sensors' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors', 'merge_install': False, 'path': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors', 'symlink_install': False, 'test_result_base': None}
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_args' from command line to 'None'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_target' from command line to 'None'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_clean_cache' from command line to 'False'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_clean_first' from command line to 'False'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'cmake_force_configure' from command line to 'False'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'ament_cmake_args' from command line to 'None'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'catkin_cmake_args' from command line to 'None'
+[0.243s] Level 5:colcon.colcon_core.verb:set package 'person_sim' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.243s] DEBUG:colcon.colcon_core.verb:Building package 'person_sim' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim', 'merge_install': False, 'path': '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim', 'symlink_install': False, 'test_result_base': None}
+[0.243s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.244s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.244s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_control' with build type 'ament_python'
+[0.244s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_control', 'ament_prefix_path')
+[0.246s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.246s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/ament_prefix_path.ps1'
+[0.247s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/ament_prefix_path.dsv'
+[0.247s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/ament_prefix_path.sh'
+[0.248s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.248s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.251s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_description' with build type 'ament_python'
+[0.251s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_description', 'ament_prefix_path')
+[0.251s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/ament_prefix_path.ps1'
+[0.252s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/ament_prefix_path.dsv'
+[0.252s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/ament_prefix_path.sh'
+[0.252s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.252s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.255s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo' with build type 'ament_python'
+[0.255s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_gazebo', 'ament_prefix_path')
+[0.255s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/ament_prefix_path.ps1'
+[0.256s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/ament_prefix_path.dsv'
+[0.256s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/ament_prefix_path.sh'
+[0.257s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.257s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.260s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors' with build type 'ament_python'
+[0.260s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_sensors', 'ament_prefix_path')
+[0.260s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/ament_prefix_path.ps1'
+[0.261s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/ament_prefix_path.dsv'
+[0.261s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/ament_prefix_path.sh'
+[0.262s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.262s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.265s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim' with build type 'ament_python'
+[0.265s] Level 1:colcon.colcon_core.shell:create_environment_hook('person_sim', 'ament_prefix_path')
+[0.265s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/ament_prefix_path.ps1'
+[0.266s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/ament_prefix_path.dsv'
+[0.266s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/ament_prefix_path.sh'
+[0.267s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.267s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.445s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_control'
+[0.446s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.446s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.626s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_description'
+[0.627s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.627s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.813s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo'
+[0.813s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.813s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.995s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors'
+[0.995s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.995s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.172s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim'
+[1.173s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.173s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.500s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_control': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_control build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/install.log --single-version-externally-managed install_data
+[1.504s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data
+[1.507s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data
+[1.683s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_description': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_description build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/install.log --single-version-externally-managed install_data
+[1.693s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/person_sim build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/install.log --single-version-externally-managed install_data
+[1.792s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_control' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_control build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_control/install.log --single-version-externally-managed install_data
+[1.794s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control' for CMake module files
+[1.794s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control' for CMake config files
+[1.795s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib'
+[1.795s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/bin'
+[1.795s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/pkgconfig/limo_control.pc'
+[1.795s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages'
+[1.796s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_control', 'pythonpath')
+[1.796s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/pythonpath.ps1'
+[1.796s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/pythonpath.dsv'
+[1.796s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/hook/pythonpath.sh'
+[1.797s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/bin'
+[1.797s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(limo_control)
+[1.798s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.ps1'
+[1.799s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.dsv'
+[1.799s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.sh'
+[1.800s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.bash'
+[1.800s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.zsh'
+[1.801s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/colcon-core/packages/limo_control)
+[1.803s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo' for CMake module files
+[1.804s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data
+[1.804s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo' for CMake config files
+[1.804s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib'
+[1.804s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/bin'
+[1.804s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/pkgconfig/limo_gazebo.pc'
+[1.805s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages'
+[1.805s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_gazebo', 'pythonpath')
+[1.805s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/pythonpath.ps1'
+[1.805s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/pythonpath.dsv'
+[1.805s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/hook/pythonpath.sh'
+[1.806s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/bin'
+[1.806s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(limo_gazebo)
+[1.806s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/package.ps1'
+[1.807s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/package.dsv'
+[1.807s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/package.sh'
+[1.808s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/package.bash'
+[1.808s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo/package.zsh'
+[1.808s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/colcon-core/packages/limo_gazebo)
+[1.847s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors' for CMake module files
+[1.848s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_sensors' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data
+[1.848s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors' for CMake config files
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib'
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/bin'
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/pkgconfig/limo_sensors.pc'
+[1.850s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/lib/python3.10/site-packages'
+[1.850s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_sensors', 'pythonpath')
+[1.850s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/pythonpath.ps1'
+[1.851s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/pythonpath.dsv'
+[1.851s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/hook/pythonpath.sh'
+[1.852s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/bin'
+[1.852s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(limo_sensors)
+[1.853s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/package.ps1'
+[1.853s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/package.dsv'
+[1.854s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/package.sh'
+[1.855s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/package.bash'
+[1.855s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/limo_sensors/package.zsh'
+[1.855s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_sensors/share/colcon-core/packages/limo_sensors)
+[1.972s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim' for CMake module files
+[1.973s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/person_sim' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/person_sim build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/person_sim/install.log --single-version-externally-managed install_data
+[1.974s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim' for CMake config files
+[1.974s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/lib'
+[1.974s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/bin'
+[1.974s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/lib/pkgconfig/person_sim.pc'
+[1.975s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/lib/python3.10/site-packages'
+[1.975s] Level 1:colcon.colcon_core.shell:create_environment_hook('person_sim', 'pythonpath')
+[1.975s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/pythonpath.ps1'
+[1.975s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/pythonpath.dsv'
+[1.976s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/hook/pythonpath.sh'
+[1.976s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/bin'
+[1.976s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(person_sim)
+[1.977s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/package.ps1'
+[1.977s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/package.dsv'
+[1.977s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/package.sh'
+[1.978s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/package.bash'
+[1.978s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/person_sim/package.zsh'
+[1.978s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/person_sim/share/colcon-core/packages/person_sim)
+[2.018s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description' for CMake module files
+[2.019s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_description' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_description build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/install.log --single-version-externally-managed install_data
+[2.019s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description' for CMake config files
+[2.019s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib'
+[2.020s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/bin'
+[2.020s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/pkgconfig/limo_description.pc'
+[2.020s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages'
+[2.020s] Level 1:colcon.colcon_core.shell:create_environment_hook('limo_description', 'pythonpath')
+[2.020s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/pythonpath.ps1'
+[2.020s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/pythonpath.dsv'
+[2.021s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/hook/pythonpath.sh'
+[2.022s] Level 1:colcon.colcon_core.environment:checking '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/bin'
+[2.022s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(limo_description)
+[2.022s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/package.ps1'
+[2.023s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/package.dsv'
+[2.023s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/package.sh'
+[2.023s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/package.bash'
+[2.024s] INFO:colcon.colcon_core.shell:Creating package script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description/package.zsh'
+[2.024s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/colcon-core/packages/limo_description)
+[2.024s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[2.024s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[2.025s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[2.025s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[2.029s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[2.029s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[2.029s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[2.038s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[2.039s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/local_setup.ps1'
+[2.040s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/_local_setup_util_ps1.py'
+[2.042s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/setup.ps1'
+[2.043s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/local_setup.sh'
+[2.044s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/_local_setup_util_sh.py'
+[2.044s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/setup.sh'
+[2.045s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/local_setup.bash'
+[2.046s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/setup.bash'
+[2.047s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/local_setup.zsh'
+[2.048s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/setup.zsh'

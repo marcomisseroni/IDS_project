@@ -1,0 +1,31 @@
+running egg_info
+creating ../../build/limo_description/limo_description.egg-info
+writing ../../build/limo_description/limo_description.egg-info/PKG-INFO
+writing dependency_links to ../../build/limo_description/limo_description.egg-info/dependency_links.txt
+writing entry points to ../../build/limo_description/limo_description.egg-info/entry_points.txt
+writing requirements to ../../build/limo_description/limo_description.egg-info/requires.txt
+writing top-level names to ../../build/limo_description/limo_description.egg-info/top_level.txt
+writing manifest file '../../build/limo_description/limo_description.egg-info/SOURCES.txt'
+reading manifest file '../../build/limo_description/limo_description.egg-info/SOURCES.txt'
+writing manifest file '../../build/limo_description/limo_description.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build/lib
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build/lib/limo_description
+copying limo_description/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build/lib/limo_description
+running install
+running install_lib
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages/limo_description
+copying /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/build/lib/limo_description/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages/limo_description
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages/limo_description/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/ament_index
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/ament_index/resource_index
+creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/ament_index/resource_index/packages
+copying resource/limo_description -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/ament_index/resource_index/packages
+copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/share/limo_description
+running install_egg_info
+Copying ../../build/limo_description/limo_description.egg-info to /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_description/lib/python3.10/site-packages/limo_description-0.0.0-py3.10.egg-info
+running install_scripts
+writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_description/install.log'

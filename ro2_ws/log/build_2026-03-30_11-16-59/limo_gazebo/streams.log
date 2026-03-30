@@ -1,0 +1,33 @@
+[1.212s] Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data
+[1.494s] running egg_info
+[1.496s] creating ../../build/limo_gazebo/limo_gazebo.egg-info
+[1.496s] writing ../../build/limo_gazebo/limo_gazebo.egg-info/PKG-INFO
+[1.496s] writing dependency_links to ../../build/limo_gazebo/limo_gazebo.egg-info/dependency_links.txt
+[1.496s] writing entry points to ../../build/limo_gazebo/limo_gazebo.egg-info/entry_points.txt
+[1.496s] writing requirements to ../../build/limo_gazebo/limo_gazebo.egg-info/requires.txt
+[1.496s] writing top-level names to ../../build/limo_gazebo/limo_gazebo.egg-info/top_level.txt
+[1.496s] writing manifest file '../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt'
+[1.498s] reading manifest file '../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt'
+[1.498s] writing manifest file '../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt'
+[1.498s] running build
+[1.498s] running build_py
+[1.499s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build
+[1.499s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build/lib
+[1.499s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build/lib/limo_gazebo
+[1.499s] copying limo_gazebo/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build/lib/limo_gazebo
+[1.499s] running install
+[1.500s] running install_lib
+[1.500s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages/limo_gazebo
+[1.500s] copying /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build/lib/limo_gazebo/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages/limo_gazebo
+[1.501s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages/limo_gazebo/__init__.py to __init__.cpython-310.pyc
+[1.501s] running install_data
+[1.501s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/ament_index
+[1.501s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/ament_index/resource_index
+[1.501s] creating /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/ament_index/resource_index/packages
+[1.502s] copying resource/limo_gazebo -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/ament_index/resource_index/packages
+[1.502s] copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/share/limo_gazebo
+[1.502s] running install_egg_info
+[1.504s] Copying ../../build/limo_gazebo/limo_gazebo.egg-info to /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages/limo_gazebo-0.0.0-py3.10.egg-info
+[1.505s] running install_scripts
+[1.532s] writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/install.log'
+[1.552s] Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/src/limo_gazebo' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data
