@@ -21,7 +21,7 @@ import numpy as np
 
 class EKF(Node):
 
-    def __init__(self, enc_weight, imu_weight, initial_state, R, Q, dt = 0.3, dx = 0, dy = 0, dtheta = 0):
+    def __init__(self, enc_weight, imu_weight, initial_state, dx = 0, dy = 0, dtheta = 0):
 
         super().__init__('ekf')
         if enc_weight + imu_weight != 1 or enc_weight < 0 or imu_weight < 0:
@@ -31,20 +31,24 @@ class EKF(Node):
         else:
             self.weight_enc = enc_weight
             self.weight_imu = imu_weight
+
         # Define parameters
         self.v = 0
         self.yaw_rate = 0
         self.state = initial_state.copy()
-        self.dt = dt
+        self.dt = self.declare_parameter('dt', 1).value
         self.dx = dx
         self.dy = dy
         self.dtheta = dtheta
         self.A = self._A()
         self.G = self._G()
         self.H = self._H()
-        self.R = R
-        self.Q = Q
+        R_list = self.declare_parameter('R', [[0.01,0,0],[0,0.01,0],[0,0,0.01]]).value
+        self.R = np.array(R_list)
+        Q_list = self.declare_parameter('Q', [[0.001,0,0],[0,0.001,0],[0,0,0.001]]).value
+        self.Q = np.array(Q_list)
         self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
+
         # Communication stuff
         self.publisher = self.create_publisher(Float64MultiArray, 'ekf_state', 10)
         self.subscription_e = self.create_subscription(Float64MultiArray, 'enc', self.enc_listener_callback, 10)
@@ -57,14 +61,18 @@ class EKF(Node):
         self.subscription_l 
         self.subscription_a 
         self.timer = self.create_timer(self.dt, self.timer_callback)
-        self.start = False
-        self.new_enc_data = False
-        self.new_imu_data = False
-        self.new_lidar_data = False
+
+        # Initialize variables for the measurements
         self.enc_v = 0
         self.enc_w = 0
         self.imu_w = 0
         self.lidar_meas = np.zeros(3)
+
+        # Flags
+        self.start = False
+        self.new_enc_data = False
+        self.new_imu_data = False
+        self.new_lidar_data = False
 
     def timer_callback(self):
         if not self.start:
@@ -150,9 +158,7 @@ class EKF(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    R = np.diag([1, 1, 1])
-    Q = np.diag([0.1, 0.1, 0.05])
-    ekf = EKF(enc_weight=0.5, imu_weight=0.5, initial_state=np.zeros(3), R=R, Q=Q, dt=0.3)
+    ekf = EKF(enc_weight=0.5, imu_weight=0.5, initial_state=np.zeros(3))
     rclpy.spin(ekf)
     ekf.destroy_node()
     rclpy.shutdown()

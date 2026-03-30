@@ -28,3 +28,8 @@ OPERATIONS FROM MAIN:
 - 2-3-4-5 using desires_pos method of Limo's class
 - 6 using mpc_sim
 - 7-8 in the main the conversion and both prediction and update step in ekf_step
+
+TO DOs for ros2 implementation:
+- Check how to divide all the topics, nodes and packages
+- How to start the execution synchronized (via admin topic we can start everything)
+- How to decide who is each mpc node (maybe there is a way to compare a variable to its namespace)

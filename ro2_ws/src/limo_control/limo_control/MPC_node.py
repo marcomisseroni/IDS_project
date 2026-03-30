@@ -5,7 +5,6 @@ from std_msgs.msg import Float64MultiArray
 import numpy as np
 import matplotlib.pyplot as plt
 import casadi as cs
-from adam.casadi.computations import KinDynComputations
 from matplotlib.patches import Rectangle
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
@@ -27,15 +26,20 @@ class MPC(Node):
 #  _| |_| | | | | |_| | (_| | | |/ / (_| | |_| | (_) | | | |
 # |_____|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_|                                                          
                                                                                                        
-    def __init__(self, x_init, dt):
+    def __init__(self, x_init, dt_mpc):
         super().__init__('mpc')
         # states and inputs size
         self.nx = 3 # size of state vector x = [x,y,theta]
         self.nu = 2 # size of control vector u = [v, w]
 
         # MPC settings
-        self.dt_MPC = dt # time step MPC
-        self.N = 10  # time horizon MPC
+        self.dt_MPC = self.declare_parameter('dt', 0.0).value # time step MPC
+        self.N = self.declare_parameter('N', 0.0).value  # time horizon MPC
+        self.N_sim = self.declare_parameter('N_sim', 0.0).value # number of simulation steps
+        v_min = self.declare_parameter('v_min', 0.0).value
+        v_max = self.declare_parameter('v_max', 0.0).value
+        w_min = self.declare_parameter('w_min', 0.0).value
+        w_max = self.declare_parameter('w_max', 0.0).value
 
         # create the dynamics function
         x = cs.SX.sym('x', self.nx)
@@ -47,9 +51,10 @@ class MPC(Node):
         self.f = cs.Function('f', [x, u], [rhs])
 
         self.x_init = x_init               # initial state
-        self.u_min = [limo.v_min, limo.w_min]   # minimum value of u
-        self.u_max = [limo.v_max, limo.w_max]   # maximum value of u
-        self.robot_ray = limo.r_collision       # ray of the robot used for visualization
+        self.u_min = [v_min, w_min]   # minimum value of u
+        self.u_max = [v_max, w_max]   # maximum value of u
+        self.robot_ray = self.declare_parameter('r_collision', 0.0).value      # ray of the robot used for visualization
+        self.sol = np.zeros(self.N_sim)
 
         # OCP weigths
         self.w_p = 1e4 # final position weigth
@@ -57,20 +62,32 @@ class MPC(Node):
         self.w_final_v = 1e-2 # final velocity cost weight
         self.w_a = 1e-1 # weigth on the angle of the limo in respect to the target
 
+        # limo positions
+        self.x1 = np.zeros(3)
+        self.x2 = np.zeros(3)
+        self.x3 = np.zeros(3)
+
+        # Target position
+        self.target = np.zeros(2)
+
+        # Flag 
+        self.start = False
+
         # Communication stuff
         # Pub
-        self.publisher = self.create_publisher(Float64MultiArray, 'mpc_result', 10)
+        self.publisher = self.create_publisher(Float64MultiArray, 'control_inputs', 10)
         self.timer = self.create_timer(self.dt_MPC, self.timer_callback)
 
         # Sub
-        self.subscription_1 = self.create_subscription(Float64MultiArray, 'ekf_result1', self.ekf_listener_callback1, 10)
-        self.subscription_2 = self.create_subscription(Float64MultiArray, 'ekf_result2', self.ekf_listener_callback2, 10)
-        self.subscription_3 = self.create_subscription(Float64MultiArray, 'ekf_result3', self.ekf_listener_callback3, 10)
+        self.subscription_1 = self.create_subscription(Float64MultiArray, '/limo1/ekf_state', self.ekf_listener_callback1, 10)
+        self.subscription_2 = self.create_subscription(Float64MultiArray, '/limo2/ekf_state', self.ekf_listener_callback2, 10)
+        self.subscription_3 = self.create_subscription(Float64MultiArray, '/limo3/ekf_state', self.ekf_listener_callback3, 10)
         self.subscription_a = self.create_subscription(String, 'admin', self.admin_listener_callback, 10)
-        self.subscription_1
-        self.subscription_2
-        self.subscription_3
-        self.subscription_a
+        self.subscription_t = self.create_subscription(Float64MultiArray, 'target', self.target_listener_callback, 10)
+        #self.subscription_1
+        #self.subscription_2
+        #self.subscription_3
+        #self.subscription_a
 
 #   ____   _____ _____             _               
 #  / __ \ / ____|  __ \           | |              
@@ -187,30 +204,53 @@ class MPC(Node):
 
     def timer_callback(self):
         #MPC step and publish the result
-        return
+        if not self.start:
+            return
+        self.sol, state = self.MPC_step(self.sol, self.x_init, self.x_des, self.x1, self.x2, self.robot_ray, self.target)
+        control_inputs = Float64MultiArray()
+        control_inputs.data = self.sol.value(self.U[0])
+        self.publisher.publish(control_inputs)
+        self.get_logger().info('Publishing: "%s"' % control_inputs.data)
 
     def ekf_listener_callback1(self, msg):
         # Save the EKF result and use it for the MPC step
+        self.x1 = np.array(msg.data)
         return
 
     def ekf_listener_callback2(self, msg):
         # Save the EKF result and use it for the MPC step
+        self.x2 = np.array(msg.data)
         return
 
     def ekf_listener_callback3(self, msg):
         # Save the EKF result and use it for the MPC step
+        self.x3 = np.array(msg.data)
         return
 
     def admin_listener_callback(self, msg):
         # Listen to the admin topic to start or stop the MPC
+        if msg.data == "start":
+            self.start = True
+        elif msg.data == "stop":
+            self.start = False
+        return
+    
+    def target_listener_callback(self, msg):
+        # Listen to the target topic to update the target position
+        self.target = np.array(msg.data)
         return
 
 def main(args=None):
     rclpy.init(args=args)
-    mpc = MPC(x_init=np.zeros(3), dt=0.1)
 
     # Initialize the MPC
-
+    x0 = np.zeros(3)
+    mpc = MPC(x_init=x0, dt=0.3)
+    x_sol_1 = np.zeros((mpc.nx,mpc.N_sim))
+    u_sol_1 = np.zeros((mpc.nu,mpc.N_sim))
+    mpc.create_OCP_problem()
+    sol0 = mpc.warm_start(x0, mpc.x2, mpc.x3, mpc.robot_ray)
+    
     rclpy.spin(mpc)
     mpc.destroy_node()
     rclpy.shutdown()
