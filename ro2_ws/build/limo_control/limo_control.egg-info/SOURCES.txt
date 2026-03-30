@@ -8,6 +8,7 @@ setup.py
 ../../build/limo_control/limo_control.egg-info/requires.txt
 ../../build/limo_control/limo_control.egg-info/top_level.txt
 ../../build/limo_control/limo_control.egg-info/zip-safe
+limo_control/EKF_node.py
 limo_control/__init__.py
 resource/limo_control
 test/test_copyright.py

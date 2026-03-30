@@ -82,7 +82,7 @@ class EKF:
         S = self.H @ self.P @ self.H.T + self.R
         W = self.P @ self.H.T @ np.linalg.inv(S) 
         self.state += W @ (lidar_meas - self.state)
-        self.P = (np.identity(3) - W) @ self.H @ self.P 
+        self.P = (np.identity(3) - W @ self.H) @ self.P 
 
     
 
