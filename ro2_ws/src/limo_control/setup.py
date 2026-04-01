@@ -12,7 +12,10 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/param', ['param/limo_params.yaml']),
     ],
-    install_requires=['setuptools'],
+    install_requires=[
+        'setuptools',
+        'casadi',
+        ],
     zip_safe=True,
     maintainer='marco',
     maintainer_email='marco.misseroni@studenti.unitn.it',

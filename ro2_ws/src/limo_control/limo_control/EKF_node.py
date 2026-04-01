@@ -43,10 +43,10 @@ class EKF(Node):
         self.A = self._A()
         self.G = self._G()
         self.H = self._H()
-        R_list = self.declare_parameter('R', [[0.01,0,0],[0,0.01,0],[0,0,0.01]]).value
-        self.R = np.array(R_list)
-        Q_list = self.declare_parameter('Q', [[0.001,0,0],[0,0.001,0],[0,0,0.001]]).value
-        self.Q = np.array(Q_list)
+        R_list = self.declare_parameter('R',[0.01, 0.0, 0.0,0.0, 0.01, 0.0,0.0, 0.0, 0.01]).value
+        self.R = np.array(R_list).reshape(3,3)
+        Q_list = self.declare_parameter('Q', [0.01, 0.0, 0.0,0.0, 0.01, 0.0,0.0, 0.0, 0.01]).value
+        self.Q = np.array(Q_list).reshape(3,3)
         self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
 
         # Communication stuff
@@ -55,11 +55,11 @@ class EKF(Node):
         self.subscription_i = self.create_subscription(Float64MultiArray, 'imu', self.imu_listener_callback, 10)
         self.subscription_l = self.create_subscription(Float64MultiArray, 'lidar', self.lidar_listener_callback, 10)
         self.subscription_a = self.create_subscription(String, 'admin', self.admin_listener_callback, 10)
-        self.subscription_e # prevent unused variable warning
-        self.subscription_e 
-        self.subscription_i 
-        self.subscription_l 
-        self.subscription_a 
+        #self.subscription_e # prevent unused variable warning
+        #self.subscription_e 
+        #self.subscription_i 
+        #self.subscription_l 
+        #self.subscription_a 
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
         # Initialize variables for the measurements

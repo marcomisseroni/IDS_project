@@ -1,9 +1,12 @@
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/EKF_node.py
+/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/MPC_node.py
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/__init__.py
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/__pycache__/EKF_node.cpython-310.pyc
+/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/__pycache__/MPC_node.cpython-310.pyc
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control/__pycache__/__init__.cpython-310.pyc
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/ament_index/resource_index/packages/limo_control
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/package.xml
+/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/share/limo_control/param/limo_params.yaml
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info/zip-safe
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info/requires.txt
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info/PKG-INFO
@@ -12,3 +15,4 @@
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info/top_level.txt
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info/SOURCES.txt
 /home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/limo_control/EKF_node
+/home/marco/marco/uni/magistrale/IDS_project/ro2_ws/install/limo_control/lib/limo_control/MPC_node
