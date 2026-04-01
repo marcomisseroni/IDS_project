@@ -66,7 +66,11 @@ def main():
 
     fps = 30
     delay = int(1000 / fps)
-
+    # filter smoothness
+    alpha = 0.1
+    x_filt_L = None
+    x_filt_R = None
+    
     # vector to contain all the estimated positions
     x_rel = []
     y_rel = []
@@ -83,12 +87,21 @@ def main():
         frame_L, x_target_L, y_target_L = detect_objects(frame_L)
         frame_R, x_target_R, y_target_R = detect_objects(frame_R)
 
+        # filtering the obtained position
+        if x_filt_L is None:
+            x_filt_L = x_target_L
+            x_filt_R = x_target_R
+        else:
+            x_filt_L = alpha * x_target_L + (1 - alpha) * x_filt_L
+            x_filt_R = alpha * x_target_R + (1 - alpha) * x_filt_R
+
+
         combined = np.hstack((frame_L, frame_R))
         combined_resized = cv2.resize(combined, (1280, 360))
         cv2.imshow("Person recognition", combined_resized)
 
         # estimated position of the target
-        x_relative, y_relative = target_estimation(x_target_L, x_target_R)
+        x_relative, y_relative = target_estimation(x_filt_L, x_filt_R)
         x_rel.append(x_relative)
         y_rel.append(y_relative)
         if cv2.waitKey(delay) == ord('q') or not ret_L:
