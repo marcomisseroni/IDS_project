@@ -1,0 +1,22 @@
+[3.980s] Invoking command in '/home/federico/IDS_project/ro2_ws/src/limo_description': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_description build --build-base /home/federico/IDS_project/ro2_ws/build/limo_description/build install --record /home/federico/IDS_project/ro2_ws/build/limo_description/install.log --single-version-externally-managed install_data
+[4.633s] running egg_info
+[4.700s] writing ../../build/limo_description/limo_description.egg-info/PKG-INFO
+[4.701s] writing dependency_links to ../../build/limo_description/limo_description.egg-info/dependency_links.txt
+[4.701s] deleting ../../build/limo_description/limo_description.egg-info/entry_points.txt
+[4.701s] writing requirements to ../../build/limo_description/limo_description.egg-info/requires.txt
+[4.702s] writing top-level names to ../../build/limo_description/limo_description.egg-info/top_level.txt
+[4.836s] reading manifest file '../../build/limo_description/limo_description.egg-info/SOURCES.txt'
+[4.837s] writing manifest file '../../build/limo_description/limo_description.egg-info/SOURCES.txt'
+[4.839s] running build
+[4.839s] running build_py
+[4.839s] running install
+[4.859s] running install_lib
+[4.938s] creating /home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages/limo_description
+[4.938s] copying /home/federico/IDS_project/ro2_ws/build/limo_description/build/lib/limo_description/__init__.py -> /home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages/limo_description
+[4.939s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages/limo_description/__init__.py to __init__.cpython-312.pyc
+[4.939s] running install_data
+[4.939s] running install_egg_info
+[5.072s] Copying ../../build/limo_description/limo_description.egg-info to /home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages/limo_description-0.0.0-py3.12.egg-info
+[5.075s] running install_scripts
+[5.469s] writing list of installed files to '/home/federico/IDS_project/ro2_ws/build/limo_description/install.log'
+[5.565s] Invoked command in '/home/federico/IDS_project/ro2_ws/src/limo_description' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_description build --build-base /home/federico/IDS_project/ro2_ws/build/limo_description/build install --record /home/federico/IDS_project/ro2_ws/build/limo_description/install.log --single-version-externally-managed install_data

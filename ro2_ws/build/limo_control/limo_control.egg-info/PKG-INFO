@@ -2,12 +2,7 @@ Metadata-Version: 2.1
 Name: limo-control
 Version: 0.0.0
 Summary: Package for controlling the LIMO robot
-Home-page: UNKNOWN
 Maintainer: marco
 Maintainer-email: marco.misseroni@studenti.unitn.it
 License: Apache License 2.0
-Platform: UNKNOWN
 Provides-Extra: test
-
-UNKNOWN
-

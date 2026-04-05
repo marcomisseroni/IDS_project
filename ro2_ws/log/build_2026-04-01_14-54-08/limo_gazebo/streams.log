@@ -1,0 +1,22 @@
+[3.982s] Invoking command in '/home/federico/IDS_project/ro2_ws/src/limo_gazebo': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/federico/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/federico/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data
+[4.696s] running egg_info
+[4.760s] writing ../../build/limo_gazebo/limo_gazebo.egg-info/PKG-INFO
+[4.760s] writing dependency_links to ../../build/limo_gazebo/limo_gazebo.egg-info/dependency_links.txt
+[4.761s] deleting ../../build/limo_gazebo/limo_gazebo.egg-info/entry_points.txt
+[4.761s] writing requirements to ../../build/limo_gazebo/limo_gazebo.egg-info/requires.txt
+[4.761s] writing top-level names to ../../build/limo_gazebo/limo_gazebo.egg-info/top_level.txt
+[4.890s] reading manifest file '../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt'
+[4.891s] writing manifest file '../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt'
+[4.892s] running build
+[4.892s] running build_py
+[4.892s] running install
+[4.939s] running install_lib
+[5.054s] creating /home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages/limo_gazebo
+[5.060s] copying /home/federico/IDS_project/ro2_ws/build/limo_gazebo/build/lib/limo_gazebo/__init__.py -> /home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages/limo_gazebo
+[5.061s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages/limo_gazebo/__init__.py to __init__.cpython-312.pyc
+[5.066s] running install_data
+[5.066s] running install_egg_info
+[5.153s] Copying ../../build/limo_gazebo/limo_gazebo.egg-info to /home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages/limo_gazebo-0.0.0-py3.12.egg-info
+[5.159s] running install_scripts
+[5.495s] writing list of installed files to '/home/federico/IDS_project/ro2_ws/build/limo_gazebo/install.log'
+[5.578s] Invoked command in '/home/federico/IDS_project/ro2_ws/src/limo_gazebo' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_gazebo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_gazebo build --build-base /home/federico/IDS_project/ro2_ws/build/limo_gazebo/build install --record /home/federico/IDS_project/ro2_ws/build/limo_gazebo/install.log --single-version-externally-managed install_data

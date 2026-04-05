@@ -4,7 +4,6 @@ setup.py
 ../../build/limo_gazebo/limo_gazebo.egg-info/PKG-INFO
 ../../build/limo_gazebo/limo_gazebo.egg-info/SOURCES.txt
 ../../build/limo_gazebo/limo_gazebo.egg-info/dependency_links.txt
-../../build/limo_gazebo/limo_gazebo.egg-info/entry_points.txt
 ../../build/limo_gazebo/limo_gazebo.egg-info/requires.txt
 ../../build/limo_gazebo/limo_gazebo.egg-info/top_level.txt
 ../../build/limo_gazebo/limo_gazebo.egg-info/zip-safe

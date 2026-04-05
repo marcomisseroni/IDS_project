@@ -1,35 +1,8 @@
-TO DOs - simulation implementation
-- Generation of target trajectory
-- Simulation of data - camera + encoders + imu + lidar readings (output of prev. MPC step)
-- Every limo uses EKF to estimate its position 
-- Every limo computes the global position of the target
-- Consensus algorithm to estimate the target position
-- Calculation of central position (projection of the old center onto the circumference around target) 
-- Control algorithm using MPC to move to the desired position
+TODOS:
 
-MPC TODOS:
-- Obstacle avoidance (with the other limos too)
-- real time function implementation
-
-
-ACTUAL FLOW FOR SIMULATION:
-- Before the cycle generate the target trajectory, then repeat:
-    1) Collect data from camera to locate target 
-    2) Calculate the average of the 3 positions of the target (maybe not simple average but weighted on the P matrix of each limo)
-    3) Compute the center of the formation (point on the line from old center to target position at a decided distance)
-    4) Compute the 3 available positions for each limo
-    5) Assign the desired position to each limo
-    6) Solve MPC step (using last step measurements)-> each limo obtain its target position and the inputs [v, w] to reach it
-    7) Convert [v, w] in [w_r, w_l, w_imu] and apply the prediction step of the EKF
-    8) Collect lidar reading [x, y, theta] for each limo and compute the update step of the EKF
-
-OPERATIONS FROM MAIN:
-- 1
-- 2-3-4-5 using desires_pos method of Limo's class
-- 6 using mpc_sim
-- 7-8 in the main the conversion and both prediction and update step in ekf_step
-
-TO DOs for ros2 implementation:
-- Check how to divide all the topics, nodes and packages
-- How to start the execution synchronized (via admin topic we can start everything)
-- How to decide who is each mpc node (maybe there is a way to compare a variable to its namespace)
+- RGBD camera: riconoscimento persona
+- RGBD camera: riconoscimento aruco delle altre limo (3 aruco su ogni limo)
+- Misure di ogni limo: odometry, posizione relativa delle altre limo, posizione relativa del target
+- Decentralized kalman filter con camera + odometry (stati stimati: x1,y1,th1, x2,y2,th2, x3,y3,th3, x_persona,y_persona)
+- Ogni limo sa la propria desired position
+- MPC per il controllo

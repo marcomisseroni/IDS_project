@@ -1,0 +1,31 @@
+[3.992s] Invoking command in '/home/federico/IDS_project/ro2_ws/src/limo_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_control build --build-base /home/federico/IDS_project/ro2_ws/build/limo_control/build install --record /home/federico/IDS_project/ro2_ws/build/limo_control/install.log --single-version-externally-managed install_data
+[4.697s] running egg_info
+[4.765s] writing ../../build/limo_control/limo_control.egg-info/PKG-INFO
+[4.766s] writing dependency_links to ../../build/limo_control/limo_control.egg-info/dependency_links.txt
+[4.766s] writing entry points to ../../build/limo_control/limo_control.egg-info/entry_points.txt
+[4.767s] writing requirements to ../../build/limo_control/limo_control.egg-info/requires.txt
+[4.768s] writing top-level names to ../../build/limo_control/limo_control.egg-info/top_level.txt
+[4.898s] reading manifest file '../../build/limo_control/limo_control.egg-info/SOURCES.txt'
+[4.899s] writing manifest file '../../build/limo_control/limo_control.egg-info/SOURCES.txt'
+[4.900s] running build
+[4.900s] running build_py
+[4.901s] running install
+[4.911s] running install_lib
+[5.051s] creating /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control
+[5.056s] copying /home/federico/IDS_project/ro2_ws/build/limo_control/build/lib/limo_control/__init__.py -> /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control
+[5.057s] copying /home/federico/IDS_project/ro2_ws/build/limo_control/build/lib/limo_control/EKF.py -> /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control
+[5.057s] copying /home/federico/IDS_project/ro2_ws/build/limo_control/build/lib/limo_control/MPC_node.py -> /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control
+[5.057s] copying /home/federico/IDS_project/ro2_ws/build/limo_control/build/lib/limo_control/EKF_node.py -> /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control
+[5.057s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control/__init__.py to __init__.cpython-312.pyc
+[5.060s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control/EKF.py to EKF.cpython-312.pyc
+[5.073s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control/MPC_node.py to MPC_node.cpython-312.pyc
+[5.074s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control/EKF_node.py to EKF_node.cpython-312.pyc
+[5.079s] running install_data
+[5.091s] copying package.xml -> /home/federico/IDS_project/ro2_ws/install/limo_control/share/limo_control
+[5.092s] running install_egg_info
+[5.177s] Copying ../../build/limo_control/limo_control.egg-info to /home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages/limo_control-0.0.0-py3.12.egg-info
+[5.183s] running install_scripts
+[5.544s] Installing EKF_node script to /home/federico/IDS_project/ro2_ws/install/limo_control/lib/limo_control
+[5.544s] Installing MPC_node script to /home/federico/IDS_project/ro2_ws/install/limo_control/lib/limo_control
+[5.545s] writing list of installed files to '/home/federico/IDS_project/ro2_ws/build/limo_control/install.log'
+[5.635s] Invoked command in '/home/federico/IDS_project/ro2_ws/src/limo_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_control build --build-base /home/federico/IDS_project/ro2_ws/build/limo_control/build install --record /home/federico/IDS_project/ro2_ws/build/limo_control/install.log --single-version-externally-managed install_data

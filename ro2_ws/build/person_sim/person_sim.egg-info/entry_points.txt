@@ -1,3 +1,2 @@
 [console_scripts]
 person_sim_node = person_sim.person_sim_node:main
-

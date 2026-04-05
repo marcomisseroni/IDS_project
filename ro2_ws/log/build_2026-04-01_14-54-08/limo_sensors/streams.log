@@ -1,0 +1,22 @@
+[3.972s] Invoking command in '/home/federico/IDS_project/ro2_ws/src/limo_sensors': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/federico/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/federico/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data
+[4.644s] running egg_info
+[4.712s] writing ../../build/limo_sensors/limo_sensors.egg-info/PKG-INFO
+[4.713s] writing dependency_links to ../../build/limo_sensors/limo_sensors.egg-info/dependency_links.txt
+[4.714s] deleting ../../build/limo_sensors/limo_sensors.egg-info/entry_points.txt
+[4.715s] writing requirements to ../../build/limo_sensors/limo_sensors.egg-info/requires.txt
+[4.716s] writing top-level names to ../../build/limo_sensors/limo_sensors.egg-info/top_level.txt
+[4.847s] reading manifest file '../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt'
+[4.849s] writing manifest file '../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt'
+[4.850s] running build
+[4.850s] running build_py
+[4.850s] running install
+[4.867s] running install_lib
+[4.963s] creating /home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages/limo_sensors
+[4.963s] copying /home/federico/IDS_project/ro2_ws/build/limo_sensors/build/lib/limo_sensors/__init__.py -> /home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages/limo_sensors
+[4.963s] byte-compiling /home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages/limo_sensors/__init__.py to __init__.cpython-312.pyc
+[4.964s] running install_data
+[4.964s] running install_egg_info
+[5.074s] Copying ../../build/limo_sensors/limo_sensors.egg-info to /home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages/limo_sensors-0.0.0-py3.12.egg-info
+[5.080s] running install_scripts
+[5.461s] writing list of installed files to '/home/federico/IDS_project/ro2_ws/build/limo_sensors/install.log'
+[5.523s] Invoked command in '/home/federico/IDS_project/ro2_ws/src/limo_sensors' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/federico/IDS_project/ro2_ws/build/limo_sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/federico/IDS_project/ro2_ws/install/limo_sensors/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/limo_sensors build --build-base /home/federico/IDS_project/ro2_ws/build/limo_sensors/build install --record /home/federico/IDS_project/ro2_ws/build/limo_sensors/install.log --single-version-externally-managed install_data

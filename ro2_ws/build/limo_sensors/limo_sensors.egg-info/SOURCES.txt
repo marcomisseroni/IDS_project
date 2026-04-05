@@ -4,7 +4,6 @@ setup.py
 ../../build/limo_sensors/limo_sensors.egg-info/PKG-INFO
 ../../build/limo_sensors/limo_sensors.egg-info/SOURCES.txt
 ../../build/limo_sensors/limo_sensors.egg-info/dependency_links.txt
-../../build/limo_sensors/limo_sensors.egg-info/entry_points.txt
 ../../build/limo_sensors/limo_sensors.egg-info/requires.txt
 ../../build/limo_sensors/limo_sensors.egg-info/top_level.txt
 ../../build/limo_sensors/limo_sensors.egg-info/zip-safe
