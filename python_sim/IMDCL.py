@@ -17,8 +17,8 @@ class IMDCL:
         self.P = np.eye(2, 2) * 10**-3
         self.phi = np.eye(2, 2)
         self.pi12 = np.zeros((2, 2))
-        self.pi13 = np.zeros((2, 2))
         self.pi23 = np.zeros((2, 2))
+        self.pi31 = np.zeros((2, 2))
         self.gamma = np.zeros((2,1))
         self.mu = mu
         self.sigma = sigma
@@ -32,12 +32,10 @@ class IMDCL:
         self.phi = self.F @ self.phi
 
     def rel_meas(self, state_b, phi_b, P_b, z_ab, id_b):
-        if(self.state[0, 0] > state_b[0, 0]):
-            H_a = np.array([[-1, 0]])  
-            H_b = np.array([[-1, 0]])
-        else:
-            H_a = np.array([[1, 0]])  
-            H_b = np.array([[1, 0]])
+        H_a1 = -(self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2)
+        H_b1 = -(self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2)
+        H_a = np.array([[H_a1, 0]])  
+        H_b = np.array([[H_b1, 0]])  
         id_a = self.id
         pi_ab = None
         if((id_a == 1 and id_b == 2) or (id_a == 2 and id_b == 1)):
@@ -45,7 +43,7 @@ class IMDCL:
         elif((id_a == 2 and id_b == 3) or (id_a == 3 and id_b == 2)):
             pi_ab = self.pi23
         elif((id_a == 1 and id_b == 3) or (id_a == 3 and id_b == 1)):
-            pi_ab = self.pi13
+            pi_ab = self.pi31
         if(pi_ab is None):
             print("pi_ab not assigned")
             return
@@ -54,8 +52,10 @@ class IMDCL:
         r_a = z_ab - abs(state_b[0, 0] - self.state[0, 0])
         S_ab = self.R + H_a @ self.P @ H_a.transpose() + H_b @ P_b @ H_b.transpose() - H_a @ Pab @ H_b.transpose() - H_b @ Pba @ H_a.transpose()
         gamma_a = (pi_ab @ phi_b.transpose() @ H_b.transpose() - np.linalg.inv(self.phi) @ self.P @ H_a.transpose()) * S_ab ** -0.5
-        gamma_b = (np.linalg.inv(phi_b) @ P_b @ H_b.transpose() - pi_ab @ self.phi.transpose() @ H_a.transpose()) * S_ab ** -0.5
-        return r_a * S_ab ** -0.5, gamma_a, gamma_b, phi_b.transpose() @ H_b.transpose() * S_ab ** -0.5, self.phi.transpose() @ H_a.transpose() * S_ab ** -0.5
+        gamma_b = (np.linalg.inv(phi_b) @ P_b @ H_b.transpose() - pi_ab.transpose() @ self.phi.transpose() @ H_a.transpose()) * S_ab ** -0.5
+        W1 = phi_b.transpose() @ H_b.transpose() * S_ab ** -0.5
+        W2 = self.phi.transpose() @ H_a.transpose() * S_ab ** -0.5
+        return r_a * S_ab ** -0.5, gamma_a, gamma_b, W1, W2
 
     def update(self, r_a, gamma_a, gamma_b, W1, W2, id_a, id_b):
         pi_a = None
@@ -66,12 +66,12 @@ class IMDCL:
         if(id_a != 1 and id_b != 1):
             if(id_b == 2):
                 pi_b = self.pi12
-                pi_a = self.pi13
+                pi_a = self.pi31
                 gamma1 = pi_b @ W1 - pi_a @ W2
                 gamma2 = gamma_b
                 gamma3 = gamma_a
             if(id_b == 3):
-                pi_b = self.pi13
+                pi_b = self.pi31
                 pi_a = self.pi12
                 gamma1 = pi_b @ W1 - pi_a @ W2
                 gamma2 = gamma_a
@@ -93,14 +93,14 @@ class IMDCL:
 
         if(id_a != 3 and id_b != 3):
             if(id_b == 1):
-                pi_b = self.pi13
+                pi_b = self.pi31
                 pi_a = self.pi23
                 gamma3 = pi_b @ W1 - pi_a @ W2
                 gamma1 = gamma_b
                 gamma2 = gamma_a
             if(id_b == 2):
                 pi_b = self.pi23
-                pi_a = self.pi13
+                pi_a = self.pi31
                 gamma3 = pi_b @ W1 - pi_a @ W2
                 gamma2 = gamma_b
                 gamma1 = gamma_a
@@ -120,7 +120,7 @@ class IMDCL:
         self.P = self.P - self.phi @ self.gamma @ self.gamma.transpose() @ self.phi.transpose()   #to check
         self.pi12 = self.pi12 - gamma1 @ gamma2.transpose()
         self.pi23 = self.pi23 - gamma2 @ gamma3.transpose()
-        self.pi13 = self.pi13 - gamma1 @ gamma3.transpose()
+        self.pi31 = self.pi31 - gamma1 @ gamma3.transpose()
 
 
 if __name__ == "__main__":

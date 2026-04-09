@@ -16,7 +16,7 @@ rx = 1920 #resolution of the camera along x
 d = 36/rx # physical size of a pixel (mm)
 n_d = 255 # number of depth channels
 
-def detect_human(frame):
+def detect_target(frame):
     results = model(frame, verbose=False)
     detected_objects = []
 
@@ -112,7 +112,7 @@ def main():
             break
 
         # using YOLO to detect the target in the frame
-        frame, x1, x2, y1, y2, xc = detect_human(frame)
+        frame, x1, x2, y1, y2, xc = detect_target(frame)
 
         combined = np.hstack((frame, frame_d))
         combined_resized = cv2.resize(combined, (1280, 360))
