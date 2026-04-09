@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.linalg import sqrtm
 import random
 
 class IMDCL:
@@ -7,17 +6,20 @@ class IMDCL:
     agents_number = 0
 
     def __init__(self, s0, R, Q, dt, mu, sigma):
-        self.state = s0.reshape(-1, 1)
-        self.R = R
-        self.Q = Q
+        self.state = s0
+        self.R = R  #scalar
+        self.Q = Q  #2x2
         self.dt = dt
         self.F = np.eye(2, 2)
         self.F[0, 1] = self.dt
+        self.G = np.eye(2, 2)
+        self.G[0, 0] = 0
         self.P = np.eye(2, 2) * 10**-3
         self.phi = np.eye(2, 2)
         self.pi12 = np.zeros((2, 2))
         self.pi13 = np.zeros((2, 2))
         self.pi23 = np.zeros((2, 2))
+        self.gamma = np.zeros((2,1))
         self.mu = mu
         self.sigma = sigma
         IMDCL.agents_number += 1
@@ -25,11 +27,17 @@ class IMDCL:
 
     def prediction(self):
         epsilon = random.gauss(self.mu, self.sigma)
-        self.state = self.F @ self.state + np.array([0, epsilon]).reshape(-1, 1) 
-        self.P = self.F @ self.P @ self.F.transpose()
+        self.state = self.F @ self.state + self.G @ np.ones((2,1)) * epsilon
+        self.P = self.F @ self.P @ self.F.transpose() + self.G @ self.Q @ self.G.transpose()
         self.phi = self.F @ self.phi
 
-    def rel_meas(self, state_b, phi_b, P_b, z_ab, id_b, H_a = np.array([[1, 0]]), H_b = np.array([[1, 0]])): 
+    def rel_meas(self, state_b, phi_b, P_b, z_ab, id_b):
+        if(self.state[0, 0] > state_b[0, 0]):
+            H_a = np.array([[-1, 0]])  
+            H_b = np.array([[-1, 0]])
+        else:
+            H_a = np.array([[1, 0]])  
+            H_b = np.array([[1, 0]])
         id_a = self.id
         pi_ab = None
         if((id_a == 1 and id_b == 2) or (id_a == 2 and id_b == 1)):
@@ -42,12 +50,12 @@ class IMDCL:
             print("pi_ab not assigned")
             return
         Pab = self.phi @ pi_ab @ phi_b.transpose()
-        Pba = phi_b @ pi_ab @ self.phi.transpose()
-        r_a = z_ab - (state_b[0, 0] - self.state[0, 0])
+        Pba = phi_b @ pi_ab.transpose() @ self.phi.transpose()
+        r_a = z_ab - abs(state_b[0, 0] - self.state[0, 0])
         S_ab = self.R + H_a @ self.P @ H_a.transpose() + H_b @ P_b @ H_b.transpose() - H_a @ Pab @ H_b.transpose() - H_b @ Pba @ H_a.transpose()
-        gamma_a = (pi_ab @ phi_b.transpose() @ H_b.transpose() - np.linalg.inv(self.phi) @ self.P @ H_a.transpose()) @ np.linalg.inv(sqrtm(S_ab))
-        gamma_b = (np.linalg.inv(phi_b) @ P_b @ H_b.transpose() - pi_ab @ self.phi.transpose() @ H_a.transpose()) @ np.linalg.inv(sqrtm(S_ab))
-        return r_a, gamma_a, gamma_b, phi_b.transpose() @ H_b.transpose() @ np.linalg.inv(sqrtm(S_ab)), self.phi.transpose() @ H_a.transpose() @ np.linalg.inv(sqrtm(S_ab))
+        gamma_a = (pi_ab @ phi_b.transpose() @ H_b.transpose() - np.linalg.inv(self.phi) @ self.P @ H_a.transpose()) * S_ab ** -0.5
+        gamma_b = (np.linalg.inv(phi_b) @ P_b @ H_b.transpose() - pi_ab @ self.phi.transpose() @ H_a.transpose()) * S_ab ** -0.5
+        return r_a * S_ab ** -0.5, gamma_a, gamma_b, phi_b.transpose() @ H_b.transpose() * S_ab ** -0.5, self.phi.transpose() @ H_a.transpose() * S_ab ** -0.5
 
     def update(self, r_a, gamma_a, gamma_b, W1, W2, id_a, id_b):
         pi_a = None
@@ -102,9 +110,14 @@ class IMDCL:
         if(gamma1 is None or gamma2 is None or gamma3 is None):
             print("Gamma not assiciated")
             return
-        gamma = pi_b @ W1 - pi_a @ W2
-        self.state = self.state + self.phi @ (gamma * r_a)
-        self.P = self.P - self.phi @ gamma @ gamma.transpose() @ self.phi.transpose()
+        if(self.id == 1):
+            self.gamma = gamma1
+        elif(self.id == 2):
+            self.gamma = gamma2
+        elif(self.id == 3):
+            self.gamma = gamma3
+        self.state = self.state + self.phi @ (self.gamma * r_a)
+        self.P = self.P - self.phi @ self.gamma @ self.gamma.transpose() @ self.phi.transpose()   #to check
         self.pi12 = self.pi12 - gamma1 @ gamma2.transpose()
         self.pi23 = self.pi23 - gamma2 @ gamma3.transpose()
         self.pi13 = self.pi13 - gamma1 @ gamma3.transpose()
@@ -119,7 +132,7 @@ if __name__ == "__main__":
     Q = np.eye(2, 2)
     dt = 0.1
     mu = 0
-    sigma = 0.5
+    sigma = 0.1
     N_sim = 50
     agent1 = IMDCL(s1, R, Q, dt, mu, sigma)
     agent2 = IMDCL(s2, R, Q, dt, mu, sigma)
