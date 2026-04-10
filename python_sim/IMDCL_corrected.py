@@ -6,13 +6,15 @@ class IMDCL:
 
     agents_number = 0
 
-    def __init__(self, s0, R, Q, P, dt, mu, sigma):
+    def __init__(self, s0, R, Q, P, dt, mu, sigma, damping=0.95):
         self.state = s0
         self.R = R  #scalar
         self.Q = Q  #2x2
         self.dt = dt
+        self.damping = damping  # velocity damping factor (0 < damping < 1)
         self.F = np.eye(2, 2)
         self.F[0, 1] = self.dt
+        self.F[1, 1] = damping  # velocity decays with factor 'damping'
         self.G = np.eye(2, 2)
         self.G[0, 0] = 0
         self.P = P
@@ -214,87 +216,4 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig('imdcl_evolution.png', dpi=150)
     print("Plot saved to imdcl_evolution.png")
-    plt.show()
-    relative_meas_flag = 1
-    state_hist = []
-    P_trace = []
-    for i in range(N_sim):
-        agent1.prediction()
-        agent2.prediction()
-        agent3.prediction()
-        if(relative_meas_flag == 1):
-            relative_meas_flag += 1
-            epsilon = random.gauss(mu, sigma1)
-            meas_out = agent1.rel_meas(agent2.state, agent2.phi, agent2.P, agent2.state[0] - agent1.state[0] + epsilon, 2)
-            if meas_out is not None:
-                r_a, gamma_a, gamma_b, W1, W2 = meas_out
-                agent1.update(r_a, gamma_a, gamma_b, W1, W2, 1, 2)
-                agent2.update(r_a, gamma_a, gamma_b, W1, W2, 1, 2)
-                agent3.update(r_a, gamma_a, gamma_b, W1, W2, 1, 2)
-
-        if(relative_meas_flag == 2):
-            relative_meas_flag += 1
-            epsilon = random.gauss(mu, sigma2)
-            meas_out = agent2.rel_meas(agent3.state, agent3.phi, agent3.P, agent3.state[0] - agent2.state[0] + epsilon, 3)
-            if meas_out is not None:
-                r_a, gamma_a, gamma_b, W1, W2 = meas_out
-                agent1.update(r_a, gamma_a, gamma_b, W1, W2, 2, 3)
-                agent2.update(r_a, gamma_a, gamma_b, W1, W2, 2, 3)
-                agent3.update(r_a, gamma_a, gamma_b, W1, W2, 2, 3)
-
-        if(relative_meas_flag == 3):
-            relative_meas_flag = 1
-            epsilon = random.gauss(mu, sigma3)
-            meas_out = agent3.rel_meas(agent1.state, agent1.phi, agent1.P, agent1.state[0] - agent3.state[0] + epsilon, 1)
-            if meas_out is not None:
-                r_a, gamma_a, gamma_b, W1, W2 = meas_out
-                agent1.update(r_a, gamma_a, gamma_b, W1, W2, 3, 1)
-                agent2.update(r_a, gamma_a, gamma_b, W1, W2, 3, 1)
-                agent3.update(r_a, gamma_a, gamma_b, W1, W2, 3, 1)
-
-        #print("Agent1: ", agent1.state.flatten())
-        #print("Agent2: ", agent2.state.flatten())
-        #print("Agent3: ", agent3.state.flatten())
-        #print("P1: ", agent1.P.flatten())
-        #print("P2: ", agent2.P.flatten())
-        #print("P3: ", agent3.P.flatten())
-
-        state_hist.append([
-        agent1.state[0, 0],
-        agent2.state[0, 0],
-        agent3.state[0, 0]
-        ])
-
-        P_trace.append([
-            np.trace(agent1.P),
-            np.trace(agent2.P),
-            np.trace(agent3.P)
-        ])
-
-    state_hist = np.array(state_hist)
-
-    plt.figure()
-    plt.plot(state_hist[:, 0], label="Agent 1")
-    plt.plot(state_hist[:, 1], label="Agent 2")
-    plt.plot(state_hist[:, 2], label="Agent 3")
-
-    plt.title("Evoluzione stato (x)")
-    plt.xlabel("time step")
-    plt.ylabel("position")
-    plt.legend()
-    plt.grid()
-    plt.show()
-    
-    P_trace = np.array(P_trace)
-
-    plt.figure()
-    plt.plot(P_trace[:, 0], label="Agent 1")
-    plt.plot(P_trace[:, 1], label="Agent 2")
-    plt.plot(P_trace[:, 2], label="Agent 3")
-
-    plt.title("Trace matrice di covarianza")
-    plt.xlabel("time step")
-    plt.ylabel("trace(P)")
-    plt.legend()
-    plt.grid()
     plt.show()
