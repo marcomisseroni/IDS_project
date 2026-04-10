@@ -32,8 +32,8 @@ class IMDCL:
         self.phi = self.F @ self.phi
 
     def rel_meas(self, state_b, phi_b, P_b, z_ab, id_b):
-        H_a1 = -(self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2)
-        H_b1 = -(self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2)
+        H_a1 = -float((self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2))
+        H_b1 = -float((self.state[0] - state_b[0]) / np.sqrt((self.state[0] - state_b[0]) ** 2))
         H_a = np.array([[H_a1, 0]])  
         H_b = np.array([[H_b1, 0]])  
         id_a = self.id
@@ -58,54 +58,51 @@ class IMDCL:
         return r_a * S_ab ** -0.5, gamma_a, gamma_b, W1, W2
 
     def update(self, r_a, gamma_a, gamma_b, W1, W2, id_a, id_b):
-        pi_a = None
-        pi_b = None
+        pi_ja = None
+        pi_jb = None
         gamma1 = None
         gamma2 = None
         gamma3 = None
         if(id_a != 1 and id_b != 1):
             if(id_b == 2):
-                pi_b = self.pi12
-                pi_a = self.pi31
-                gamma1 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi12
+                pi_ja = self.pi31.transpose()
                 gamma2 = gamma_b
                 gamma3 = gamma_a
             if(id_b == 3):
-                pi_b = self.pi31
-                pi_a = self.pi12
-                gamma1 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi31.transpose()
+                pi_ja = self.pi12
                 gamma2 = gamma_a
                 gamma3 = gamma_b
+            gamma1 = pi_jb @ W1 - pi_ja @ W2
 
         if(id_a != 2 and id_b != 2):
             if(id_b == 1):
-                pi_b = self.pi12
-                pi_a = self.pi23
-                gamma2 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi12.transpose()
+                pi_ja = self.pi23
                 gamma1 = gamma_b
                 gamma3 = gamma_a
             if(id_b == 3):
-                pi_b = self.pi23
-                pi_a = self.pi12
-                gamma2 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi23
+                pi_ja = self.pi12.transpose()
                 gamma1 = gamma_a
                 gamma3 = gamma_b
+            gamma2 = pi_jb @ W1 - pi_ja @ W2
 
         if(id_a != 3 and id_b != 3):
             if(id_b == 1):
-                pi_b = self.pi31
-                pi_a = self.pi23
-                gamma3 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi31
+                pi_ja = self.pi23.transpose()
                 gamma1 = gamma_b
                 gamma2 = gamma_a
             if(id_b == 2):
-                pi_b = self.pi23
-                pi_a = self.pi31
-                gamma3 = pi_b @ W1 - pi_a @ W2
+                pi_jb = self.pi23.transpose()
+                pi_ja = self.pi31
                 gamma2 = gamma_b
                 gamma1 = gamma_a
-        if(pi_a is None or pi_b is None):
-            print("pi_a or pi_b not assigned")
+            gamma3 = pi_jb @ W1 - pi_ja @ W2
+        if(pi_ja is None or pi_jb is None):
+            print("pi_ja or pi_jb not assigned")
             return
         if(gamma1 is None or gamma2 is None or gamma3 is None):
             print("Gamma not assiciated")
@@ -120,7 +117,7 @@ class IMDCL:
         self.P = self.P - self.phi @ self.gamma @ self.gamma.transpose() @ self.phi.transpose()   #to check
         self.pi12 = self.pi12 - gamma1 @ gamma2.transpose()
         self.pi23 = self.pi23 - gamma2 @ gamma3.transpose()
-        self.pi31 = self.pi31 - gamma1 @ gamma3.transpose()
+        self.pi31 = self.pi31 - gamma3 @ gamma1.transpose()
 
 
 if __name__ == "__main__":
@@ -169,5 +166,8 @@ if __name__ == "__main__":
         print("Agent1: ", agent1.state.flatten())
         print("Agent2: ", agent2.state.flatten())
         print("Agent3: ", agent3.state.flatten())
+        print("P1: ", agent1.P)
+        print("P2: ", agent2.P)
+        print("P3: ", agent3.P)
         
         
