@@ -14,7 +14,6 @@ class IMDCL:
         self.F = np.eye(2, 2)
         self.F[0, 1] = self.dt
         self.G = np.eye(2, 2)
-        self.G[0, 0] = 0
         self.P = P
         self.phi = np.eye(2, 2)
         self.pi12 = np.zeros((2, 2))
@@ -27,8 +26,9 @@ class IMDCL:
         self.id = IMDCL.agents_number
 
     def prediction(self):
-        epsilon = random.gauss(self.mu, self.sigma)
-        self.state = self.F @ self.state + self.G @ np.ones((2,1)) * epsilon
+        epsilon1 = random.gauss(self.mu, self.sigma)
+        epsilon2 = random.gauss(self.mu, self.sigma)
+        self.state = self.F @ self.state + self.G @ np.array([epsilon1, epsilon2])
         self.P = self.F @ self.P @ self.F.transpose() + self.G @ self.Q @ self.G.transpose()
         self.phi = self.F @ self.phi
 
@@ -37,7 +37,7 @@ class IMDCL:
         abs_diff = abs(diff)
         if abs_diff < 1e-9:
             return None
-        H_a1 = - diff / abs_diff
+        H_a1 = -diff / abs_diff
         H_b1 = - H_a1
         H_a = np.array([[H_a1, 0]])  
         H_b = np.array([[H_b1, 0]])  
@@ -123,9 +123,6 @@ class IMDCL:
         elif(self.id == 3):
             self.gamma = gamma3
         self.state = self.state + self.phi @ (self.gamma * r_a)
-        #print("phi = ", self.phi)
-        #print("gamma = ", self.gamma)
-        print("r_a = ", r_a)
         self.P = self.P - self.phi @ self.gamma @ self.gamma.transpose() @ self.phi.transpose()  
         self.pi12 = self.pi12 - gamma1 @ gamma2.transpose()
         self.pi23 = self.pi23 - gamma2 @ gamma3.transpose()
@@ -137,17 +134,17 @@ if __name__ == "__main__":
     s1 = np.array([0, 1]).reshape(-1, 1)
     s2 = np.array([1, 1]).reshape(-1, 1)
     s3 = np.array([2, 1]).reshape(-1, 1)
-    R = 1
-    Q = np.eye(2, 2)
+    R = 0.001
+    Q = np.eye(2, 2) * 10 **-6
     P1 = np.eye(2, 2) * 10**-3
-    P2 = np.eye(2, 2) * 10**-2
-    P3 = np.eye(2, 2) * 10**-1
+    P2 = np.eye(2, 2) * 10**-3
+    P3 = np.eye(2, 2) * 10**-3
     dt = 0.1
     mu = 0
-    sigma1 = 0.01
-    sigma2 = 0.01
-    sigma3 = 0.01
-    N_sim = 100
+    sigma1 = 0.001
+    sigma2 = 0.001
+    sigma3 = 0.001
+    N_sim = 600
     agent1 = IMDCL(s1, R, Q, P1, dt, mu, sigma1)
     agent2 = IMDCL(s2, R, Q, P2, dt, mu, sigma2)
     agent3 = IMDCL(s3, R, Q, P3, dt, mu, sigma3)
@@ -160,7 +157,7 @@ if __name__ == "__main__":
         agent3.prediction()
         if(relative_meas_flag == 1):
             epsilon = random.gauss(mu, sigma1)
-            meas_out = agent1.rel_meas(agent2.state, agent2.phi, agent2.P, agent2.state[0] - agent1.state[0] + epsilon, 2)
+            meas_out = agent1.rel_meas(agent2.state, agent2.phi, agent2.P, abs(agent2.state[0] - agent1.state[0]) + epsilon, 2)
             if meas_out is not None:
                 r_a, gamma_a, gamma_b, W1, W2 = meas_out
                 agent1.update(r_a, gamma_a, gamma_b, W1, W2, 1, 2)
@@ -169,7 +166,7 @@ if __name__ == "__main__":
 
         if(relative_meas_flag == 2):
             epsilon = random.gauss(mu, sigma2)
-            meas_out = agent2.rel_meas(agent3.state, agent3.phi, agent3.P, agent3.state[0] - agent2.state[0] + epsilon, 3)
+            meas_out = agent2.rel_meas(agent3.state, agent3.phi, agent3.P, abs(agent3.state[0] - agent2.state[0]) + epsilon, 3)
             if meas_out is not None:
                 r_a, gamma_a, gamma_b, W1, W2 = meas_out
                 agent1.update(r_a, gamma_a, gamma_b, W1, W2, 2, 3)
@@ -179,7 +176,7 @@ if __name__ == "__main__":
         if(relative_meas_flag == 3):
             relative_meas_flag = 1
             epsilon = random.gauss(mu, sigma3)
-            meas_out = agent3.rel_meas(agent1.state, agent1.phi, agent1.P, agent1.state[0] - agent3.state[0] + epsilon, 1)
+            meas_out = agent3.rel_meas(agent1.state, agent1.phi, agent1.P, abs(agent1.state[0] - agent3.state[0]) + epsilon, 1)
             if meas_out is not None:
                 r_a, gamma_a, gamma_b, W1, W2 = meas_out
                 agent1.update(r_a, gamma_a, gamma_b, W1, W2, 3, 1)
@@ -189,11 +186,14 @@ if __name__ == "__main__":
         relative_meas_flag += 1
 
         print("Agent1: ", agent1.state.flatten())
-        print("Agent2: ", agent2.state.flatten())
-        print("Agent3: ", agent3.state.flatten())
-        #print("P1: ", agent1.P.flatten())
+        #print("Agent2: ", agent2.state.flatten())
+        #print("Agent3: ", agent3.state.flatten())
+        print("P1: ", agent1.P.flatten())
         #print("P2: ", agent2.P.flatten())
         #print("P3: ", agent3.P.flatten())
+        print("P1_update: ", agent1.phi @ agent1.gamma @ agent1.gamma.transpose() @ agent1.phi.transpose())
+        print("phi1: ", agent1.phi)
+        print("gamma1: ", agent1.gamma)
 
         state_hist.append([
         agent1.state[0, 0],
