@@ -5,7 +5,12 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import sys
+import os
 import time
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.append(parent_dir)
+import conf_limo
 
 plot = True
 
@@ -145,48 +150,40 @@ def aruco_pose_estimation(frame, aruco_dict_type, matrix_coefficients, distortio
 # estimate the limo positions
 def limo_estimation(aruco_pos, aruco_rot):
 	# limo aruco positions
-	L = 0.06 # half of limo width (along y)
-	H = 0.12 # distance from back aruco to center of the limo (along x)
-	h = 0.02 # distance from side arucos to center of the limo (along x)
+	L = conf_limo.L # half of limo width (along y)
+	H = conf_limo.H # distance from back aruco to center of the limo (along x)
+	h = conf_limo.h # distance from side arucos to center of the limo (along x)
 
 	# vector to store the three limo reference frames
 	limo_RF = np.zeros((3,4,4))
 
 	# ---------------------- LIMO 0 ----------------------------
 	flag0 = 0;	flag1 = 0;	flag2 = 0
-	rz0 = 0; rz1 = 0; rz2 = 0
-	t0 = 0; t1 = 0; t2 = 0
+	RF_limo0 = np.eye(4); RF_limo1 = np.eye(4); RF_limo2 = np.eye(4)
 	# left side arucos
 	if aruco_pos[0][0] != 0:
 		# aruco RF
 		RF_aruco = translate(aruco_pos[0]) @ rotate(aruco_rot[0])
 		# limo RF
-		RF_limo = RF_aruco @ translate([-h, 0, -L])  @ rotate_angle("Y", np.pi) @ rotate_angle("X", -np.pi/2)
-		t0 = get_point(RF_limo)
-		rz0 = get_z_angle(RF_limo)
+		RF_limo0 = RF_aruco @ translate([-h, 0, -L])  @ rotate_angle("Y", np.pi) @ rotate_angle("X", -np.pi/2)
 		flag0 = 1
 	# center arucos
 	if aruco_pos[1][0] != 0:
 		# aruco RF
 		RF_aruco = translate(aruco_pos[1]) @ rotate(aruco_rot[1])
 		# limo RF
-		RF_limo = RF_aruco @ translate([0, 0, -H])  @ rotate_angle("Y", np.pi/2) @ rotate_angle("X", -np.pi/2)
-		t1 = get_point(RF_limo)
-		rz1 = get_z_angle(RF_limo)
+		RF_limo1 = RF_aruco @ translate([0, 0, -H])  @ rotate_angle("Y", np.pi/2) @ rotate_angle("X", -np.pi/2)
 		flag1 = 1
 	# right side arucos
 	if aruco_pos[2][0] != 0:
 		# aruco RF
 		RF_aruco = translate(aruco_pos[2]) @ rotate(aruco_rot[2])
 		# limo RF
-		RF_limo = RF_aruco @ translate([h, 0, -L]) @ rotate_angle("X", -np.pi/2)
-		t2 = get_point(RF_limo)
-		rz2 = get_z_angle(RF_limo)
+		RF_limo2 = RF_aruco @ translate([h, 0, -L]) @ rotate_angle("X", -np.pi/2)
 		flag2 = 1
 	if flag0 or flag1 or flag2:
-		t = (t0*flag0 + t1*flag1 + t2*flag2) / (flag0+flag1+flag2)
-		rz = (rz0*flag0 + rz1*flag1 + rz2*flag2) / (flag0+flag1+flag2)
-		limo_RF[0] = translate(t) @ rotate_angle("Z",rz)
+		# mean of the three possible reference frames
+		limo_RF[0] = expm((logm(RF_limo0)*flag0 + logm(RF_limo1)*flag1 + logm(RF_limo2)*flag2) / (flag0 + flag1 + flag2))
 
 	
 	
@@ -221,11 +218,11 @@ def main():
 	arucoDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 	arucoParams = cv2.aruco.DetectorParameters()
 	# aruco marker size
-	aruco_size = 0.08 # (m)
+	aruco_size = conf_limo.aruco_size # (m)
 
 	# camera matrix and distortion vector obtained after calibration
-	intrinsic_camera = np.array(((1.626e+03, 0, 9.351e+02),(0,1.612e+03, 5.145e+02),(0,0,1)))
-	distortion = np.array((0.14321164, -0.37941193, -0.00400418, -0.00202883, -0.25072842))
+	intrinsic_camera = conf_limo.intrinsic_camera
+	distortion = conf_limo.distortion
 
 	cap = cv2.VideoCapture("test_videos/Limo_aruco.mp4")
 	width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH ))

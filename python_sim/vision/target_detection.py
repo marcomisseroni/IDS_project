@@ -6,15 +6,20 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import os
+import sys
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.append(parent_dir)
+import conf_limo
 
 # Load YOLOv8 model
 model = YOLO("yolov8n.pt")
 # camera settings
 fps = 25
-f = 50 # focal length (mm)
-rx = 1920 #resolution of the camera along x
-d = 36/rx # physical size of a pixel (mm)
-n_d = 255 # number of depth channels
+f = conf_limo.f # focal length (mm)
+rx = conf_limo.rx #resolution of the camera along x
+d = conf_limo.d # physical size of a pixel (mm)
+n_d = conf_limo.n_d # number of depth channels
 
 def detect_target(frame):
     results = model(frame, verbose=False)
@@ -86,8 +91,8 @@ def target_estimation_RGBD(x1, x2, y1, y2, xc, depth):
 
 def main():
     # Open the RGBD video
-    cap = cv2.VideoCapture("Test_videos/RGB 3.mp4")
-    cap_d = cv2.VideoCapture("Test_videos/Depth.mp4")
+    cap = cv2.VideoCapture("test_videos/RGB.mp4")
+    cap_d = cv2.VideoCapture("test_videos/Depth.mp4")
 
     delay = int(1000 / fps)
     
