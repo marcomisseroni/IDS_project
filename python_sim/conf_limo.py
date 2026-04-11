@@ -44,6 +44,10 @@ d = 36/rx # physical size of a pixel (mm)
 n_d = 255 # number of depth channels
 intrinsic_camera = np.array(((1.626e+03, 0, 9.351e+02),(0,1.612e+03, 5.145e+02),(0,0,1)))
 distortion = np.array((0.14321164, -0.37941193, -0.00400418, -0.00202883, -0.25072842))
+# relative position of the camera in respect to the limo RF
+x_camera = 0.03 #(m)
+y_camera = 0 #(m)
+z_camera = 0.1 #(m)
 
 # ------------ ARUCO -------------------------
 L = 0.06 # half of limo width (along y)
