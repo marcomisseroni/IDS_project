@@ -7,73 +7,101 @@ import numpy as np
 # | |____| . \| |      | (__| | (_| \__ \__ \
 # |______|_|\_\_|       \___|_|\__,_|___/___/
                                             
-                                            
+"""
+Implementation of the Interim Master Decentralized Cooperative Localization (IMDCL) algorithm.
+
+Based on:
+S. S. Kia, S. Rounds, and S. Martínez,
+"Cooperative Localization for Mobile Agents",
+IEEE Control Systems Magazine.
+"""             
 
 class EKF:
 
-    def __init__(self, enc_weight, imu_weight, r, b, initial_state, R, Q, dt = 0.1, dx = 0, dy = 0, dtheta = 0):
+    agent_id = 1
 
-        if enc_weight + imu_weight != 1 or enc_weight < 0 or imu_weight < 0:
-            print("Error: weights used are not valid, they must be positive and sum up to 1")
-            self.weight_enc = 0.5
-            self.weight_imu = 0.5
-        else:
-            self.weight_enc = enc_weight
-            self.weight_imu = imu_weight
-        self.r = r
-        self.b = b
-        self.v = 0
-        self.yaw_rate = 0
+    def __init__(
+            self, 
+            initial_state: np.ndarray, 
+            R: np.ndarray, 
+            Q: np.ndarray, 
+            dt: float):
+        
+        self.v = 0.0
+        self.yaw_rate = 0.0
         self.state = initial_state.copy()
+        self.R = R
+        self.Q = Q
         self.dt = dt
-        self.dx = dx
-        self.dy = dy
-        self.dtheta = dtheta
         self.A = self._A()
         self.G = self._G()
         self.H = self._H()
-        self.R = R
-        self.Q = Q
         self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
+        self.phi = np.eye(3, 3)
+        self.pi12 = np.zeros((3, 3))
+        self.pi13 = np.zeros((3, 3))
+        self.pi14 = np.zeros((3, 3))
+        self.pi23 = np.zeros((3, 3))
+        self.pi24 = np.zeros((3, 3))
+        self.pi34 = np.zeros((3, 3))
+        self.gamma = np.zeros((3,2))
+        self.agent_id = type(self).agent_id
+        type(self).agent_id += 1
 
 
-    def _kinematic_model(self, w_enc_r, w_enc_l, w_imu):
-        self.v = self.r * (w_enc_l + w_enc_r) / 2
-        w_enc = self.r * (w_enc_r - w_enc_l) / self.b
-        self.yaw_rate = self.weight_enc * w_enc + self.weight_imu * w_imu
+    def _kinematic_model(
+            self, v: float, 
+            yaw_rate: float
+            ) -> np.ndarray:
+        
+        self.v = v
+        self.yaw_rate = yaw_rate
         x = self.state[0] + self.dt * self.v * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
         y = self.state[1] + self.dt * self.v * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
         theta = self.state[2] + self.dt * self.yaw_rate
         return np.array([x, y, theta])
     
-    def _A(self):
+    def _A(
+            self
+            ) -> np.ndarray:
+        
         A = np.identity(3)
         A[0, 2] = - self.dt * self.v * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
         A[1, 2] = self.dt * self.v * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
         return A
     
-    def _G(self):
+    def _G(
+            self
+            ) -> np.ndarray:
+        
         G = np.zeros((3, 3))
         G[0, 0] = self.dt * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[0, 1] = - self.dt ** 2 * self.v / 2 * self.weight_enc * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[0, 2] = - self.dt ** 2 * self.v / 2 * self.weight_imu * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
+        G[0, 1] = - self.dt ** 2 * self.v / 2 * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
         G[1, 0] = self.dt * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[1, 1] = self.dt ** 2 * self.v / 2 * self.weight_enc * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[1, 2] = self.dt ** 2 * self.v / 2 * self.weight_imu * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[2, 0] = 0
-        G[2, 2] = self.dt * self.weight_imu
-        G[2, 1] = self.dt * self.weight_enc
+        G[1, 1] = self.dt ** 2 * self.v / 2 * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
+        G[2, 1] = self.dt
         return G
     
-    def _H(self):
+    def _H(
+            self
+            ) -> np.ndarray:
+        
         return np.identity(3)
     
-    def prediction_step(self, w_enc_r, w_enc_l, w_imu):
-        self.state = self._kinematic_model(w_enc_r=w_enc_r, w_enc_l=w_enc_l, w_imu=w_imu)
+    def prediction_step(
+            self, 
+            v: float, 
+            yaw_rate: float):
+        
+        self.state = self._kinematic_model(v, yaw_rate)
         self.A = self._A()
         self.G = self._G()
         self.H = self._H()
         self.P = self.A @ self.P @ self.A.T + self.G @ self.Q @ self.G.T
+        self.phi = self.A @ self.phi
+
+    def measurement():
+        return
 
     def update_step(self, lidar_meas):
         lidar_meas[0] += self.dx
