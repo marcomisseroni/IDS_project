@@ -143,12 +143,12 @@ def aruco_pose_estimation(frame, aruco_dict_type, matrix_coefficients, distortio
 			T_aruco_camera = rotate_angle("Z", -np.pi/2) @ rotate_angle("X", -np.pi/2)
 			T_camera = T_aruco_camera @ T
 			# saving the values
-			aruco_pos[ids,:] = get_point(T_camera)
-			aruco_rot[ids,:,:] = T_camera[:3,:3]
+			aruco_pos[ids[i][0],:] = get_point(T_camera)
+			aruco_rot[ids[i][0],:,:] = T_camera[:3,:3]
 	return frame, aruco_pos, aruco_rot
 
 # estimate the limo positions
-def limo_estimation(aruco_pos, aruco_rot):
+def limo_estimation(aruco_pos, aruco_rot, T_limo_camera):
 	# limo aruco positions
 	L = conf_limo.L # half of limo width (along y)
 	H = conf_limo.H # distance from back aruco to center of the limo (along x)
@@ -183,33 +183,72 @@ def limo_estimation(aruco_pos, aruco_rot):
 		flag2 = 1
 	if flag0 or flag1 or flag2:
 		# mean of the three possible reference frames
-		limo_RF[0] = expm((logm(RF_limo0)*flag0 + logm(RF_limo1)*flag1 + logm(RF_limo2)*flag2) / (flag0 + flag1 + flag2))
+		limo_RF0 = expm((logm(RF_limo0)*flag0 + logm(RF_limo1)*flag1 + logm(RF_limo2)*flag2) / (flag0 + flag1 + flag2))
+		# transforming the reading in the limo RF
+		limo_RF[0] = T_limo_camera @ limo_RF0
 
 	
 	
 	# ---------------------- LIMO 1 ----------------------------
+	flag3 = 0;	flag4 = 0;	flag5 = 0
+	RF_limo3 = np.eye(4); RF_limo4 = np.eye(4); RF_limo5 = np.eye(4)
 	# left side arucos
 	if aruco_pos[3][0] != 0:
-		print("left aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[3]) @ rotate(aruco_rot[3])
+		# limo RF
+		RF_limo3 = RF_aruco @ translate([-h, 0, -L])  @ rotate_angle("Y", np.pi) @ rotate_angle("X", -np.pi/2)
+		flag3 = 1
 	# center arucos
 	if aruco_pos[4][0] != 0:
-		print("center aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[4]) @ rotate(aruco_rot[4])
+		# limo RF
+		RF_limo4 = RF_aruco @ translate([0, 0, -H])  @ rotate_angle("Y", np.pi/2) @ rotate_angle("X", -np.pi/2)
+		flag4 = 1
 	# right side arucos
 	if aruco_pos[5][0] != 0:
-		print("right aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[5]) @ rotate(aruco_rot[5])
+		# limo RF
+		RF_limo5 = RF_aruco @ translate([h, 0, -L]) @ rotate_angle("X", -np.pi/2)
+		flag5 = 1
+	if flag3 or flag4 or flag5:
+		# mean of the three possible reference frames
+		limo_RF1 = expm((logm(RF_limo3)*flag3 + logm(RF_limo4)*flag4 + logm(RF_limo5)*flag5) / (flag3 + flag4 + flag5))
+		# transforming the reading in the limo RF
+		limo_RF[1] = T_limo_camera @ limo_RF1
 
 	# ---------------------- LIMO 2 ----------------------------
+	flag6 = 0;	flag7 = 0;	flag8 = 0
+	RF_limo6 = np.eye(4); RF_limo7 = np.eye(4); RF_limo8 = np.eye(4)
 	# left side arucos
 	if aruco_pos[6][0] != 0:
-		print("left aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[6]) @ rotate(aruco_rot[6])
+		# limo RF
+		RF_limo6 = RF_aruco @ translate([-h, 0, -L])  @ rotate_angle("Y", np.pi) @ rotate_angle("X", -np.pi/2)
+		flag6 = 1
 	# center arucos
 	if aruco_pos[7][0] != 0:
-		print("center aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[7]) @ rotate(aruco_rot[7])
+		# limo RF
+		RF_limo7 = RF_aruco @ translate([0, 0, -H])  @ rotate_angle("Y", np.pi/2) @ rotate_angle("X", -np.pi/2)
+		flag7 = 1
 	# right side arucos
 	if aruco_pos[8][0] != 0:
-		print("right aruco data")
+		# aruco RF
+		RF_aruco = translate(aruco_pos[8]) @ rotate(aruco_rot[8])
+		# limo RF
+		RF_limo8 = RF_aruco @ translate([h, 0, -L]) @ rotate_angle("X", -np.pi/2)
+		flag8 = 1
+	if flag6 or flag7 or flag8:
+		# mean of the three possible reference frames
+		limo_RF2 = expm((logm(RF_limo6)*flag6 + logm(RF_limo7)*flag7 + logm(RF_limo8)*flag8) / (flag6 + flag7 + flag8))
+		# transforming the reading in the limo RF
+		limo_RF[2] = T_limo_camera @ limo_RF2
 
-	# average position based on multiple limos
 	return limo_RF
 
 def main():
@@ -231,6 +270,13 @@ def main():
 	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 	out = cv2.VideoWriter('output.mp4', cv2.CAP_FFMPEG, fourcc, 20.0, (width,  height))
 
+	# limo camera position
+	x_camera = conf_limo.x_camera
+	y_camera = conf_limo.y_camera
+	z_camera = conf_limo.z_camera
+	# transformation from limo RF to camera RF
+	T_limo_camera = translate([x_camera, y_camera, z_camera])
+
 	# vector containing the data
 	x_pos = []
 	y_pos = []
@@ -243,13 +289,12 @@ def main():
 		# measuring the aruco positions
 		output, aruco_pos, aruco_rot = aruco_pose_estimation(img, ARUCO_DICT[aruco_type], intrinsic_camera, distortion, aruco_size)
 		# estimating the limo positions
-		limo_RF = limo_estimation(aruco_pos, aruco_rot)
+		limo_RF = limo_estimation(aruco_pos, aruco_rot, T_limo_camera)
 
 		# to plot the RF i need to return in the aruco RF
 		T_aruco_camera = rotate_angle("Z", -np.pi/2) @ rotate_angle("X", -np.pi/2)
-		RF_plot = np.linalg.inv(T_aruco_camera) @ limo_RF[0]
+		RF_plot = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(T_limo_camera) @ limo_RF[0]
 		cv2.drawFrameAxes(output, intrinsic_camera, distortion, RF_plot[:3,:3], get_point(RF_plot), 0.1)
-
 		# if we want the limo position and orientation along z
 		limo_0_states = [get_point(limo_RF[0])[0], get_point(limo_RF[0])[1], get_z_angle(limo_RF[0])]
 		x_pos.append(get_point(limo_RF[0])[0])
