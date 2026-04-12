@@ -38,11 +38,12 @@ r_circle = 0.5
 N_sim = 100
 
 # ------------- CAMERA ------------------------
-f = 50 # focal length (mm)
 rx = 1920 #resolution of the camera along x
-d = 36/rx # physical size of a pixel (mm)
+d = 10/rx # physical size of a pixel (mm)
+f = 1331.4783*d # focal length (mm)
+rx_depth = 256 # resolution of the depth camera along x
 n_d = 255 # number of depth channels
-intrinsic_camera = np.array(((1.626e+03, 0, 9.351e+02),(0,1.612e+03, 5.145e+02),(0,0,1)))
+intrinsic_camera = np.array(((1331.4783, 0.0, 959.11017),(0.0, 1331.4783, 732.06586),(0,0,1)))
 distortion = np.array((0.14321164, -0.37941193, -0.00400418, -0.00202883, -0.25072842))
 # relative position of the camera in respect to the limo RF
 x_camera = 0.03 #(m)

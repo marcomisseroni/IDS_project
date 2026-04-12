@@ -16,7 +16,7 @@ class Vision:
 #  _| |_| | | | | |_| | (_| | | |/ / (_| | |_| | (_) | | | |
 # |_____|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_| 
 
-    def __init__(self, cap, cap_d):
+    def __init__(self):
         # type of aruco library used
         self.aruco_type = "DICT_6X6_50"
         # dictionary with different aruco sets
@@ -48,7 +48,11 @@ class Vision:
         self.rx = conf_limo.rx #resolution of the camera along x
         self.d = conf_limo.d # physical size of a pixel (mm)
         self.n_d = conf_limo.n_d # number of depth channels
-
+        self.T_limo_camera = self.translate([conf_limo.x_camera, conf_limo.y_camera, conf_limo.z_camera])
+        # type of aruco library used
+        self.aruco_type = "DICT_6X6_50"
+        arucoDict = cv2.aruco.getPredefinedDictionary(self.ARUCO_DICT[self.aruco_type])
+        arucoParams = cv2.aruco.DetectorParameters()
 
 #                                  _____       _            _   _             
 #     /\                          |  __ \     | |          | | (_)            
@@ -167,7 +171,7 @@ class Vision:
         return frame, aruco_pos, aruco_rot
 
     # estimate the limo positions
-    def limo_estimation(self, aruco_pos, aruco_rot, T_limo_camera):
+    def limo_estimation(self, aruco_pos, aruco_rot):
         # limo aruco positions
         L = conf_limo.L # half of limo width (along y)
         H = conf_limo.H # distance from back aruco to center of the limo (along x)
@@ -204,7 +208,7 @@ class Vision:
             # mean of the three possible reference frames
             limo_RF0 = expm((logm(RF_limo0)*flag0 + logm(RF_limo1)*flag1 + logm(RF_limo2)*flag2) / (flag0 + flag1 + flag2))
             # transforming the reading in the limo RF
-            limo_RF[0] = T_limo_camera @ limo_RF0
+            limo_RF[0] = self.T_limo_camera @ limo_RF0
 
         
         
@@ -236,7 +240,7 @@ class Vision:
             # mean of the three possible reference frames
             limo_RF1 = expm((logm(RF_limo3)*flag3 + logm(RF_limo4)*flag4 + logm(RF_limo5)*flag5) / (flag3 + flag4 + flag5))
             # transforming the reading in the limo RF
-            limo_RF[1] = T_limo_camera @ limo_RF1
+            limo_RF[1] = self.T_limo_camera @ limo_RF1
 
         # ---------------------- LIMO 2 ----------------------------
         flag6 = 0;	flag7 = 0;	flag8 = 0
@@ -266,7 +270,7 @@ class Vision:
             # mean of the three possible reference frames
             limo_RF2 = expm((logm(RF_limo6)*flag6 + logm(RF_limo7)*flag7 + logm(RF_limo8)*flag8) / (flag6 + flag7 + flag8))
             # transforming the reading in the limo RF
-            limo_RF[2] = T_limo_camera @ limo_RF2
+            limo_RF[2] = self.T_limo_camera @ limo_RF2
 
         return limo_RF
 
@@ -282,14 +286,9 @@ class Vision:
     def detect_target(self, frame):
         results = self.model(frame, verbose=False)
         detected_objects = []
-
         # we want the closest (biggest) person position
-        x_target = None
-        y_target = None
-        x_1 = None
-        x_2 = None
-        y_1 = None
-        y_2 = None
+        x_target = 0; y_target = 0
+        x_1 = 0; x_2 = 0; y_1 = 0; y_2 = 0
         biggest_area = 0
         for r in results:
             for box in r.boxes:
@@ -302,40 +301,92 @@ class Vision:
                     detected_objects.append(label)
                     # Draw bounding box
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-                    # drawing a circle in the box centroid
-                    x_c = int((x1+x2)/2)
-                    y_c = int((y1+y2)/2)
-                    cv2.circle(frame, (x_c, y_c), 3, (255,0,0), 4)
+                    # box centroid
+                    x_target = int((x1+x2)/2)
+                    y_target = int((y1+y2)/2)
                     # finding the biggest box area
                     area = (x2-x1)*(y2-y1)
                     if area > biggest_area:
                         biggest_area = area
-                        x_target = x_c
-                        y_target = y_c
                         x_1 = x1
                         x_2 = x2
                         y_1 = y1
                         y_2 = y2
-        if x_target != None:
-            cv2.rectangle(frame, (x_1, y_1), (x_2, y_2), (0, 0, 255), 2)
-            cv2.circle(frame, (x_target, y_target), 3, (0,0,255), 3)
-        return frame, x_1, x_2, y_1, y_2, x_target
+        return x_1, x_2, y_1, y_2, x_target
 
     def target_estimation_RGBD(self, x1, x2, y1, y2, xc, depth):
+        # resixing the box coordinates based on the depth image resolution
+        factor = conf_limo.rx_depth / conf_limo.rx
+        x1 = int(x1*factor); x2 = int(x2*factor); y1 = int(y1*factor); y2 = int(y2*factor)
         # angle in respect to the camera
         tan_theta = 1/self.f*(self.rx/2-xc)
         # distance from the depth image
         # using max value of the region
         region = depth[y1:y2, x1:x2]
-        depth_val = np.max(region)
-        D = -2970/self.n_d*depth_val + 3000
+        depth_val = np.min(region)
+        #D = -2970/self.n_d*depth_val + 3000
+        D = depth_val
 
         # distances
         x_relative = D
         y_relative = D*tan_theta
-        return x_relative, y_relative
+        # transforming the reading in the limo RF
+        target = self.translate([x_relative, y_relative, 0])
+        target_limoRF = self.T_limo_camera @ target
+        # result in meters
+        x = self.get_point(target_limoRF)[0]/1000.0
+        y = self.get_point(target_limoRF)[1]/1000.0
+        return x, y
+
+#  __  __       _          __                  _   _             
+# |  \/  |     (_)        / _|                | | (_)            
+# | \  / | __ _ _ _ __   | |_ _   _ _ __   ___| |_ _  ___  _ __  
+# | |\/| |/ _` | | '_ \  |  _| | | | '_ \ / __| __| |/ _ \| '_ \ 
+# | |  | | (_| | | | | | | | | |_| | | | | (__| |_| | (_) | | | |
+# |_|  |_|\__,_|_|_| |_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|
+                                                                                                                                
+    def vision_main(self, frame, frame_d, visualize=False):
+        # initializing the values
+        target=np.zeros(3); limo0=np.zeros(3); limo1=np.zeros(3); limo2=np.zeros(3)
+
+        # --------------- TARGET ----------------------
+        # using YOLO to detect the target in the frame
+        x1, x2, y1, y2, xc = self.detect_target(frame)
+        # estimated position of the target (if found)
+        if xc != 0:
+            x_target, y_target = self.target_estimation_RGBD(x1, x2, y1, y2, xc, frame_d)
+            target = [x_target, y_target, 0]
+
+        # --------------- LIMOS ----------------------
+        # measuring the aruco positions
+        output, aruco_pos, aruco_rot = self.aruco_pose_estimation(frame, self.ARUCO_DICT[self.aruco_type], conf_limo.intrinsic_camera,
+                                                                  conf_limo.distortion, conf_limo.aruco_size)
+        # estimating the limo positions
+        limo_RF = self.limo_estimation(aruco_pos, aruco_rot)
+        # saving the values in the form [x,y,th] for each limo
+        limo0 = [self.get_point(limo_RF[0])[0], self.get_point(limo_RF[0])[1], self.get_z_angle(limo_RF[0])]
+        limo1 = [self.get_point(limo_RF[1])[0], self.get_point(limo_RF[1])[1], self.get_z_angle(limo_RF[1])]
+        limo2 = [self.get_point(limo_RF[2])[0], self.get_point(limo_RF[2])[1], self.get_z_angle(limo_RF[2])]      
+
+
+        # -------------- Visualization --------------------
+        if(visualize):
+            output = frame
+            # target box and centroid
+            if xc != None:
+                cv2.rectangle(output, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            # to plot the RF i need to return in the aruco RF
+            T_aruco_camera = self.rotate_angle("Z", -np.pi/2) @ self.rotate_angle("X", -np.pi/2)
+            RF_plot0 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[0]
+            RF_plot1 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[1]
+            RF_plot2 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[2]
+            cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot0[:3,:3], self.get_point(RF_plot0), 0.1)
+            cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
+            cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
+            # showing the video with the target
+            resized = cv2.resize(output, (1280, 960))
+            cv2.imshow("Complete vision system", resized)
+        return target, limo0, limo1, limo2 # outputs in the form [x,y,th]
 
 
 #  _______        _   
@@ -346,5 +397,77 @@ class Vision:
 #    |_|\___||___/\__|
 
 if __name__ == "__main__":
-    print("prova")
+    # Open the RGBD video
+    #cap = cv2.VideoCapture("vision/test_videos/RGB.mp4")
+    #cap_d = cv2.VideoCapture("vision/test_videos/Depth.mp4")
+    cap = cv2.VideoCapture("vision/test_videos/Depth1/rgb.mp4")
+
+    # initializing the vision object
     vision = Vision()
+
+    fps = 60
+    delay = int(1000 / fps)
+    # vector to contain all the estimated target positions
+    x_target = []; y_target = []
+    x_limo0 = []; y_limo0 = []; th_limo0 = []
+    x_limo1 = []; y_limo1 = []; th_limo1 = []
+    x_limo2 = []; y_limo2 = []; th_limo2 = []
+
+    plt.ion()
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.set_title("Target trajectory")
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
+    ax.grid(True)
+    line, = ax.plot([], [], 'b.')
+
+    i = 0
+    while True:
+        # loading the current frame
+        ret, frame = cap.read()
+        print(i)
+        #ret_d, frame_d = cap_d.read()
+        # loading the depth information
+        path = "vision/test_videos/Depth1/depth/" + f"{i:06}" + ".png"
+        frame_d = cv2.imread(path)
+        i = i+1
+
+        if not ret:
+            print("ERROR IN CAPTURING")
+            break
+
+        target, limo0, limo1, limo2 = vision.vision_main(frame, frame_d, visualize=True)
+
+        # saving the target position
+        if target[0] != 0:
+            x_target.append(target[0])
+            y_target.append(target[1])
+        
+        # saving the limo positions
+        if limo0[0] != 0:
+            x_limo0.append(limo0[0])
+            y_limo0.append(limo0[1])
+            th_limo0.append(limo0[2])
+        if limo1[0] != 0:
+            x_limo1.append(limo1[0])
+            y_limo1.append(limo1[1])
+            th_limo1.append(limo1[2])
+        if limo2[0] != 0:
+            x_limo2.append(limo2[0])
+            y_limo2.append(limo2[1])
+            th_limo2.append(limo2[2])
+
+        # plot
+        line.set_xdata(x_target)
+        line.set_ydata(y_target)
+        ax.relim()
+        ax.autoscale_view()
+        plt.draw()
+        plt.pause(0.001)
+
+        if cv2.waitKey(1) == ord('q') or not ret:
+            break
+
+    cap.release()
+    #cap_d.release()
+    cv2.destroyAllWindows()
