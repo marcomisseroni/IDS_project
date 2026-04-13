@@ -19,7 +19,7 @@ IEEE Control Systems Magazine.
 
 class EKF:
 
-    agent_id = 1
+    agent_id = 0
 
     def __init__(
             self, 
@@ -38,18 +38,13 @@ class EKF:
         self.G = self._G()
         self.Ha = np.eye(3, 3)
         self.Hb = np.eye(3, 3)
-        self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
+        self.P = np.eye(3, 3)
         self.phi = np.eye(3, 3)
         self.cross_cov = {}
-        self.cross_cov[(1, 2)] = np.zeros((3, 3))
-        self.cross_cov[(1, 3)] = np.zeros((3, 3))
-        self.cross_cov[(1, 4)] = np.zeros((3, 3))
-        self.cross_cov[(2, 3)] = np.zeros((3, 3))
-        self.cross_cov[(2, 4)] = np.zeros((3, 3))
-        self.cross_cov[(3, 4)] = np.zeros((3, 3))
-        self.gamma = np.zeros((3,2))
-        self.agent_id = type(self).agent_id
+        self.gamma = np.zeros((3,3))
         type(self).agent_id += 1
+        self.agent_id = type(self).agent_id
+        self.is_initialized = False
 
 
     def _kinematic_model(
@@ -90,8 +85,7 @@ class EKF:
     
     def _Ha(
             self,
-            b_state: np.ndarray
-            ):
+            b_state: np.ndarray):
         
         Ha = np.zeros((3, 3))
         Ha[0, 0] = np.cos(self.state[2])
@@ -104,8 +98,7 @@ class EKF:
         self.Ha = Ha
     
     def _Hb(
-            self,
-            ):
+            self):
     
         Hb = np.zeros((3, 3))
         Hb[0, 0] = np.cos(self.state[2])
@@ -130,6 +123,13 @@ class EKF:
             v: float, 
             yaw_rate: float):
         
+        if(not self.is_initialized):
+            self.is_initialized = True
+            N = type(self).agent_id
+            dim = (N ** 2 - N) // 2
+            payload = [np.zeros((3, 3)) for _ in range(dim)]
+            self.cross_cov_set(payload) 
+
         self.state = self._kinematic_model(v, yaw_rate)
         self.A = self._A()
         self.G = self._G()
@@ -173,11 +173,50 @@ class EKF:
             W1: np.ndarray,
             W2: np.ndarray,
             id_a: int,
-            id_b: int
-            ):
-        
+            id_b: int):
+        N = type(self).agent_id
+        gamma = [None] * N
+
+        for j in range(1, N + 1):
+            if(j == id_a):
+                gamma[j - 1] = gamma_a
+            
+            elif(j == id_b):
+                gamma[j - 1] = gamma_b
+
+            else:
+                pija = self.cross_cov[(min(j, id_a), max(j, id_a))]
+                pijb = self.cross_cov[(min(j, id_b), max(j, id_b))]
+                if j > id_a:
+                    pija = pija.T
+
+                if j > id_b:
+                    pijb = pijb.T
+
+                gamma[j - 1] = pijb @ W1 - pija @ W2
+
+        self.gamma = gamma[self.agent_id - 1]
         self.state = self.state + self.phi @ self.gamma @ r_a
-        self.P = self.P - self.phi @ self.gamma @ self.gamma.T @ self.phi.T  
-        #self.pi12 = self.pi12 - gamma1 @ gamma2.T
-        #self.pi23 = self.pi23 - gamma2 @ gamma3.T
-        #self.pi31 = self.pi31 - gamma3 @ gamma1.T
+        self.P = self.P - self.phi @ self.gamma @ self.gamma.T @ self.phi.T
+        for i in range(1, N + 1):
+            for j in range(i + 1, N + 1):
+
+                self.cross_cov[(i, j)] -= gamma[i - 1] @ gamma[j - 1].T
+
+    
+    def cross_cov_set(
+            self,
+            payload: list[np.ndarray]):
+        
+        N = type(self).agent_id
+        exp_len = (N ** 2 - N) // 2
+        if(len(payload) != exp_len):
+            print("Error: payload length is different from: ", exp_len)
+            return
+        
+        k = 0
+        for i in range(1, N + 1):
+            for j in range(i + 1, N + 1):
+
+                self.cross_cov[(i, j)] = payload[k]
+                k += 1
