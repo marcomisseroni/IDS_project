@@ -108,7 +108,7 @@ class EKF:
         Hb[2, 2] = 1
         self.Hb = Hb
 
-    def h(
+    def _h(
             self,
             b_state: np.ndarray
             ) -> np.ndarray:
@@ -128,12 +128,11 @@ class EKF:
             N = type(self).agent_id
             dim = (N ** 2 - N) // 2
             payload = [np.zeros((3, 3)) for _ in range(dim)]
-            self.cross_cov_set(payload) 
+            self._cross_cov_set(payload) 
 
         self.state = self._kinematic_model(v, yaw_rate)
         self.A = self._A()
         self.G = self._G()
-        self.H = self._H()
         self.P = self.A @ self.P @ self.A.T + self.G @ self.Q @ self.G.T
         self.phi = self.A @ self.phi
 
@@ -155,7 +154,7 @@ class EKF:
         
         Pab = self.phi @ piab @ phi_b.T
         Pba = phi_b @ piab.T @ self.phi.T
-        r_a = z_ab - self.h(b_state)
+        r_a = z_ab - self._h(b_state)
         S_ab = self.R + self.Ha @ self.P @ self.Ha.T + self.Hb @ Pb @ self.Hb.T - self.Ha @ Pab @ self.Hb.T - self.Hb @ Pba @ self.Ha.T
         inv_sqrt_S = sqrtm(np.linalg.inv(S_ab))
         gamma_a = (piab @ phi_b.T @ self.Hb.T - np.linalg.inv(self.phi) @ self.P @ self.Ha.T) @ inv_sqrt_S
@@ -204,7 +203,7 @@ class EKF:
                 self.cross_cov[(i, j)] -= gamma[i - 1] @ gamma[j - 1].T
 
     
-    def cross_cov_set(
+    def _cross_cov_set(
             self,
             payload: list[np.ndarray]):
         

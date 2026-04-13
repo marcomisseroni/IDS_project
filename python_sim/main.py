@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import Limo
 import sim_data
 import conf_limo
@@ -15,6 +16,9 @@ r = conf_limo.r_circle
 sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
 target_init = np.array([sim.global_target_pos(0)])
 center_global = np.array([0.0 ,0.0])
+flag_rel_meas = 0
+mu = 0
+sigma = 0.01
 
 print("Initializing limo 0...")
 
@@ -84,21 +88,36 @@ for i in range(N_sim):
     in1 = limo_1.mpc_sim(limo_0.ekf.state, limo_2.ekf.state, x1_des)
     in2 = limo_2.mpc_sim(limo_0.ekf.state, limo_1.ekf.state, x2_des)
     # ekf
-    print("Simulate encoder readings...")
-    enc0 = sim.sensors_from_input(in0)
-    enc1 = sim.sensors_from_input(in1)
-    enc2 = sim.sensors_from_input(in2)
     print("Prediction step of the EKF...")
-    limo_0.ekf.prediction_step(enc0[1], enc0[0], in0[1])
-    limo_1.ekf.prediction_step(enc1[1], enc1[0], in1[1])
-    limo_2.ekf.prediction_step(enc2[1], enc2[0], in2[1])
-    print("Simulate lidar readings and perform EKF step...\n")
-    lid_meas0 = sim.ext_sensors(limo_0.ekf.state)
-    lid_meas1 = sim.ext_sensors(limo_1.ekf.state)
-    lid_meas2 = sim.ext_sensors(limo_2.ekf.state)
-    limo_0.ekf.update_step(lid_meas0)
-    limo_1.ekf.update_step(lid_meas1)
-    limo_2.ekf.update_step(lid_meas2)
+    limo_0.ekf.prediction_step(in0[0], in0[1])
+    limo_1.ekf.prediction_step(in1[0], in1[1])
+    limo_2.ekf.prediction_step(in2[0], in2[1])
+    print("Simulate relative measurement and perform EKF step...\n")
+    epsilon1 = random.gauss(mu, sigma)
+    epsilon2 = random.gauss(mu, sigma)
+    epsilon3 = random.gauss(mu, sigma)
+    meas_unc = np.array([epsilon1, epsilon2, epsilon3])
+    if(flag_rel_meas == 0):
+        meas = limo_1.ekf.state - limo_0.ekf.state + meas_unc
+        r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(limo_1.ekf.state, limo_1.ekf.phi, limo_1.ekf.P, meas, limo_1.ekf.agent_id)
+        id_a = limo_0.ekf.agent_id
+        id_b = limo_1.ekf.agent_id
+    elif(flag_rel_meas == 1):
+        meas = limo_2.ekf.state - limo_1.ekf.state + meas_unc
+        r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(limo_2.ekf.state, limo_2.ekf.phi, limo_2.ekf.P, meas, limo_2.ekf.agent_id)
+        id_a = limo_1.ekf.agent_id
+        id_b = limo_2.ekf.agent_id
+    elif(flag_rel_meas == 2):
+        meas = limo_0.ekf.state - limo_2.ekf.state + meas_unc
+        r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id)
+        id_a = limo_2.ekf.agent_id
+        id_b = limo_0.ekf.agent_id
+
+    flag_rel_meas += 1
+    if flag_rel_meas > 2: flag_rel_meas = 0
+    limo_0.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
+    limo_1.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
+    limo_2.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
 
     # frame update
     limo_0.frame_update()
