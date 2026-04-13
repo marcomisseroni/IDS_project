@@ -20,13 +20,6 @@ flag_rel_meas = 0
 mu = 0
 sigma = 0.01
 
-def simulate_relative_measurement(a_state, b_state, noise):
-    theta_a = a_state[2]
-    delta_x = (b_state[0] - a_state[0]) * np.cos(theta_a) + (b_state[1] - a_state[1]) * np.sin(theta_a)
-    delta_y = (b_state[1] - a_state[1]) + np.cos(theta_a) + (a_state[0] - b_state[0]) * np.sin(theta_a)
-    delta_theta = b_state[2] - a_state[2]
-    return np.array([delta_x, delta_y, delta_theta]) + noise
-
 print("Initializing limo 0...")
 
 # limo 0
@@ -72,6 +65,12 @@ state2 = np.zeros((3, N_sim))
 input0 = np.zeros((2, N_sim))
 input1 = np.zeros((2, N_sim))
 input2 = np.zeros((2, N_sim))
+cov0 = np.zeros(N_sim)
+cov1 = np.zeros(N_sim)
+cov2 = np.zeros(N_sim)
+ccov0 = np.zeros(N_sim)
+ccov1 = np.zeros(N_sim)
+ccov2 = np.zeros(N_sim)
 
 print("Starting MPC loop...")
 
@@ -105,17 +104,17 @@ for i in range(N_sim):
     epsilon3 = random.gauss(mu, sigma)
     meas_unc = np.array([epsilon1, epsilon2, epsilon3])
     if(flag_rel_meas == 0):
-        meas = simulate_relative_measurement(limo_0.ekf.state, limo_1.ekf.state, meas_unc)
+        meas = sim.simulate_relative_measurement(limo_0.ekf.state, limo_1.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(limo_1.ekf.state, limo_1.ekf.phi, limo_1.ekf.P, meas, limo_1.ekf.agent_id)
         id_a = limo_0.ekf.agent_id
         id_b = limo_1.ekf.agent_id
     elif(flag_rel_meas == 1):
-        meas = simulate_relative_measurement(limo_1.ekf.state, limo_2.ekf.state, meas_unc)
+        meas = sim.simulate_relative_measurement(limo_1.ekf.state, limo_2.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(limo_2.ekf.state, limo_2.ekf.phi, limo_2.ekf.P, meas, limo_2.ekf.agent_id)
         id_a = limo_1.ekf.agent_id
         id_b = limo_2.ekf.agent_id
     elif(flag_rel_meas == 2):
-        meas = simulate_relative_measurement(limo_2.ekf.state, limo_0.ekf.state, meas_unc)
+        meas = sim.simulate_relative_measurement(limo_2.ekf.state, limo_0.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id)
         id_a = limo_2.ekf.agent_id
         id_b = limo_0.ekf.agent_id
@@ -153,6 +152,14 @@ for i in range(N_sim):
     input0[:,i] = in0
     input1[:,i] = in1
     input2[:,i] = in2
+    # self covariance
+    cov0[i] = np.trace(limo_0.ekf.P)
+    cov1[i] = np.trace(limo_1.ekf.P)
+    cov2[i] = np.trace(limo_2.ekf.P)
+    # cross covariance
+    ccov0[i] = np.linalg.norm(limo_0.ekf.cross_cov[1, 2] + limo_0.ekf.cross_cov[1, 3] + limo_0.ekf.cross_cov[2, 3])
+    ccov1[i] = np.linalg.norm(limo_1.ekf.cross_cov[1, 2] + limo_1.ekf.cross_cov[1, 3] + limo_1.ekf.cross_cov[2, 3])
+    ccov2[i] = np.linalg.norm(limo_2.ekf.cross_cov[1, 2] + limo_2.ekf.cross_cov[1, 3] + limo_2.ekf.cross_cov[2, 3])
 
 # PLOT
 fig, ax = plt.subplots(figsize=(10, 4))
@@ -212,6 +219,27 @@ plt.plot(time, state0[2])
 plt.plot(time, state1[2])
 plt.plot(time, state2[2])
 plt.ylabel('theta')
+plt.xlabel('time')
+plt.grid()
+
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(10,6))
+
+plt.subplot(2,1,1)
+plt.plot(time, cov0, label='limo0')
+plt.plot(time, cov1, label='limo1')
+plt.plot(time, cov2, label='limo2')
+plt.ylabel('Trace(P)')
+plt.grid()
+plt.legend()
+
+plt.subplot(2,1,2)
+plt.plot(time, ccov0, label = 'limo0')
+plt.plot(time, ccov1, label = 'limo1')
+plt.plot(time, ccov2, label = 'limo2')
+plt.ylabel('Cross-covariance')
 plt.xlabel('time')
 plt.grid()
 
