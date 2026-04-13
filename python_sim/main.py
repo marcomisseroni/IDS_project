@@ -20,6 +20,13 @@ flag_rel_meas = 0
 mu = 0
 sigma = 0.01
 
+def simulate_relative_measurement(a_state, b_state, noise):
+    theta_a = a_state[2]
+    delta_x = (b_state[0] - a_state[0]) * np.cos(theta_a) + (b_state[1] - a_state[1]) * np.sin(theta_a)
+    delta_y = (b_state[1] - a_state[1]) + np.cos(theta_a) + (a_state[0] - b_state[0]) * np.sin(theta_a)
+    delta_theta = b_state[2] - a_state[2]
+    return np.array([delta_x, delta_y, delta_theta]) + noise
+
 print("Initializing limo 0...")
 
 # limo 0
@@ -98,17 +105,17 @@ for i in range(N_sim):
     epsilon3 = random.gauss(mu, sigma)
     meas_unc = np.array([epsilon1, epsilon2, epsilon3])
     if(flag_rel_meas == 0):
-        meas = limo_1.ekf.state - limo_0.ekf.state + meas_unc
+        meas = simulate_relative_measurement(limo_0.ekf.state, limo_1.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(limo_1.ekf.state, limo_1.ekf.phi, limo_1.ekf.P, meas, limo_1.ekf.agent_id)
         id_a = limo_0.ekf.agent_id
         id_b = limo_1.ekf.agent_id
     elif(flag_rel_meas == 1):
-        meas = limo_2.ekf.state - limo_1.ekf.state + meas_unc
+        meas = simulate_relative_measurement(limo_1.ekf.state, limo_2.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(limo_2.ekf.state, limo_2.ekf.phi, limo_2.ekf.P, meas, limo_2.ekf.agent_id)
         id_a = limo_1.ekf.agent_id
         id_b = limo_2.ekf.agent_id
     elif(flag_rel_meas == 2):
-        meas = limo_0.ekf.state - limo_2.ekf.state + meas_unc
+        meas = simulate_relative_measurement(limo_2.ekf.state, limo_0.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id)
         id_a = limo_2.ekf.agent_id
         id_b = limo_0.ekf.agent_id
@@ -179,4 +186,34 @@ def update(frame):
 
 draw_static()
 ani = FuncAnimation(fig, update, frames=N_sim, interval=100)
+plt.show()
+
+# Additional plots
+time = np.arange(N_sim) * dt
+plt.figure(figsize=(10,6))
+
+plt.subplot(3,1,1)
+plt.plot(time, state0[0], label='limo0')
+plt.plot(time, state1[0], label='limo1')
+plt.plot(time, state2[0], label='limo2')
+plt.ylabel('x')
+plt.grid()
+plt.legend()
+
+plt.subplot(3,1,2)
+plt.plot(time, state0[1])
+plt.plot(time, state1[1])
+plt.plot(time, state2[1])
+plt.ylabel('y')
+plt.grid()
+
+plt.subplot(3,1,3)
+plt.plot(time, state0[2])
+plt.plot(time, state1[2])
+plt.plot(time, state2[2])
+plt.ylabel('theta')
+plt.xlabel('time')
+plt.grid()
+
+plt.tight_layout()
 plt.show()
