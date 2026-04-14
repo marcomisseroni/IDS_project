@@ -45,7 +45,7 @@ def split_video(input_path, output_left, output_right):
 
 if __name__ == "__main__":
 
-    input_video = "test_videos/RGBD.MP4"
+    input_video = "test_videos/test.MP4"
     base, ext = os.path.splitext(input_video)
     output_left = base + "_left.mp4"
     output_right = base + "_right.mp4"
