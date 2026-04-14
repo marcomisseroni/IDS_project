@@ -44,7 +44,7 @@ class Vision:
             "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
         }
         self.model = YOLO("yolov8n.pt")
-        self.f = conf_limo.f # focal length (mm)
+        self.fpx = conf_limo.fpx # focal length (px)
         self.rx = conf_limo.rx #resolution of the camera along x
         self.d = conf_limo.d # physical size of a pixel (mm)
         self.n_d = conf_limo.n_d # number of depth channels
@@ -318,25 +318,40 @@ class Vision:
         # resixing the box coordinates based on the depth image resolution
         factor = conf_limo.rx_depth / conf_limo.rx
         x1 = int(x1*factor); x2 = int(x2*factor); y1 = int(y1*factor); y2 = int(y2*factor)
+        dx = x2-x1
+        dy = y2-y1
+        # selecting a window 50% smaller
+        x1 = int(x1 + dx/4); x2 = int(x2 - dx/4); y1 = int(y1 + dy/4); y2 = int(y2 - dy/4)
         # angle in respect to the camera
-        tan_theta = 1/self.f*(self.rx/2-xc)
+        tan_theta = 1/self.fpx*(self.rx/2-xc)
         # distance from the depth image
-        # using max value of the region
-        region = depth[y1:y2, x1:x2]
-        depth_val = np.min(region)
-        #D = -2970/self.n_d*depth_val + 3000
-        D = depth_val
+        # using min value of the region
+        #region = depth[y1:y2, x1:x2]
+        #depth_val = np.min(region)
+        
+        # in case of a HSV image
+        hsv = cv2.cvtColor(depth, cv2.COLOR_BGR2HSV)
+        roi = hsv[y1:y2, x1:x2]
+        h_channel = roi[:, :, 0] # values from 0 to 179
+        # removing pixels with no informations
+        mask = (h_channel > 10) & (h_channel < 170)
+        valid_h = h_channel[mask]
+        depth_val = np.median(valid_h)
+        D = 2970/self.n_d*depth_val + 30
 
         # distances
         x_relative = D
         y_relative = D*tan_theta
+        print(tan_theta)
         # transforming the reading in the limo RF
         target = self.translate([x_relative, y_relative, 0])
         target_limoRF = self.T_limo_camera @ target
         # result in meters
         x = self.get_point(target_limoRF)[0]/1000.0
         y = self.get_point(target_limoRF)[1]/1000.0
-        return x, y
+        # showing the bounding box
+        cv2.rectangle(depth, (x1, y1), (x2, y2), (0, 0, 0), 2)
+        return x, y, depth
 
 #  __  __       _          __                  _   _             
 # |  \/  |     (_)        / _|                | | (_)            
@@ -354,7 +369,7 @@ class Vision:
         x1, x2, y1, y2, xc = self.detect_target(frame)
         # estimated position of the target (if found)
         if xc != 0:
-            x_target, y_target = self.target_estimation_RGBD(x1, x2, y1, y2, xc, frame_d)
+            x_target, y_target, frame_d = self.target_estimation_RGBD(x1, x2, y1, y2, xc, frame_d)
             target = [x_target, y_target, 0]
 
         # --------------- LIMOS ----------------------
@@ -384,8 +399,11 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
             # showing the video with the target
-            resized = cv2.resize(output, (1280, 960))
-            cv2.imshow("Complete vision system", resized)
+            combined = np.hstack((output, frame_d))
+            combined_resized = cv2.resize(combined, (1280, 360))
+            cv2.imshow("Person recognition", combined_resized)
+            #resized = cv2.resize(output, (1280, 960))
+            #cv2.imshow("Complete vision system", resized)
         return target, limo0, limo1, limo2 # outputs in the form [x,y,th]
 
 
@@ -398,15 +416,13 @@ class Vision:
 
 if __name__ == "__main__":
     # Open the RGBD video
-    #cap = cv2.VideoCapture("vision/test_videos/RGB.mp4")
-    #cap_d = cv2.VideoCapture("vision/test_videos/Depth.mp4")
-    cap = cv2.VideoCapture("vision/test_videos/Depth1/rgb.mp4")
+    cap = cv2.VideoCapture("vision/test_videos/RGB3.mp4")
+    cap_d = cv2.VideoCapture("vision/test_videos/depth3.mp4")
 
     # initializing the vision object
     vision = Vision()
 
-    fps = 60
-    delay = int(1000 / fps)
+    delay = int(1000 / conf_limo.fps)
     # vector to contain all the estimated target positions
     x_target = []; y_target = []
     x_limo0 = []; y_limo0 = []; th_limo0 = []
@@ -415,22 +431,18 @@ if __name__ == "__main__":
 
     plt.ion()
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.set_title("Target trajectory")
-    ax.set_xlabel('x [m]')
-    ax.set_ylabel('y [m]')
+    ax.set_title("Target and limo trajectories")
+    ax.set_xlabel('y [m]')
+    ax.set_ylabel('x [m]')
     ax.grid(True)
-    line, = ax.plot([], [], 'b.')
+    line1, = ax.plot([], [], 'bo', label='Target')
+    line2, = ax.plot([], [], 'ro', label='Limo')
+    ax.legend()
 
-    i = 0
     while True:
         # loading the current frame
         ret, frame = cap.read()
-        print(i)
-        #ret_d, frame_d = cap_d.read()
-        # loading the depth information
-        path = "vision/test_videos/Depth1/depth/" + f"{i:06}" + ".png"
-        frame_d = cv2.imread(path)
-        i = i+1
+        ret_d, frame_d = cap_d.read()
 
         if not ret:
             print("ERROR IN CAPTURING")
@@ -441,25 +453,27 @@ if __name__ == "__main__":
         # saving the target position
         if target[0] != 0:
             x_target.append(target[0])
-            y_target.append(target[1])
+            y_target.append(-target[1])
         
         # saving the limo positions
         if limo0[0] != 0:
             x_limo0.append(limo0[0])
-            y_limo0.append(limo0[1])
+            y_limo0.append(-limo0[1])
             th_limo0.append(limo0[2])
         if limo1[0] != 0:
             x_limo1.append(limo1[0])
-            y_limo1.append(limo1[1])
+            y_limo1.append(-limo1[1])
             th_limo1.append(limo1[2])
         if limo2[0] != 0:
             x_limo2.append(limo2[0])
-            y_limo2.append(limo2[1])
+            y_limo2.append(-limo2[1])
             th_limo2.append(limo2[2])
 
         # plot
-        line.set_xdata(x_target)
-        line.set_ydata(y_target)
+        line1.set_xdata(y_target)
+        line1.set_ydata(x_target)
+        line2.set_xdata(y_limo0)
+        line2.set_ydata(x_limo0)
         ax.relim()
         ax.autoscale_view()
         plt.draw()

@@ -40,18 +40,20 @@ N_sim = 100
 # ------------- CAMERA ------------------------
 rx = 1920 #resolution of the camera along x
 d = 10/rx # physical size of a pixel (mm)
-f = 1331.4783*d # focal length (mm)
-rx_depth = 256 # resolution of the depth camera along x
-n_d = 255 # number of depth channels
-intrinsic_camera = np.array(((1331.4783, 0.0, 959.11017),(0.0, 1331.4783, 732.06586),(0,0,1)))
-distortion = np.array((0.14321164, -0.37941193, -0.00400418, -0.00202883, -0.25072842))
+f = 6.86 # focal length (mm)
+fpx = 1.30092897e+03 # focal length (px)
+rx_depth = 1920 # resolution of the depth camera along x
+n_d = 179 # number of depth channels
+intrinsic_camera = np.array(((1.30092897e+03, 0.0, 9.73008095e+02),(0.0, 1.30280592e+03, 7.22305051e+02),(0,0,1)))
+distortion = np.array((0.15521988, -0.57432332, -0.00566708, -0.00113189,  0.68733757))
 # relative position of the camera in respect to the limo RF
 x_camera = 0.03 #(m)
-y_camera = 0 #(m)
-z_camera = 0.1 #(m)
+y_camera = 0    #(m)
+z_camera = 0.1  #(m)
+fps = 30
 
 # ------------ ARUCO -------------------------
-L = 0.06 # half of limo width (along y)
-H = 0.12 # distance from back aruco to center of the limo (along x)
-h = 0.02 # distance from side arucos to center of the limo (along x)
-aruco_size = 0.08 # (m)S
+L = 0.10 # half of limo width (along y)
+H = 0.13 # distance from back aruco to center of the limo (along x)
+h = 0.045 # distance from side arucos to center of the limo (along x)
+aruco_size = 0.08 # (m)
