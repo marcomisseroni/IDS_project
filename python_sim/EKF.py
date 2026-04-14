@@ -42,8 +42,8 @@ class EKF:
         self.phi = np.eye(3, 3)
         self.cross_cov = {}
         self.gamma = np.zeros((3,3))
-        type(self).agent_id += 1
         self.agent_id = type(self).agent_id
+        type(self).agent_id += 1
         self.is_initialized = False
 
 
@@ -176,12 +176,12 @@ class EKF:
         N = type(self).agent_id
         gamma = [None] * N
 
-        for j in range(1, N + 1):
+        for j in range(N):
             if(j == id_a):
-                gamma[j - 1] = gamma_a
+                gamma[j] = gamma_a
             
             elif(j == id_b):
-                gamma[j - 1] = gamma_b
+                gamma[j] = gamma_b
 
             else:
                 pija = self.cross_cov[(min(j, id_a), max(j, id_a))]
@@ -192,15 +192,15 @@ class EKF:
                 if j > id_b:
                     pijb = pijb.T
 
-                gamma[j - 1] = pijb @ W1 - pija @ W2
+                gamma[j] = pijb @ W1 - pija @ W2
 
-        self.gamma = gamma[self.agent_id - 1]
+        self.gamma = gamma[self.agent_id]
         self.state = self.state + self.phi @ self.gamma @ r_a
         self.P = self.P - self.phi @ self.gamma @ self.gamma.T @ self.phi.T
-        for i in range(1, N + 1):
-            for j in range(i + 1, N + 1):
+        for i in range(N):
+            for j in range(i + 1, N):
 
-                self.cross_cov[(i, j)] -= gamma[i - 1] @ gamma[j - 1].T
+                self.cross_cov[(i, j)] -= gamma[i] @ gamma[j].T
 
     
     def _cross_cov_set(
@@ -214,8 +214,8 @@ class EKF:
             return
         
         k = 0
-        for i in range(1, N + 1):
-            for j in range(i + 1, N + 1):
+        for i in range(N):
+            for j in range(i + 1, N):
 
                 self.cross_cov[(i, j)] = payload[k]
                 k += 1

@@ -157,9 +157,9 @@ for i in range(N_sim):
     cov1[i] = np.trace(limo_1.ekf.P)
     cov2[i] = np.trace(limo_2.ekf.P)
     # cross covariance
-    ccov0[i] = np.linalg.norm(limo_0.ekf.cross_cov[1, 2] + limo_0.ekf.cross_cov[1, 3] + limo_0.ekf.cross_cov[2, 3])
-    ccov1[i] = np.linalg.norm(limo_1.ekf.cross_cov[1, 2] + limo_1.ekf.cross_cov[1, 3] + limo_1.ekf.cross_cov[2, 3])
-    ccov2[i] = np.linalg.norm(limo_2.ekf.cross_cov[1, 2] + limo_2.ekf.cross_cov[1, 3] + limo_2.ekf.cross_cov[2, 3])
+    ccov0[i] = np.linalg.norm(limo_0.ekf.cross_cov[0, 1] + limo_0.ekf.cross_cov[0, 2] + limo_0.ekf.cross_cov[1, 2])
+    ccov1[i] = np.linalg.norm(limo_1.ekf.cross_cov[0, 1] + limo_1.ekf.cross_cov[0, 2] + limo_1.ekf.cross_cov[1, 2])
+    ccov2[i] = np.linalg.norm(limo_2.ekf.cross_cov[0, 1] + limo_2.ekf.cross_cov[0, 2] + limo_2.ekf.cross_cov[1, 2])
 
 # PLOT
 fig, ax = plt.subplots(figsize=(10, 4))
