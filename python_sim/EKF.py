@@ -108,7 +108,7 @@ class EKF:
         Hb[2, 2] = 1
         self.Hb = Hb
 
-    def _h(
+    def _h( # check + on delta_y
             self,
             b_state: np.ndarray
             ) -> np.ndarray:
