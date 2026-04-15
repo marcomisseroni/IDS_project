@@ -3,7 +3,7 @@ from scipy.linalg import sqrtm
 from meas_model import MeasurementModel
 from agent_type import AgentType
 from agent_type import MobileRobotModel
-from agent_type import PersonAgent
+from agent_type import PersonModel
 
 #  ______ _  ________ 
 # |  ____| |/ /  ____|
@@ -41,15 +41,13 @@ class EKF:
         if self.agent_type == AgentType.ROBOT:
             self.model = MobileRobotModel()
         elif self.agent_type == AgentType.PERSON:
-            self.model = PersonAgent()
+            self.model = PersonModel()
         else:
             raise ValueError(f"Unsupported agent_type: {self.agent_type}")
         
-        self.meas_model = MeasurementModel()
+        self.meas_model = MeasurementModel(R_rr, R_rp)
         self.u = np.array([0, 0])
         self.state = initial_state.copy()
-        self.R_rr = R_rr
-        self.R_rp = R_rp
         self.Q = Q
         self.dt = dt
         self.n = len(self.state)
@@ -87,9 +85,9 @@ class EKF:
             self.is_initialized = True
             self._cross_cov_set() 
 
-        self.state = self.model.f(self.state, self.u, self.dt)
         self.A = self.model.A(self.state, self.u, self.dt)
         self.G = self.model.G(self.state, self.u, self.dt)
+        self.state = self.model.f(self.state, self.u, self.dt)
         self.P = self.A @ self.P @ self.A.T + self.G @ self.Q @ self.G.T
         self.phi = self.A @ self.phi
 
@@ -103,17 +101,20 @@ class EKF:
             b_agent_type: AgentType
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         
-        self.meas_model.Ha(b_agent_type, b_state, self.state)
-        self.meas_model.Hb(b_agent_type, b_state, self.state)
+        if self.agent_type != AgentType.ROBOT:
+            raise RuntimeError("measurement() is supported only for robot observers")
+        self.Ha = self.meas_model.Ha(b_agent_type, b_state, self.state)
+        self.Hb = self.meas_model.Hb(b_agent_type, b_state, self.state)
         piab = self.cross_cov[(min(self.agent_id, id_b), max(self.agent_id, id_b))]
 
         if self.agent_id > id_b: 
             piab = piab.T
         
+        R = self.meas_model.R(b_agent_type)
         Pab = self.phi @ piab @ phi_b.T
         Pba = phi_b @ piab.T @ self.phi.T
         r_a = z_ab - self.meas_model.h(b_agent_type, b_state, self.state)
-        S_ab = self.R + self.Ha @ self.P @ self.Ha.T + self.Hb @ Pb @ self.Hb.T - self.Ha @ Pab @ self.Hb.T - self.Hb @ Pba @ self.Ha.T
+        S_ab = R + self.Ha @ self.P @ self.Ha.T + self.Hb @ Pb @ self.Hb.T - self.Ha @ Pab @ self.Hb.T - self.Hb @ Pba @ self.Ha.T
         inv_sqrt_S = sqrtm(np.linalg.inv(S_ab))
         gamma_a = (piab @ phi_b.T @ self.Hb.T - np.linalg.inv(self.phi) @ self.P @ self.Ha.T) @ inv_sqrt_S
         gamma_b = (np.linalg.inv(phi_b) @ Pb @ self.Hb.T - piab.T @ self.phi.T @ self.Ha.T) @ inv_sqrt_S

@@ -108,12 +108,12 @@ class EKF:
         Hb[2, 2] = 1
         self.Hb = Hb
 
-    def _h( # check + on delta_y
+    def _h(
             self,
             b_state: np.ndarray
             ) -> np.ndarray:
         delta_x = (b_state[0] - self.state[0]) * np.cos(self.state[2]) + (b_state[1] - self.state[1]) * np.sin(self.state[2])
-        delta_y = (b_state[1] - self.state[1]) + np.cos(self.state[2]) + (self.state[0] - b_state[0]) * np.sin(self.state[2])
+        delta_y = (b_state[1] - self.state[1]) * np.cos(self.state[2]) + (self.state[0] - b_state[0]) * np.sin(self.state[2])
         delta_theta = b_state[2] - self.state[2]
 
         return np.array([delta_x, delta_y, delta_theta])
@@ -130,9 +130,9 @@ class EKF:
             payload = [np.zeros((3, 3)) for _ in range(dim)]
             self._cross_cov_set(payload) 
 
-        self.state = self._kinematic_model(v, yaw_rate)
         self.A = self._A()
         self.G = self._G()
+        self.state = self._kinematic_model(v, yaw_rate)
         self.P = self.A @ self.P @ self.A.T + self.G @ self.Q @ self.G.T
         self.phi = self.A @ self.phi
 

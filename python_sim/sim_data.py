@@ -94,7 +94,7 @@ class data_sim:
     def simulate_relative_measurement(self, a_state, b_state, noise):
         theta_a = a_state[2]
         delta_x = (b_state[0] - a_state[0]) * np.cos(theta_a) + (b_state[1] - a_state[1]) * np.sin(theta_a)
-        delta_y = (b_state[1] - a_state[1]) + np.cos(theta_a) + (a_state[0] - b_state[0]) * np.sin(theta_a)
+        delta_y = (b_state[1] - a_state[1]) * np.cos(theta_a) + (a_state[0] - b_state[0]) * np.sin(theta_a)
         delta_theta = b_state[2] - a_state[2]
         return np.array([delta_x, delta_y, delta_theta]) + noise
     

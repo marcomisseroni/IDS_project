@@ -20,14 +20,22 @@ In the nomenclature used *a* is the agent that takes the measurement and *b* is 
 
 class MeasurementModel:
 
-    def h_robot_robot( # check + in delta_y
+    def __init__(
+            self,
+            R_rr: np.ndarray,
+            R_rp: np.ndarray):
+        
+        self.R_rr = R_rr
+        self.R_rp = R_rp
+
+    def h_robot_robot(
             self,
             b_state: np.ndarray,
             a_state: np.ndarray,
             ) -> np.ndarray:
             
         delta_x = (b_state[0] - a_state[0]) * np.cos(a_state[2]) + (b_state[1] - a_state[1]) * np.sin(a_state[2])
-        delta_y = (b_state[1] - a_state[1]) + np.cos(a_state[2]) + (a_state[0] - b_state[0]) * np.sin(a_state[2])
+        delta_y = (b_state[1] - a_state[1]) * np.cos(a_state[2]) + (a_state[0] - b_state[0]) * np.sin(a_state[2])
         delta_theta = b_state[2] - a_state[2]
         return np.array([delta_x, delta_y, delta_theta])
     
@@ -140,5 +148,17 @@ class MeasurementModel:
             return self.Hb_robot_robot(b_state, a_state)
         elif b_type == AgentType.PERSON:
             return self.Hb_robot_person(b_state, a_state)
+        else:
+            raise ValueError(f"Unsupported agent_type: {b_type}")
+        
+    def R(
+            self,
+            b_type: AgentType
+            ) -> np.ndarray:
+        
+        if(b_type == AgentType.ROBOT):
+            return self.R_rr
+        elif(b_type == AgentType.PERSON):
+            return self.R_rp
         else:
             raise ValueError(f"Unsupported agent_type: {b_type}")
