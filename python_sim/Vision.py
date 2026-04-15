@@ -43,7 +43,7 @@ class Vision:
             "DICT_APRILTAG_36h10": cv2.aruco.DICT_APRILTAG_36h10,
             "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
         }
-        self.model = YOLO("yolov8n.pt")
+        self.model = YOLO("yolov8n-seg.pt")
         self.fpx = conf_limo.fpx # focal length (px)
         self.rx = conf_limo.rx #resolution of the camera along x
         self.d = conf_limo.d # physical size of a pixel (mm)
@@ -290,8 +290,9 @@ class Vision:
         x_target = 0; y_target = 0
         x_1 = 0; x_2 = 0; y_1 = 0; y_2 = 0
         biggest_area = 0
+        mask = None
         for r in results:
-            for box in r.boxes:
+            for i, box in enumerate(r.boxes):
                 class_id = int(box.cls[0])  # Get class ID
                 confidence = box.conf[0].item()  # Confidence score
                 label = self.model.names[class_id]
@@ -312,45 +313,37 @@ class Vision:
                         x_2 = x2
                         y_1 = y1
                         y_2 = y2
-        return x_1, x_2, y_1, y_2, x_target
+                        # mask of the human
+                        mask = r.masks.data[i].cpu().numpy()
+                        if mask is not None:
+                            mask = np.squeeze(mask)
+                            mask = (mask * 255).astype(np.uint8)
+        return x_1, x_2, y_1, y_2, x_target, mask
 
-    def target_estimation_RGBD(self, x1, x2, y1, y2, xc, depth):
-        # resixing the box coordinates based on the depth image resolution
-        factor = conf_limo.rx_depth / conf_limo.rx
-        x1 = int(x1*factor); x2 = int(x2*factor); y1 = int(y1*factor); y2 = int(y2*factor)
-        dx = x2-x1
-        dy = y2-y1
-        # selecting a window 50% smaller
-        x1 = int(x1 + dx/4); x2 = int(x2 - dx/4); y1 = int(y1 + dy/4); y2 = int(y2 - dy/4)
+    def target_estimation_RGBD(self, xc, depth, mask):
         # angle in respect to the camera
         tan_theta = 1/self.fpx*(self.rx/2-xc)
-        # distance from the depth image
-        # using min value of the region
-        #region = depth[y1:y2, x1:x2]
-        #depth_val = np.min(region)
-        
-        # in case of a HSV image
+        # converting the image in HSV
         hsv = cv2.cvtColor(depth, cv2.COLOR_BGR2HSV)
-        roi = hsv[y1:y2, x1:x2]
-        h_channel = roi[:, :, 0] # values from 0 to 179
-        # removing pixels with no informations
-        mask = (h_channel > 10) & (h_channel < 170)
-        valid_h = h_channel[mask]
-        depth_val = np.median(valid_h)
+        mask = cv2.resize(mask, (hsv.shape[1], hsv.shape[0]))
+        h_channel = hsv[:, :, 0] # values from 0 to 179
+        h_values = h_channel[mask > 0]
+        # median of the depth values inside the mask
+        depth_val = np.median(h_values)
         D = 2970/self.n_d*depth_val + 30
 
         # distances
         x_relative = D
         y_relative = D*tan_theta
-        print(tan_theta)
         # transforming the reading in the limo RF
         target = self.translate([x_relative, y_relative, 0])
         target_limoRF = self.T_limo_camera @ target
         # result in meters
         x = self.get_point(target_limoRF)[0]/1000.0
         y = self.get_point(target_limoRF)[1]/1000.0
-        # showing the bounding box
-        cv2.rectangle(depth, (x1, y1), (x2, y2), (0, 0, 0), 2)
+        # showing the contour of the mask
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(depth, contours, -1, (0, 0, 0), 2)
         return x, y, depth
 
 #  __  __       _          __                  _   _             
@@ -366,10 +359,10 @@ class Vision:
 
         # --------------- TARGET ----------------------
         # using YOLO to detect the target in the frame
-        x1, x2, y1, y2, xc = self.detect_target(frame)
+        x1, x2, y1, y2, xc, mask = self.detect_target(frame)
         # estimated position of the target (if found)
-        if xc != 0:
-            x_target, y_target, frame_d = self.target_estimation_RGBD(x1, x2, y1, y2, xc, frame_d)
+        if (mask is not None) and x1!=0:
+            x_target, y_target, frame_d = self.target_estimation_RGBD(xc, frame_d, mask)
             target = [x_target, y_target, 0]
 
         # --------------- LIMOS ----------------------
