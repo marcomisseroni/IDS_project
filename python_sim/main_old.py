@@ -6,8 +6,7 @@ import conf_limo
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
-from localization.agent_type import AgentType
-from localization.localization_system import EKF
+from matplotlib.patches import Rectangle
 
 print("Starting simulation...")
 
@@ -21,46 +20,32 @@ flag_rel_meas = 0
 mu = 0
 sigma = 0.01
 
-print("Initializing limo0")
+print("Initializing limo 0...")
 
+# limo 0
 x0_init = [r,0,0]
 limo_0 = Limo.Limo(x0_init, target_init)
 x_sol_0 = np.zeros((limo_0.mpc.nx,N_sim))
 u_sol_0 = np.zeros((limo_0.mpc.nu,N_sim))
 limo_0.mpc.create_OCP_problem()
-limo_0_real = EKF(x0_init, conf_limo.R_rr, conf_limo.R_rp, conf_limo.Q, dt, AgentType.ROBOT)
 
 print("Initializing limo 1...")
 
+# limo 1
 x1_init = [-r*np.cos(60*np.pi/180),r*np.sin(60*np.pi/180),0]
 limo_1 = Limo.Limo(x1_init, target_init)
 x_sol_1 = np.zeros((limo_1.mpc.nx,N_sim))
 u_sol_1 = np.zeros((limo_1.mpc.nu,N_sim))
 limo_1.mpc.create_OCP_problem()
-limo_1_real = EKF(x1_init, conf_limo.R_rr, conf_limo.R_rp, conf_limo.Q, dt, AgentType.ROBOT)
 
 print("Initializing limo 2...")
 
+# limo 2
 x2_init = [-r*np.cos(60*np.pi/180),-r*np.sin(60*np.pi/180),0]
 limo_2 = Limo.Limo(x2_init, target_init)
 x_sol_2 = np.zeros((limo_2.mpc.nx,N_sim))
 u_sol_2 = np.zeros((limo_2.mpc.nu,N_sim))
 limo_2.mpc.create_OCP_problem()
-limo_2_real = EKF(x2_init, conf_limo.R_rr, conf_limo.R_rp, conf_limo.Q, dt, AgentType.ROBOT)
-
-print("Initializing person aget")
-
-Q_p = np.zeros((4, 4))
-Q_p[0, 0] = dt**4 / 4
-Q_p[0, 2] = dt**3 / 2
-Q_p[1, 1] = dt**4 / 4
-Q_p[1, 3] = dt**3 / 2
-Q_p[2, 0] = dt**3 / 2
-Q_p[2, 2] = dt**2
-Q_p[3, 1] = dt**3 / 2
-Q_p[3, 3] = dt**2
-person_initial_state = np.append(target_init, 0, 0)
-person = EKF(person_initial_state, None, None, Q_p, dt, AgentType.PERSON) # R matrix not used for person
 
 print("Warm start for the MPC")
 
@@ -77,9 +62,6 @@ c = np.zeros((2, N_sim))
 state0 = np.zeros((3, N_sim))
 state1 = np.zeros((3, N_sim))
 state2 = np.zeros((3, N_sim))
-state0_real = np.zeros((3, N_sim))
-state1_real = np.zeros((3, N_sim))
-state2_real = np.zeros((3, N_sim))
 input0 = np.zeros((2, N_sim))
 input1 = np.zeros((2, N_sim))
 input2 = np.zeros((2, N_sim))
@@ -90,44 +72,37 @@ ccov0 = np.zeros(N_sim)
 ccov1 = np.zeros(N_sim)
 ccov2 = np.zeros(N_sim)
 
-
 print("Starting MPC loop...")
 
 for i in range(N_sim):
     print("iteration ", i, " / ", N_sim)
     print("Simulate camera readings...")
     # sim of the three target measures
-    target = person.state[:2]
-    t[:,i] = target
+    target0 = sim.global_target_pos(i)
+    target1 = sim.global_target_pos(i)
+    target2 = sim.global_target_pos(i)
+    t[:,i] = (target0 + target1 + target2) / 3
     print("Compute desired positions for each limo...")
     # computation of the desired limo position
     center_global += limo_0.frame_movement
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target-center_global, target-center_global, target-center_global, limo_1.ekf.state, limo_2.ekf.state)
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target-center_global, target-center_global, target-center_global, limo_0.ekf.state, limo_2.ekf.state)
-    p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target-center_global, target-center_global, target-center_global, limo_0.ekf.state, limo_1.ekf.state)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target0-center_global, target1-center_global, target2-center_global, limo_1.ekf.state, limo_2.ekf.state)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target1-center_global, target0-center_global, target2-center_global, limo_0.ekf.state, limo_2.ekf.state)
+    p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target2-center_global, target0-center_global, target1-center_global, limo_0.ekf.state, limo_1.ekf.state)
     print("Perform MPC step...")
     # MPC for each limo to compute inputs for desired position
     in0 = limo_0.mpc_sim(limo_1.ekf.state, limo_2.ekf.state, x0_des)
     in1 = limo_1.mpc_sim(limo_0.ekf.state, limo_2.ekf.state, x1_des)
     in2 = limo_2.mpc_sim(limo_0.ekf.state, limo_1.ekf.state, x2_des)
-    limo_0_real.prediction_step(in0)
-    limo_1_real.prediction_step(in1)
-    limo_2_real.prediction_step(in2)
     # ekf
     print("Prediction step of the EKF...")
-    epsilon1 = random.gauss(mu, sigma)
-    epsilon2 = random.gauss(mu, sigma)
-    limo_0.ekf.prediction_step(in0[0] + epsilon1, in0[1] + epsilon2)
-    limo_1.ekf.prediction_step(in1[0] + epsilon1, in1[1] + epsilon2)
-    limo_2.ekf.prediction_step(in2[0] + epsilon1, in2[1] + epsilon2)
-    person.prediction_step(None)
+    limo_0.ekf.prediction_step(in0[0], in0[1])
+    limo_1.ekf.prediction_step(in1[0], in1[1])
+    limo_2.ekf.prediction_step(in2[0], in2[1])
     print("Simulate relative measurement and perform EKF step...\n")
     epsilon1 = random.gauss(mu, sigma)
     epsilon2 = random.gauss(mu, sigma)
     epsilon3 = random.gauss(mu, sigma)
     meas_unc = np.array([epsilon1, epsilon2, epsilon3])
-    # change structure for meas -> create function to simulate robot-person measurement using sim.global_target_pos(i) -> real person pos
-    # take right measurement: one at the time measures person and limo_1 -> limo_0, limo_2 -> limo_0
     if(flag_rel_meas == 0):
         meas = sim.simulate_relative_measurement(limo_0.ekf.state, limo_1.ekf.state, meas_unc)
         r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(limo_1.ekf.state, limo_1.ekf.phi, limo_1.ekf.P, meas, limo_1.ekf.agent_id)
@@ -149,13 +124,11 @@ for i in range(N_sim):
     limo_0.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
     limo_1.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
     limo_2.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
-    person.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
 
     # frame update
     limo_0.frame_update()
     limo_1.frame_update()
     limo_2.frame_update()
-    # frame update for person
 
     # data to plot
     p0[:,i] += center_global

@@ -3,8 +3,9 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import time
 import conf_limo
-import EKF
 import MPC
+from localization.localization_system import EKF
+from localization.agent_type import AgentType
 
 class Limo:
     def __init__(self, state_init, target_init):
@@ -14,7 +15,7 @@ class Limo:
         self.target = target_init
         self.center = np.array([0,0])
         # create the EKF object
-        self.ekf = EKF.EKF(state_init, conf_limo.R, conf_limo.Q, self.dt)
+        self.ekf = EKF(state_init, conf_limo.R_rr, conf_limo.R_rp, conf_limo.Q, self.dt, AgentType.ROBOT)
         # create the MPC object
         self.mpc = MPC.MPC(state_init,self.dt)
         self.mpc.create_OCP_problem()

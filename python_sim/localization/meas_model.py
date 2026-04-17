@@ -47,9 +47,7 @@ class MeasurementModel:
         
         delta_x = (b_state[0] - a_state[0]) * np.cos(a_state[2]) + (b_state[1] - a_state[1]) * np.sin(a_state[2])
         delta_y = (b_state[1] - a_state[1]) * np.cos(a_state[2]) + (a_state[0] - b_state[0]) * np.sin(a_state[2])
-        v_x = b_state[2]
-        v_y = b_state[3]
-        return np.array([delta_x, delta_y, v_x, v_y])
+        return np.array([delta_x, delta_y])
 
     def h(
             self,
@@ -87,7 +85,7 @@ class MeasurementModel:
             a_state: np.ndarray
             ) -> np.ndarray:
         
-        Ha = np.zeros((4, 3))
+        Ha = np.zeros((2, 3))
         Ha[0, 0] = np.cos(a_state[2])
         Ha[0, 1] = np.sin(a_state[2])
         Ha[0, 2] = ( - b_state[1] + a_state[1]) * np.cos(a_state[2]) + ( - a_state[0] + b_state[0]) * np.sin(a_state[2])
@@ -130,7 +128,7 @@ class MeasurementModel:
             a_state: np.ndarray
             ) -> np.ndarray:
         
-        Hb = np.identity(4)
+        Hb = np.zeros((2, 4))
         Hb[0, 0] = np.cos(a_state[2])
         Hb[0, 1] = np.sin(a_state[2])
         Hb[1, 0] = - np.sin(a_state[2])
