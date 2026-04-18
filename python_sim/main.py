@@ -59,7 +59,7 @@ Q_p[2, 0] = dt**3 / 2
 Q_p[2, 2] = dt**2
 Q_p[3, 1] = dt**3 / 2
 Q_p[3, 3] = dt**2
-person_initial_state = np.append(target_init, 0, 0)
+person_initial_state = np.append(target_init, np.array([0, 0]))
 person = EKF(person_initial_state, None, None, Q_p, dt, AgentType.PERSON) # R matrix not used for person
 
 print("Warm start for the MPC")
@@ -96,12 +96,12 @@ print("Starting MPC loop...")
 for i in range(N_sim):
     print("iteration ", i, " / ", N_sim)
     print("Simulate camera readings...")
-    # sim of the three target measures
+    # sim of the target measures
     target = person.state[:2]
-    t[:,i] = target
+    t[:,i] = sim.global_target_pos(i)
     print("Compute desired positions for each limo...")
     # computation of the desired limo position
-    center_global += limo_0.frame_movement
+    #center_global += limo_0.frame_movement
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x0_des = limo_0.desired_pos(target-center_global, target-center_global, target-center_global, limo_1.ekf.state, limo_2.ekf.state)
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x1_des = limo_1.desired_pos(target-center_global, target-center_global, target-center_global, limo_0.ekf.state, limo_2.ekf.state)
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target-center_global, target-center_global, target-center_global, limo_0.ekf.state, limo_1.ekf.state)
@@ -117,46 +117,59 @@ for i in range(N_sim):
     print("Prediction step of the EKF...")
     epsilon1 = random.gauss(mu, sigma)
     epsilon2 = random.gauss(mu, sigma)
-    limo_0.ekf.prediction_step(in0[0] + epsilon1, in0[1] + epsilon2)
-    limo_1.ekf.prediction_step(in1[0] + epsilon1, in1[1] + epsilon2)
-    limo_2.ekf.prediction_step(in2[0] + epsilon1, in2[1] + epsilon2)
+    prop_unc = np.array([epsilon1, epsilon2])
+    limo_0.ekf.prediction_step(in0 + prop_unc)
+    limo_1.ekf.prediction_step(in1 + prop_unc)
+    limo_2.ekf.prediction_step(in2 + prop_unc)
     person.prediction_step(None)
     print("Simulate relative measurement and perform EKF step...\n")
     epsilon1 = random.gauss(mu, sigma)
     epsilon2 = random.gauss(mu, sigma)
     epsilon3 = random.gauss(mu, sigma)
     meas_unc = np.array([epsilon1, epsilon2, epsilon3])
-    # change structure for meas -> create function to simulate robot-person measurement using sim.global_target_pos(i) -> real person pos
-    # take right measurement: one at the time measures person and limo_1 -> limo_0, limo_2 -> limo_0
-    if(flag_rel_meas == 0):
-        meas = sim.simulate_relative_measurement(limo_0.ekf.state, limo_1.ekf.state, meas_unc)
-        r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(limo_1.ekf.state, limo_1.ekf.phi, limo_1.ekf.P, meas, limo_1.ekf.agent_id)
+  
+    if(flag_rel_meas == 0): # limo_0 measures person
+        meas = sim.sim_robot_person_meas(limo_0_real.state, sim.global_target_pos(i), np.array([epsilon1, epsilon2]))
+        r_a, gamma_a, gamma_b, W1, W2 = limo_0.ekf.measurement(person.state, person.phi, person.P, meas, person.agent_id, AgentType.PERSON)
         id_a = limo_0.ekf.agent_id
-        id_b = limo_1.ekf.agent_id
-    elif(flag_rel_meas == 1):
-        meas = sim.simulate_relative_measurement(limo_1.ekf.state, limo_2.ekf.state, meas_unc)
-        r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(limo_2.ekf.state, limo_2.ekf.phi, limo_2.ekf.P, meas, limo_2.ekf.agent_id)
+        id_b = person.agent_id
+    elif(flag_rel_meas == 1): # limo_1 measures limo_0
+        meas = sim.sim_robot_robot_meas(limo_1_real.state, limo_0_real.state, meas_unc)
+        r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id, AgentType.ROBOT)
         id_a = limo_1.ekf.agent_id
-        id_b = limo_2.ekf.agent_id
-    elif(flag_rel_meas == 2):
-        meas = sim.simulate_relative_measurement(limo_2.ekf.state, limo_0.ekf.state, meas_unc)
-        r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id)
+        id_b = limo_0.ekf.agent_id
+    elif(flag_rel_meas == 2): # limo_2 measures person
+        meas = sim.sim_robot_person_meas(limo_2_real.state, sim.global_target_pos(i), np.array([epsilon1, epsilon2]))
+        r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(person.state, person.phi, person.P, meas, person.agent_id, AgentType.PERSON)
+        id_a = limo_2.ekf.agent_id
+        id_b = person.agent_id
+    elif(flag_rel_meas == 3): # limo_2 measures limo_0
+        meas = sim.sim_robot_robot_meas(limo_2_real.state, limo_0_real.state, meas_unc)
+        r_a, gamma_a, gamma_b, W1, W2 = limo_2.ekf.measurement(limo_0.ekf.state, limo_0.ekf.phi, limo_0.ekf.P, meas, limo_0.ekf.agent_id, AgentType.ROBOT)
         id_a = limo_2.ekf.agent_id
         id_b = limo_0.ekf.agent_id
+    elif(flag_rel_meas == 4): # limo_1 measures person
+        meas = sim.sim_robot_person_meas(limo_1_real.state, sim.global_target_pos(i), np.array([epsilon1, epsilon2]))
+        r_a, gamma_a, gamma_b, W1, W2 = limo_1.ekf.measurement(person.state, person.phi, person.P, meas, person.agent_id, AgentType.PERSON)
+        id_a = limo_1.ekf.agent_id
+        id_b = person.agent_id
 
     flag_rel_meas += 1
-    if flag_rel_meas > 2: flag_rel_meas = 0
+    if flag_rel_meas > 4: flag_rel_meas = 0
     limo_0.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
     limo_1.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
     limo_2.ekf.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
     person.update_step(r_a, gamma_a, gamma_b, W1, W2, id_a, id_b)
 
     # frame update
-    limo_0.frame_update()
-    limo_1.frame_update()
-    limo_2.frame_update()
+    #limo_0.frame_update()
+    #limo_1.frame_update()
+    #limo_2.frame_update()
+    #limo_0_real.state[:2] -= limo_0.frame_movement
+    #limo_1_real.state[:2] -= limo_1.frame_movement
+    #limo_2_real.state[:2] -= limo_2.frame_movement
     # frame update for person
-
+    #person.state[:2] -= limo_0.frame_movement
     # data to plot
     p0[:,i] += center_global
     p1[:,i] += center_global

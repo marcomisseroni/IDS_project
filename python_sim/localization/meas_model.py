@@ -1,5 +1,5 @@
 import numpy as np
-from agent_type import AgentType
+from localization.agent_type import AgentType
 
 #  __  __                                                    _   __  __           _      _ 
 # |  \/  |                                                  | | |  \/  |         | |    | |

@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.linalg import sqrtm
-from meas_model import MeasurementModel
-from agent_type import AgentType
-from agent_type import MobileRobotModel
-from agent_type import PersonModel
+from localization.meas_model import MeasurementModel
+from localization.agent_type import AgentType
+from localization.agent_type import MobileRobotModel
+from localization.agent_type import PersonModel
 
 #  ______ _  ________ 
 # |  ____| |/ /  ____|

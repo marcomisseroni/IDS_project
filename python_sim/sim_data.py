@@ -91,13 +91,17 @@ class data_sim:
         w_r = np.round((v + w * self.b / 2) / self.r)
         return np.array([w_l, w_r])
     
-    def simulate_relative_measurement(self, a_state, b_state, noise):
+    def sim_robot_robot_meas(self, a_state, b_state, noise):
         theta_a = a_state[2]
         delta_x = (b_state[0] - a_state[0]) * np.cos(theta_a) + (b_state[1] - a_state[1]) * np.sin(theta_a)
         delta_y = (b_state[1] - a_state[1]) * np.cos(theta_a) + (a_state[0] - b_state[0]) * np.sin(theta_a)
         delta_theta = b_state[2] - a_state[2]
         return np.array([delta_x, delta_y, delta_theta]) + noise
     
+    def sim_robot_person_meas(self, robot_state, person_state, noise):
+        delta_x = (person_state[0] - robot_state[0]) * np.cos(robot_state[2]) + (person_state[1] - robot_state[1]) * np.sin(robot_state[2])
+        delta_y = (person_state[1] - robot_state[1]) * np.cos(robot_state[2]) + (robot_state[0] - person_state[0]) * np.sin(robot_state[2])
+        return np.array([delta_x, delta_y]) + noise
 
 
 

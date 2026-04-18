@@ -26,7 +26,7 @@ w_min = -0.1*4*v_max/b
 # ----------------- SENSORS -------------------
 # lidar covariance
 R_rr = np.identity(3) * 0.01
-R_rp = np.identity(3) * 0.01
+R_rp = np.identity(2) * 0.01
 # model covariance
 Q = np.identity(3) * 0.001
 
