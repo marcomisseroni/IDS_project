@@ -4,6 +4,7 @@ import Limo
 import sim_data
 import conf_limo
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Circle
 from localization.agent_type import AgentType
@@ -83,13 +84,46 @@ state2_real = np.zeros((3, N_sim))
 input0 = np.zeros((2, N_sim))
 input1 = np.zeros((2, N_sim))
 input2 = np.zeros((2, N_sim))
+person_state = np.zeros((2, N_sim))
 cov0 = np.zeros(N_sim)
 cov1 = np.zeros(N_sim)
 cov2 = np.zeros(N_sim)
+cov0_xy = np.zeros((N_sim, 2, 2))
+cov1_xy = np.zeros((N_sim, 2, 2))
+cov2_xy = np.zeros((N_sim, 2, 2))
+person_cov_xy = np.zeros((N_sim, 2, 2))
 ccov0 = np.zeros(N_sim)
 ccov1 = np.zeros(N_sim)
 ccov2 = np.zeros(N_sim)
 
+def plot_cov_ellipse(cov, mean, n_std=2.0, ax=None, color='tab:blue', alpha=0.2, label=None):
+
+    if ax is None:
+        ax = plt.gca()
+
+    vals, vecs = np.linalg.eigh(cov)
+    order = vals.argsort()[::-1]
+    vals, vecs = vals[order], vecs[:, order]
+
+    angle = np.degrees(np.arctan2(*vecs[:, 0][::-1]))
+
+    width, height = 2 * n_std * np.sqrt(vals)
+
+    ell = Ellipse(xy=mean,
+                  width=width,
+                  height=height,
+                  angle=angle,
+                  edgecolor=color,
+                  facecolor='none',
+                  linewidth=2,
+                  alpha=alpha,
+                  label=label)
+
+    ax.add_patch(ell)
+    ax.scatter(*mean, c=color, s=20)
+
+    return ell
+    
 
 print("Starting MPC loop...")
 
@@ -188,6 +222,7 @@ for i in range(N_sim):
     state0[:,i] = np.array([x0, y0, theta0])
     state1[:,i] = np.array([x1, y1, theta1])
     state2[:,i] = np.array([x2, y2, theta2])
+    person_state[:, i] = person.state[:2]
     # inputs
     input0[:,i] = in0
     input1[:,i] = in1
@@ -196,6 +231,10 @@ for i in range(N_sim):
     cov0[i] = np.trace(limo_0.ekf.P)
     cov1[i] = np.trace(limo_1.ekf.P)
     cov2[i] = np.trace(limo_2.ekf.P)
+    cov0_xy[i] = limo_0.ekf.P[:2, :2]
+    cov1_xy[i] = limo_1.ekf.P[:2, :2]
+    cov2_xy[i] = limo_2.ekf.P[:2, :2]
+    person_cov_xy[i] = person.P[:2, :2]
     # cross covariance
     ccov0[i] = np.linalg.norm(limo_0.ekf.cross_cov[0, 1] + limo_0.ekf.cross_cov[0, 2] + limo_0.ekf.cross_cov[1, 2])
     ccov1[i] = np.linalg.norm(limo_1.ekf.cross_cov[0, 1] + limo_1.ekf.cross_cov[0, 2] + limo_1.ekf.cross_cov[1, 2])
@@ -223,6 +262,10 @@ def update(frame):
     limo_0.mpc.plot_robot(state0[:,frame], limo_0.mpc.robot_ray, 'b', fill=0)
     limo_1.mpc.plot_robot(state1[:,frame], limo_1.mpc.robot_ray, 'y', fill=0)
     limo_2.mpc.plot_robot(state2[:,frame], limo_2.mpc.robot_ray, 'g', fill=0)
+    plot_cov_ellipse(cov0_xy[frame], state0[:2, frame], ax=ax, color='b')
+    plot_cov_ellipse(cov1_xy[frame], state1[:2, frame], ax=ax, color='y')
+    plot_cov_ellipse(cov2_xy[frame], state2[:2, frame], ax=ax, color='g')
+    plot_cov_ellipse(person_cov_xy[frame], person_state[:, frame], ax=ax, color='m')
     # text with input results
     txt0 = ax.text(0.02, 0.95, f'u0 = {input0[0,frame]:.2f}', transform=ax.transAxes)
     txt1 = ax.text(0.02, 0.90, f'u1 = {input1[0,frame]:.2f}', transform=ax.transAxes)
