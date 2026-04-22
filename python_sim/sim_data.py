@@ -58,8 +58,7 @@ class data_sim:
 
     def global_target_pos(self, i):
         target_pos = np.array([self.x_pos[i], self.y_pos[i]])
-        noise = np.random.normal(0, self.std, 2)
-        return target_pos + noise
+        return target_pos
 
     def prop_sensors(self, state, des_pos):
         noise = np.random.normal(0, self.std)
