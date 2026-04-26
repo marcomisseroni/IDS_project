@@ -135,11 +135,22 @@ class Vision:
 
     # estimate the aruco pose
     def aruco_pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients, aruco_size):
-        # converting the image to grayscale
+        # converting the image to grayscale and improving the values for the aruco detection
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        gray = clahe.apply(gray)
         # loading the correct aruco dictionary
         cv2.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
         parameters = cv2.aruco.DetectorParameters()
+        parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+        parameters.cornerRefinementWinSize = 5
+        parameters.cornerRefinementMaxIterations = 50
+        parameters.cornerRefinementMinAccuracy = 0.01
+        parameters.adaptiveThreshWinSizeMin = 3
+        parameters.adaptiveThreshWinSizeMax = 23
+        parameters.adaptiveThreshWinSizeStep = 10
+        parameters.minMarkerPerimeterRate = 0.03
+        parameters.maxMarkerPerimeterRate = 4.0
 
         # using opencv to detect the aruco corners and index
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, cv2.aruco_dict, parameters=parameters)
@@ -393,7 +404,7 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
             # showing the video with the target
             combined = np.hstack((output, frame_d))
-            combined_resized = cv2.resize(combined, (1280, 360))
+            combined_resized = cv2.resize(combined, (1920, 540))
             cv2.imshow("Person recognition", combined_resized)
             #resized = cv2.resize(output, (1280, 960))
             #cv2.imshow("Complete vision system", resized)
@@ -476,5 +487,10 @@ if __name__ == "__main__":
             break
 
     cap.release()
-    #cap_d.release()
     cv2.destroyAllWindows()
+
+    plt.ioff()
+    plt.figure(figsize=(10,6))
+    plt.plot(th_limo0, marker='o')
+    plt.title("Limo angle")
+    plt.show()
