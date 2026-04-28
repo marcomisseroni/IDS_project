@@ -40,26 +40,40 @@ def plot_robot( x, ray, color1='r', color2='k', fill=1, axis=None):
     axis.axis('equal')
 
 # function to plot the uncertainty ellipse
-def plot_cov_ellipse(cov, mean, n_std=2.0, ax=None, color='tab:blue', alpha=0.2, label=None):
+def plot_covariance_ellipse(Sigma, mu, k=2.0, ax=None, **kwargs):
+    """
+    Sigma: covariance matrix 2x2
+    mu: array [x, y]
+    k: confidence level (es. 2 ≈ 95%)
+    ax: matplotlib axis
+    kwargs: plot parameters (color, linewidth, ecc.)
+    """
+    
     if ax is None:
         ax = plt.gca()
-    vals, vecs = np.linalg.eigh(cov)
-    order = vals.argsort()[::-1]
-    vals, vecs = vals[order], vecs[:, order]
-    angle = np.degrees(np.arctan2(*vecs[:, 0][::-1]))
-    width, height = 2 * n_std * np.sqrt(vals)
-    ell = Ellipse(xy=mean,
-                  width=width,
-                  height=height,
-                  angle=angle,
-                  edgecolor=color,
-                  facecolor='none',
-                  linewidth=2,
-                  alpha=alpha,
-                  label=label)
-    ax.add_patch(ell)
-    ax.scatter(*mean, c=color, s=20)
-    return ell
+    eigenvalues, eigenvectors = np.linalg.eigh(Sigma)
+    order = eigenvalues.argsort()[::-1]
+    eigenvalues = eigenvalues[order]
+    eigenvectors = eigenvectors[:, order]
+    # ellipse axis
+    a = k * np.sqrt(eigenvalues[0])
+    b = k * np.sqrt(eigenvalues[1])
+    # rotaion angle
+    angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0])
+    # ellipse parametrization
+    theta = np.linspace(0, 2*np.pi, 100)
+    ellipse = np.array([a * np.cos(theta), b * np.sin(theta)])
+    R = np.array([
+        [np.cos(angle), -np.sin(angle)],
+        [np.sin(angle),  np.cos(angle)]
+    ])
+    # rotation and translation
+    ellipse_rotated = R @ ellipse
+    ellipse_translated = ellipse_rotated + np.array(mu).reshape(2, 1)
+    # Plot
+    ax.plot(ellipse_translated[0, :], ellipse_translated[1, :], **kwargs)
+    return ax
+
 
 #   _____ _                 _       _   _             
 #  / ____(_)               | |     | | (_)            
@@ -78,7 +92,7 @@ sim = sim_data.data_sim("sin", N_sim, dt, 0.01)
 target_init = np.array([sim.global_target_pos(0)])
 flag_rel_meas = 0
 mu = 1e-8
-sigma = 0.05
+sigma = 0.01
 
 print("Initializing limo0")
 
@@ -280,10 +294,10 @@ def update(frame):
     ax.plot(state0[0,frame],  state0[1,frame],  'x-', color='b', alpha=1)
     ax.plot(state1[0,frame],  state1[1,frame],  'x-', color='y', alpha=1)
     ax.plot(state2[0,frame],  state2[1,frame],  'x-', color='g', alpha=1)
-    #plot_cov_ellipse(cov0_xy[frame], state0[:2, frame], ax=ax, color='b')
-    #plot_cov_ellipse(cov1_xy[frame], state1[:2, frame], ax=ax, color='y')
-    #plot_cov_ellipse(cov2_xy[frame], state2[:2, frame], ax=ax, color='g')
-    #plot_cov_ellipse(person_cov_xy[frame], person_state[:, frame], ax=ax, color='m')
+    plot_covariance_ellipse(cov0_xy[frame], state0[:2, frame], k=1, ax=ax, color='b', alpha=0.1)
+    plot_covariance_ellipse(cov1_xy[frame], state1[:2, frame], k=1, ax=ax, color='y', alpha=0.1)
+    plot_covariance_ellipse(cov2_xy[frame], state2[:2, frame], k=1, ax=ax, color='g', alpha=0.1)
+    plot_covariance_ellipse(person_cov_xy[frame], person_state[:, frame], k=1, ax=ax, color='m', alpha=0.1)
     # text with input results
     txt0 = ax.text(0.02, 0.95, f'u0 = {input0[0,frame]:.2f}', transform=ax.transAxes)
     txt1 = ax.text(0.02, 0.90, f'u1 = {input1[0,frame]:.2f}', transform=ax.transAxes)
