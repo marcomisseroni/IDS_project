@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'limo_sensors'
+package_name = 'simulation'
 
 setup(
     name=package_name,
