@@ -98,7 +98,7 @@ install-scripts=$base/lib/package_name
 To build a specific package, navigate to `ros2_ws` then you can use:
 
 ```
-colcon buld --package-select <package_name>
+colcon build --package-select <package_name>
 ```
 
 Otherwise to build everything just use:

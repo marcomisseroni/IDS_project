@@ -84,12 +84,12 @@ class MPC:
             self.opti.subject_to(self.X[k+1] == self.X[k] + self.dt_MPC * self.f(self.X[k], self.U[k]))
 
         # cost on the desired position (only x and y components)
-        cost += self.w_p * (self.X[k][:2] - self.param_x_des[:2]).T @ (self.X[k][:2] - self.param_x_des[:2])
+        cost += self.w_p * (self.X[-1][:2] - self.param_x_des[:2]).T @ (self.X[-1][:2] - self.param_x_des[:2])
         # cost on the desired angle
         cost += self.w_a * (np.arctan2(self.param_x_target[1] - self.X[1][1], self.param_x_target[0] - self.X[1][0]) - self.X[1][2])**2
         
         # Final velocity cost
-        cost += self.w_final_v * self.X[-1].T @ self.X[-1]
+        cost += self.w_final_v * self.U[-1].T @ self.U[-1]
 
         # no collision constraint
         self.opti.subject_to((self.X[1][0]-self.param_x1[0])**2 + (self.X[1][1]-self.param_x1[1])**2 > (2*self.param_r)**2)
@@ -152,10 +152,7 @@ class MPC:
             new_sol = self.opti.solve()
         except:
             new_sol = self.opti.debug
-
-        # updating the states value (feedback from kalman filter)
-        x = new_sol.value(self.X[1])
-        return new_sol, x
+        return new_sol
     
 #  _____  _       _       
 # |  __ \| |     | |      

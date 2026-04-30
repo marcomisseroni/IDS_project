@@ -7,7 +7,7 @@ class SimOdometry(Node):
 
     def __init__(self):
         super().__init__('sim_odometry')
-        self.publisher_odom = self.create_publisher(Float64MultiArray, 'odom', 10)
+        self.publisher_odom = self.create_publisher(Float64MultiArray, '/odom', 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
         self.i = 0
 
