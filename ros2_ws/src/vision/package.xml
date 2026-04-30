@@ -4,12 +4,11 @@
   <name>vision</name>
   <version>0.0.0</version>
   <description>Node for aruco and human detection</description>
-  <maintainer email="feder@todo.todo">feder</maintainer>
+  <maintainer email="federicobattisti4@gmail.com">feder</maintainer>
   <license>TODO: License declaration</license>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>numpy</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
