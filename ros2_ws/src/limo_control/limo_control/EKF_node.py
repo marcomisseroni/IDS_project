@@ -2,166 +2,88 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from std_msgs.msg import Float64MultiArray
-import numpy as np                                            
+from nav_msgs.msg import Odometry
+import numpy as np
+from limo_control.agent_type import AgentType
+from limo_control.localization_system import EKF
+import conf_kalman
 
-#  ______ _  ________                   _      
-# |  ____| |/ /  ____|                 | |     
-# | |__  | ' /| |__     _ __   ___   __| | ___ 
-# |  __| |  < |  __|   | '_ \ / _ \ / _` |/ _ \
-# | |____| . \| |      | | | | (_) | (_| |  __/
-# |______|_|\_\_|      |_| |_|\___/ \__,_|\___|
+class ExtendedKalmanFilter(Node):
 
-# This node implements an extended kalman filter to estimate the state of the limo
-# Pub topuc: ekf_state (String) -> [x, y, theta]
-# Sub topic: enc (String) -> [v_enc, w_enc]
-#            imu (String) -> w_imu
-#            lidar (String) -> [x_lidar, y_lidar, theta_lidar]
-#            admin (String) -> "start" or "stop" to start or stop the estimation                                             
-                                              
+    def __init__(self, initial_state, initial_person_pos):
+        
+        super.__init__('extended_kalman_filter')
+        self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT)
+        self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON)
+        self.last_callback_time = None
+        self.actual_callback_time = None
+        self.measurement = None
 
-class EKF(Node):
+        self.pub_info = self.create_publisher(Info, '/info', 10)
+        self.pub_update = self.create_publisher(Update, '/update', 10)
 
-    def __init__(self, enc_weight, imu_weight, initial_state, dx = 0, dy = 0, dtheta = 0):
+        self.sub_odometry = self.create_subscription(
+            Odometry,
+            '/odom',
+            self.odometry_callback,
+            10)
+        self.sub_measurement = self.create_subscription(
+            Measurement,
+            '/measurement',
+            self.measurement_callback,
+            10)
+        self.sub_info = self.create_subscription(
+            Info,
+            '/info',
+            self.info_callback,
+            10)
+        self.sub_update = self.create_subscription(
+            Update,
+            'update',
+            self.update_callback,
+            10)
+        
+    def odometry_callback(self, msg):
+        self.get_logger().info('Message received: "%s"' % msg.data)
+        self.last_callback_time = self.actual_callback_time
+        self.actual_callback_time = self.get_clock().now()
 
-        super().__init__('ekf')
-        if enc_weight + imu_weight != 1 or enc_weight < 0 or imu_weight < 0:
-            print("Error: weights used are not valid, they must be positive and sum up to 1")
-            self.weight_enc = 0.5
-            self.weight_imu = 0.5
-        else:
-            self.weight_enc = enc_weight
-            self.weight_imu = imu_weight
+        if(self.last_callback_time is not None):
+            dt = self.actual_callback_time - self.last_callback_time
+            self.ekf.dt = dt
+            self.person_ekf.dt = dt
 
-        # Define parameters
-        self.v = 0
-        self.yaw_rate = 0
-        self.state = initial_state.copy()
-        self.dt = self.declare_parameter('dt', 1).value
-        self.dx = dx
-        self.dy = dy
-        self.dtheta = dtheta
-        self.A = self._A()
-        self.G = self._G()
-        self.H = self._H()
-        R_list = self.declare_parameter('R',[0.01, 0.0, 0.0,0.0, 0.01, 0.0,0.0, 0.0, 0.01]).value
-        self.R = np.array(R_list).reshape(3,3)
-        Q_list = self.declare_parameter('Q', [0.01, 0.0, 0.0,0.0, 0.01, 0.0,0.0, 0.0, 0.01]).value
-        self.Q = np.array(Q_list).reshape(3,3)
-        self.P = np.linalg.inv(self.H.T @ np.linalg.inv(self.R) @ self.H)
+        v = msg.twist.twist.linear.x
+        w = msg.twist.twist.angular.z
+        self.person_ekf.prediction_step(None)
+        self.ekf.prediction_step([v, w])
 
-        # Communication stuff
-        self.publisher = self.create_publisher(Float64MultiArray, 'ekf_state', 10)
-        self.subscription_e = self.create_subscription(Float64MultiArray, 'enc', self.enc_listener_callback, 10)
-        self.subscription_i = self.create_subscription(Float64MultiArray, 'imu', self.imu_listener_callback, 10)
-        self.subscription_l = self.create_subscription(Float64MultiArray, 'lidar', self.lidar_listener_callback, 10)
-        self.subscription_a = self.create_subscription(String, 'admin', self.admin_listener_callback, 10)
-        #self.subscription_e # prevent unused variable warning
-        #self.subscription_e 
-        #self.subscription_i 
-        #self.subscription_l 
-        #self.subscription_a 
-        self.timer = self.create_timer(self.dt, self.timer_callback)
+    def measurement_callback(self, msg):
+        if(msg.data.id_a == self.ekf.agent_id): 
+            self.measurement = msg.data.measurement
+        if(msg.data.id_b != self.ekf.agent_id): return 
+        msg_out = Info()
+        msg_out.data.state = self.ekf.state
+        msg_out.data.phi = self.ekf.phi
+        msg_out.data.P = self.ekf.P
+        self.pub_info.publish(msg_out)
+        self.get_logger().info('Publishing: "%s"' % msg_out.data)
 
-        # Initialize variables for the measurements
-        self.enc_v = 0
-        self.enc_w = 0
-        self.imu_w = 0
-        self.lidar_meas = np.zeros(3)
+    def info_callback(self, msg):
+        if(msg.data.id_a != self.ekf.agent_id): return
+        ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(msg.data.state, msg.data.phi, msg.data.P, self.measurement, msg.data.id_b, msg.data.b_agent_type)
+        msg_out = Update()
+        msg_out.data.id_a = self.ekf.agent_id
+        msg_out.data.id_b = msg.data.id_b
+        msg_out.data.ra = ra
+        msg_out.data.gamma_a = gamma_a
+        msg_out.data.gamma_b = gamma_b
+        msg_out.data.W1 = W1
+        msg_out.data.W2 = W2
+        self.pub_update.publish(msg_out)
+        self.get_logger().info('Publishing: "%s"' % msg_out.data)
+        self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.data.id_b)
 
-        # Flags
-        self.start = False
-        self.new_enc_data = False
-        self.new_imu_data = False
-        self.new_lidar_data = False
-
-    def timer_callback(self):
-        if not self.start:
-            return
-        msg = Float64MultiArray()
-        if self.new_enc_data and self.new_imu_data:
-            self.prediction_step(self.enc_w, self.enc_v, self.imu_w)
-            self.new_enc_data = False
-            self.new_imu_data = False
-        if self.new_lidar_data:
-            self.update_step(self.lidar_meas)
-            self.new_lidar_data = False
-        msg.data = [self.state[0], self.state[1], self.state[2]]
-        self.publisher.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-
-    def enc_listener_callback(self, msg):
-        self.enc_v = msg.data[0]
-        self.enc_w = msg.data[1]
-        self.new_enc_data = True
-
-    def imu_listener_callback(self, msg):
-        self.imu_w = msg.data[0]
-        self.new_imu_data = True
-
-    def lidar_listener_callback(self, msg):
-        self.lidar_meas[0] = msg.data[0]
-        self.lidar_meas[1] = msg.data[1]
-        self.lidar_meas[2] = msg.data[2]
-        self.new_lidar_data = True
-
-    def admin_listener_callback(self, msg):
-        if msg.data == "start":
-            self.start = True
-        elif msg.data == "stop":
-            self.start = False
-
-    def _kinematic_model(self, w_enc, v_enc, w_imu):
-        self.v = v_enc
-        self.yaw_rate = self.weight_enc * w_enc + self.weight_imu * w_imu
-        x = self.state[0] + self.dt * self.v * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        y = self.state[1] + self.dt * self.v * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        theta = self.state[2] + self.dt * self.yaw_rate
-        return np.array([x, y, theta])
-    
-    def _A(self):
-        A = np.identity(3)
-        A[0, 2] = - self.dt * self.v * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        A[1, 2] = self.dt * self.v * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        return A
-    
-    def _G(self):
-        G = np.zeros((3, 3))
-        G[0, 0] = self.dt * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[0, 1] = - self.dt ** 2 * self.v / 2 * self.weight_enc * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[0, 2] = - self.dt ** 2 * self.v / 2 * self.weight_imu * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[1, 0] = self.dt * np.sin(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[1, 1] = self.dt ** 2 * self.v / 2 * self.weight_enc * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[1, 2] = self.dt ** 2 * self.v / 2 * self.weight_imu * np.cos(self.state[2] + self.dt * self.yaw_rate / 2)
-        G[2, 0] = 0
-        G[2, 2] = self.dt * self.weight_imu
-        G[2, 1] = self.dt * self.weight_enc
-        return G
-    
-    def _H(self):
-        return np.identity(3)
-    
-    def prediction_step(self, w_enc, v_enc, w_imu):
-        self.state = self._kinematic_model(w_enc=w_enc, v_enc=v_enc, w_imu=w_imu)
-        self.A = self._A()
-        self.G = self._G()
-        self.H = self._H()
-        self.P = self.A @ self.P @ self.A.T + self.G @ self.Q @ self.G.T
-
-    def update_step(self, lidar_meas):
-        lidar_meas[0] += self.dx
-        lidar_meas[1] += self.dy
-        lidar_meas[2] += self.dtheta
-        S = self.H @ self.P @ self.H.T + self.R
-        W = self.P @ self.H.T @ np.linalg.inv(S) 
-        self.state += W @ (lidar_meas - self.state)
-        self.P = (np.identity(3) - W @ self.H) @ self.P 
-
-def main(args=None):
-    rclpy.init(args=args)
-    ekf = EKF(enc_weight=0.5, imu_weight=0.5, initial_state=np.zeros(3))
-    rclpy.spin(ekf)
-    ekf.destroy_node()
-    rclpy.shutdown()
-
-if __name__ == "__main__":
-    main()
+    def update_callback(self, msg):
+        if(msg.data.id_a == self.ekf.agent_id): return
+        self.ekf.update_step(msg.data.ra, msg.data.gamma_a, msg.data.gamma_b, msg.data.W1, msg.data.W2, msg.data.id_a, msg.data.id_b)

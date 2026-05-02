@@ -6,3 +6,20 @@ TODOS:
 - Decentralized kalman filter con camera + odometry (stati stimati: x1,y1,th1, x2,y2,th2, x3,y3,th3, x_persona,y_persona)
 - Ogni limo sa la propria desired position
 - MPC per il controllo
+
+
+TOPICS:
+
+    EKF_node:
+
+        reads from /odom -> prediction at each new data
+        reads from /measurement -> contains id_a and id_b and the relative measurement, when a reads the message it saves the measurement
+        write on /b_info -> if id_b from the message on /measurement matches it's own write the info such as state, phi, ...
+        reads from /b_info -> if a is reading gets the info and computes all the values needed for update step
+        write on /update -> write all values needed for update
+        read from /update -> performed update with shared data
+
+
+    Measurement handler (to decide who has to take the measurement):
+
+    ID_handler (to assign all the IDs, possibly through a table -> new class maybe):
