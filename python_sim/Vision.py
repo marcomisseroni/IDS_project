@@ -46,7 +46,6 @@ class Vision:
         self.model = YOLO("yolov8n-seg.pt")
         self.fpx = conf_limo.fpx # focal length (px)
         self.rx = conf_limo.rx #resolution of the camera along x
-        self.d = conf_limo.d # physical size of a pixel (mm)
         self.n_d = conf_limo.n_d # number of depth channels
         self.T_limo_camera = self.translate([conf_limo.x_camera, conf_limo.y_camera, conf_limo.z_camera])
         # type of aruco library used

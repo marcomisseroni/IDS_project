@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'sim_odometry_node = simulation.sim_odometry_node:main',
+            'sim_camera_node = simulation.sim_camera_node:main',
         ],
     },
 )

@@ -3,41 +3,35 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from std_msgs.msg import Float64MultiArray
 import numpy as np
-from scipy.linalg import logm, expm
+from sensor_msgs.msg import Image
+from vision.Vision_class import Vision
+from cv_bridge import CvBridge
 import cv2
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-from ultralytics import YOLO
-import time
-import conf_limo
 
-class Vision(Node):
+class Vision_node(Node):
 
     def __init__(self):
-        super().__init__('vision')
-        self.publisher_vision = self.create_publisher(Float64MultiArray, '/vision', 10)
-        self.timer = self.create_timer(0.01, self.timer_callback)
-        self.i = 0
+        super().__init__('vision_node')
+        self.sub_rgb = self.create_subscription(
+            Image,
+            '/vision',
+            self.frame_callback,
+            10)
+        self.bridge = CvBridge()
+        self.vision_obj = Vision()
 
-    def timer_callback(self):
-        msg = Float64MultiArray()
-        odom_msg = Float64MultiArray()
-        odom_msg = [random.random(), random.random()]
-        msg.data = odom_msg
-        self.publisher_vision.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
+    def frame_callback(self, msg):
+        self.get_logger().info('Received image')
+        frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, None, visualize=False)
+        print(limo0)
     
 def main(args=None):
-
-    rclpy.init(args=args)
-    vision_test = Vision()
-
-    rclpy.spin(vision)
-    vision.destroy_node()
+    rclpy.init()
+    node = Vision_node()
+    rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
