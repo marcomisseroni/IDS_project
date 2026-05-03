@@ -21,5 +21,3 @@ TOPICS:
 
 
     Measurement handler (to decide who has to take the measurement):
-
-    ID_handler (to assign all the IDs, possibly through a table -> new class maybe):

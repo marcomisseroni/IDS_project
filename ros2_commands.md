@@ -121,4 +121,9 @@ Navigate to the launch directory and use `ros2 launch launch_file.py`.
 
 To read what is published on a topic from the terminal you can use: `ros2 topic echo /topic_name`.
 
-To publish onto a topic: `ros2 topic pub /topic_name data`
+To publish onto a topic: `ros2 topic pub /topic_name data_type data`. Note that `data_type` is a ros2 type such as: `std_msgs/msg/Bool` and `data` must be written in YAML syntax.
+An example is:
+
+```
+ros2 topic pub /test std_msgs/msg/Bool "data: false"
+```

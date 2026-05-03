@@ -73,7 +73,13 @@ class BaseAgentModel(ABC):
 # |_|  |_|\___/|_.__/|_|_|\___|_|  \_\___/|_.__/ \___/ \__|_|  |_|\___/ \__,_|\___|_|
                                                                                     
 """
-Class that inherits from BaseAgentModel and implements the model of a mobile robot
+Class that inherits from BaseAgentModel and implements the model of a mobile robot.
+Equations:
+state = [x, y, theta]
+input = [v, w]
+x' = x + v * cos(theta)
+y' = y + v * sin(theta)
+theta' = theta + dt * w
 """                                                 
 
 class MobileRobotModel(BaseAgentModel):
@@ -131,7 +137,13 @@ class MobileRobotModel(BaseAgentModel):
 # |_|   \___|_|  |___/\___/|_| |_|_|  |_|\___/ \__,_|\___|_|
                                                            
 """
-Class that inherits from BaseAgentModel and implements the model of a person considering a constant velocity scenario
+Class that inherits from BaseAgentModel and implements the model of a person considering a constant velocity scenario.
+Equations:
+state = [x, y, vx, vy]
+x' = x + vx * dt
+y' = y + vy * dt
+vx' = vx
+vy' = vy
 """                         
 
 class PersonModel(BaseAgentModel):
