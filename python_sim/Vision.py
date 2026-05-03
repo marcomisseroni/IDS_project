@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import time
 import conf_limo
+# removing the QFontDatabase warning
+import os
+os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 
 class Vision:
 #  _____       _ _   _       _ _          _   _             
@@ -104,7 +107,7 @@ class Vision:
     # get the angle of the reference frame along z
     def get_z_angle(self, RF):
         # assuming only rotation along z
-        theta = np.atan2(RF[1,0], RF[0,0])
+        theta = np.arctan2(RF[1,0], RF[0,0])
         return theta
 
     # print the aruco number on the image and the bounding box
@@ -402,8 +405,8 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
             # showing the video with the target
-            combined = np.hstack((output, frame_d))
-            combined_resized = cv2.resize(combined, (1920, 540))
+            combined = np.hstack((cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth)), frame_d))
+            combined_resized = cv2.resize(combined, (conf_limo.rx_depth*2, conf_limo.ry_depth))
             cv2.imshow("Person recognition", combined_resized)
             #resized = cv2.resize(output, (1280, 960))
             #cv2.imshow("Complete vision system", resized)
@@ -420,7 +423,7 @@ class Vision:
 if __name__ == "__main__":
     # Open the RGBD video
     cap = cv2.VideoCapture("vision/test_videos/RGB3.mp4")
-    cap_d = cv2.VideoCapture("vision/test_videos/depth3.mp4")
+    cap_d = cv2.VideoCapture("vision/test_videos/depth3_640p.mp4")
 
     # initializing the vision object
     vision = Vision()

@@ -11,6 +11,7 @@ import numpy as np
 # ------------- CAMERA ------------------------
 rx = 1920 #resolution of the camera along x
 rx_depth = 640 # resolution of the depth camera along x
+ry_depth = 480 # 400
 f = 6.86 # focal length (mm)
 n_d = 179 # number of depth channels
 # from camera calibration
