@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import random
 import Limo
 import sim_data
@@ -167,6 +168,7 @@ ccov0 = np.zeros(N_sim); ccov1 = np.zeros(N_sim); ccov2 = np.zeros(N_sim)
     
 
 print("Starting MPC loop...")
+times = []
 
 # MPC loop
 for i in range(N_sim):
@@ -184,9 +186,13 @@ for i in range(N_sim):
     p0[:,i], p1[:,i], p2[:,i], c[:,i], x2_des = limo_2.desired_pos(target, target, target, limo_0.ekf.state, limo_1.ekf.state)
     print("Perform MPC step...")
     # MPC for each limo to compute inputs for desired position
+    start = time.time()
     in0 = limo_0.mpc_sim(limo_1.ekf.state, limo_2.ekf.state, x0_des)
     in1 = limo_1.mpc_sim(limo_0.ekf.state, limo_2.ekf.state, x1_des)
     in2 = limo_2.mpc_sim(limo_0.ekf.state, limo_1.ekf.state, x2_des)
+    end = time.time()
+    elapsed = end-start
+    times.append(elapsed)
     # updating the limo real positions with a prediction step (using only the kinematic model)
     limo_0_real.prediction_step(in0)
     limo_1_real.prediction_step(in1)
@@ -267,6 +273,8 @@ for i in range(N_sim):
     ccov0[i] = np.linalg.norm(limo_0.ekf.cross_cov[0, 1] + limo_0.ekf.cross_cov[0, 2] + limo_0.ekf.cross_cov[1, 2])
     ccov1[i] = np.linalg.norm(limo_1.ekf.cross_cov[0, 1] + limo_1.ekf.cross_cov[0, 2] + limo_1.ekf.cross_cov[1, 2])
     ccov2[i] = np.linalg.norm(limo_2.ekf.cross_cov[0, 1] + limo_2.ekf.cross_cov[0, 2] + limo_2.ekf.cross_cov[1, 2])
+
+print("Mean computational time for 3 MPC: ", np.median(times))
 
 # PLOT
 fig, ax = plt.subplots(figsize=(10, 4))

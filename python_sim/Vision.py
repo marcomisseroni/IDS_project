@@ -367,6 +367,7 @@ class Vision:
 # |_|  |_|\__,_|_|_| |_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|
                                                                                                                                 
     def vision_main(self, frame, frame_d, visualize=False):
+        start = time.time()
         # initializing the values
         target=np.zeros(3); limo0=np.zeros(3); limo1=np.zeros(3); limo2=np.zeros(3)
 
@@ -410,7 +411,9 @@ class Vision:
             cv2.imshow("Person recognition", combined_resized)
             #resized = cv2.resize(output, (1280, 960))
             #cv2.imshow("Complete vision system", resized)
-        return target, limo0, limo1, limo2 # outputs in the form [x,y,th]
+        end = time.time()
+        elapsed = end-start
+        return target, limo0, limo1, limo2, elapsed # outputs in the form [x,y,th]
 
 
 #  _______        _   
@@ -434,6 +437,7 @@ if __name__ == "__main__":
     x_limo0 = []; y_limo0 = []; th_limo0 = []
     x_limo1 = []; y_limo1 = []; th_limo1 = []
     x_limo2 = []; y_limo2 = []; th_limo2 = []
+    times = []
 
     plt.ion()
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -454,7 +458,8 @@ if __name__ == "__main__":
             print("ERROR IN CAPTURING")
             break
 
-        target, limo0, limo1, limo2 = vision.vision_main(frame, frame_d, visualize=True)
+        target, limo0, limo1, limo2, elapsed = vision.vision_main(frame, frame_d, visualize=False)
+        times.append(elapsed)
 
         # saving the target position
         if target[0] != 0:
@@ -496,3 +501,5 @@ if __name__ == "__main__":
     plt.plot(th_limo0, marker='o')
     plt.title("Limo angle")
     plt.show()
+
+    print("Mean time for each frame elaboration: ", np.mean(times))
