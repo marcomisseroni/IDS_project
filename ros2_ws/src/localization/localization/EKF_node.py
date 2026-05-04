@@ -1,31 +1,58 @@
+import numpy as np
+# ros2 stuff
 import rclpy
 from rclpy.node import Node
+# to have arguments in the node call
 import argparse
 import sys
-from std_msgs.msg import String
-from std_msgs.msg import Float64MultiArray
-from nav_msgs.msg import Odometry
-import numpy as np
+# to use EKF class
 from localization.agent_type import AgentType
 from localization.localization_system import EKF
+# configuration file containing convariances, ...
 import conf_kalman
+# message types used
+from nav_msgs.msg import Odometry
+from project_interfaces.msg import Measurement
+from project_interfaces.msg import Landmark
+from project_interfaces.msg import Update
+
+#  ______ _  ________               _      
+# |  ____| |/ /  ____|             | |     
+# | |__  | ' /| |__ _ __   ___   __| | ___ 
+# |  __| |  < |  __| '_ \ / _ \ / _` |/ _ \
+# | |____| . \| |  | | | | (_) | (_| |  __/
+# |______|_|\_\_|  |_| |_|\___/ \__,_|\___|
+#             ______                       
+#            |______|                      
+
+'''
+Node that implements the Extended Kalman Filter.
+It includes both the localization of the limo and the person, so each Limo has also the 
+information about the person.
+'''
 
 class ExtendedKalmanFilter(Node):
 
     def __init__(self, initial_state, initial_person_pos, args):
         
         super().__init__('extended_kalman_filter')
+        # kalman for the limo and the person
         self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON)
         self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT)
+        # variables to compute dt
         self.last_callback_time = None
         self.actual_callback_time = None
+
         self.measurement = None
+        # id management
         self.ekf.agent_id = args
         EKF.agent_id = 4
-
-        self.pub_info = self.create_publisher(Info, '/info', 10)
+        EKF.agent_dims[:3] = self.ekf.n
+        EKF.agent_dims[-1] = self.person_ekf.n
+        # topic on which the node publishes
+        self.pub_info = self.create_publisher(Landmark, '/info', 10)
         self.pub_update = self.create_publisher(Update, '/update', 10)
-
+        # topic subscription
         self.sub_odometry = self.create_subscription(
             Odometry,
             '/odom',
@@ -37,7 +64,7 @@ class ExtendedKalmanFilter(Node):
             self.measurement_callback,
             10)
         self.sub_info = self.create_subscription(
-            Info,
+            Landmark,
             '/info',
             self.info_callback,
             10)
@@ -63,52 +90,60 @@ class ExtendedKalmanFilter(Node):
         self.ekf.prediction_step([v, w])
 
     def measurement_callback(self, msg):
-        if(msg.data.id_a == self.ekf.agent_id): 
-            self.measurement = msg.data.measurement
+        if(msg.id_a == self.ekf.agent_id): 
+            self.measurement = [msg.x, msg.y, msg.dtheta]
 
-            if(msg.data.id_b == self.person_ekf.agent_id):
+            if(msg.id_b == self.person_ekf.agent_id):
                 ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(self.person_ekf.state, self.person_ekf.phi, self.person_ekf.P, self.measurement, self.person_ekf.agent_id, self.person_ekf.agent_type)
                 msg_out = Update()
-                msg_out.data.id_a = self.ekf.agent_id
-                msg_out.data.id_b = msg.data.id_b
-                msg_out.data.ra = ra
-                msg_out.data.gamma_a = gamma_a
-                msg_out.data.gamma_b = gamma_b
-                msg_out.data.W1 = W1
-                msg_out.data.W2 = W2
+                msg_out.id_a = self.ekf.agent_id
+                msg_out.id_b = msg.id_b
+                msg_out.dim_a = self.ekf.n
+                msg_out.dim_b = self.person_ekf.n
+                msg_out.ra = ra
+                msg_out.gamma_a = gamma_a
+                msg_out.gamma_b = gamma_b
+                msg_out.w1 = W1
+                msg_out.w2 = W2
                 self.pub_update.publish(msg_out)
-                self.get_logger().info('Publishing: "%s"' % msg_out.data)
+                self.get_logger().info('Publishing: "%s"' % msg_out)
                 self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
 
-        if(msg.data.id_b != self.ekf.agent_id): return 
-        msg_out = Info()
-        msg_out.data.state = self.ekf.state
-        msg_out.data.phi = self.ekf.phi
-        msg_out.data.P = self.ekf.P
+        if(msg.id_b != self.ekf.agent_id): return 
+        msg_out = Landmark()
+        msg_out.dim = self.ekf.n
+        msg_out.state = self.ekf.state
+        msg_out.phi = self.ekf.phi
+        msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)
         self.get_logger().info('Publishing: "%s"' % msg_out.data)
 
     def info_callback(self, msg):
-        if(msg.data.id_a != self.ekf.agent_id): return
-        ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(msg.data.state, msg.data.phi, msg.data.P, self.measurement, msg.data.id_b, msg.data.b_agent_type)
+        if(msg.id_a != self.ekf.agent_id): return
+        state_b = msg.state
+        phi_b = msg.phi.reshape((msg.dim, msg.dim))
+        P_b = msg.p.reshape((msg.dim, msg.dim))
+        ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(state_b, phi_b, P_b, self.measurement, msg.id_b, AgentType.ROBOT)
         msg_out = Update()
-        msg_out.data.id_a = self.ekf.agent_id
-        msg_out.data.id_b = msg.data.id_b
-        msg_out.data.ra = ra
-        msg_out.data.gamma_a = gamma_a
-        msg_out.data.gamma_b = gamma_b
-        msg_out.data.W1 = W1
-        msg_out.data.W2 = W2
+        msg_out.id_a = self.ekf.agent_id
+        msg_out.id_b = msg.id_b
+        msg_out.dim_a = self.ekf.n
+        msg_out.dim_b = self.ekf.n
+        msg_out.ra = ra
+        msg_out.gamma_a = gamma_a
+        msg_out.gamma_b = gamma_b
+        msg_out.w1 = W1
+        msg_out.w2 = W2
         self.pub_update.publish(msg_out)
         self.get_logger().info('Publishing: "%s"' % msg_out.data)
-        self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.data.id_b)
-        self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.data.id_b)
+        self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
+        self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
 
     def update_callback(self, msg):
-        if(msg.data.id_a == self.ekf.agent_id): return
-        self.ekf.update_step(msg.data.ra, msg.data.gamma_a, msg.data.gamma_b, msg.data.W1, msg.data.W2, msg.data.id_a, msg.data.id_b)
-        self.person_ekf.update_step(msg.data.ra, msg.data.gamma_a, msg.data.gamma_b, msg.data.W1, msg.data.W2, msg.data.id_a, msg.data.id_b)
+        if(msg.id_a == self.ekf.agent_id): return
+        self.ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
+        self.person_ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
 
 def main(args):
     parser = argparse.ArgumentParser()
