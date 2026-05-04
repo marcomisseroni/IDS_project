@@ -6,6 +6,7 @@ from message_filters import Subscriber, ApproximateTimeSynchronizer
 from project_interfaces.msg import Measurement
 from vision.Vision_class import Vision
 import cv2
+from limo_description import conf_limo
 
 '''
 Node that reads from /camera topic the current frame, elaborates the image with the vision class
@@ -27,20 +28,25 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = Subscriber(self, Image, '/camera') # in the limo probably /camera/color/image_raw
-        self.depth_sub = Subscriber(self, Image, '/depth') # in the limo probably /camera/depth/image_raw
+        self.rgb_sub = Subscriber(self, Image, '/camera/color/image_raw') # in the limo probably /camera/color/image_raw
+        self.depth_sub = Subscriber(self, Image, '/camera/depth/image_raw') # in the limo probably /camera/depth/image_raw
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
         # callback only when we have rgb and depth informations
         self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=10, slop=0.05)
         self.ts.registerCallback(self.synced_callback)
+        prova = conf_limo.width
 
     def synced_callback(self, rgb_msg, depth_msg):
         self.get_logger().info('Received image')
         # converting the images in the correct format
         frame = image_msg_to_numpy(rgb_msg)
-        frame_d = image_msg_to_numpy(depth_msg)
+        #frame_d = image_msg_to_numpy(depth_msg)
+
+        cv2.imshow("prova",rgb_msg)
+        cv2.waitKey(1)
+        '''
         # elaborating the data
         target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, frame_d, visualize=False)
 
@@ -81,6 +87,7 @@ class Vision_node(Node):
             msg.y = target[1]
             msg.dtheta = 0.0
             self.pub_measurement.publish(msg)
+        '''
     
 def main(args=None):
     rclpy.init()

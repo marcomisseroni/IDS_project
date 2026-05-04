@@ -98,7 +98,7 @@ install-scripts=$base/lib/package_name
 To build a specific package, navigate to `ros2_ws` then you can use:
 
 ```
-colcon build --package-select <package_name>
+colcon build --packages-select <package_name>
 ```
 
 Otherwise to build everything just use:
@@ -127,3 +127,19 @@ An example is:
 ```
 ros2 topic pub /test std_msgs/msg/Bool "data: false"
 ```
+
+ssh agilex@192.168.1.34 
+password: agx
+echo $ROS_DOMAIN_ID
+ros2 launch orbbec_camera dabai.launch.py
+
+
+Terminale PC:
+export ROS_DOMAIN_ID=2
+
+topic cmd_vel -> twist
+
+ros2 bag play aruco
+
+-DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS
+privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva
