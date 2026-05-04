@@ -128,18 +128,18 @@ An example is:
 ros2 topic pub /test std_msgs/msg/Bool "data: false"
 ```
 
-ssh agilex@192.168.1.34 
-password: agx
-echo $ROS_DOMAIN_ID
-ros2 launch orbbec_camera dabai.launch.py
+## Commands for LIMO
+
+To access the LIMO using SSH protocol you can use: `ssh agilex@192.168.1.34` where the last number could be different. The password is: `agx`. 
+
+To work on the same domain of the LIMO with your own computer you can check the *ROS DOMAIN* with: `echo $ROS_DOMAIN_ID` on the LIMO and then set the same *ROS DOMAIN* on your computer using:  `export ROS_DOMAIN_ID=x`.
+
+To launch the camera node on the LIMO you can use: `ros2 launch orbbec_camera dabai.launch.py`.
+
+It's possible to play a pre-recorded *bag play*, which replay all the messages shared on all the corresponding topics using `ros2 bag play <bag_name>`.
+
+### Firewall deactivation for windows users
+
+In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then go to `privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva`.
 
 
-Terminale PC:
-export ROS_DOMAIN_ID=2
-
-topic cmd_vel -> twist
-
-ros2 bag play aruco
-
--DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS
-privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva
