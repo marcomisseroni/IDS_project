@@ -9,7 +9,7 @@ import sys
 from localization.agent_type import AgentType
 from localization.localization_system import EKF
 # configuration file containing convariances, ...
-import conf_kalman
+import localization.conf_kalman as conf_kalman
 # message types used
 from nav_msgs.msg import Odometry
 from project_interfaces.msg import Measurement
@@ -47,8 +47,10 @@ class ExtendedKalmanFilter(Node):
         # id management
         self.ekf.agent_id = args
         EKF.agent_id = 4
-        EKF.agent_dims[:3] = self.ekf.n
-        EKF.agent_dims[-1] = self.person_ekf.n
+        EKF.agent_dims[0] = self.ekf.n
+        EKF.agent_dims[1] = self.ekf.n
+        EKF.agent_dims[2] = self.ekf.n
+        EKF.agent_dims[3] = self.person_ekf.n
         # topic on which the node publishes
         self.pub_info = self.create_publisher(Landmark, '/info', 10)
         self.pub_update = self.create_publisher(Update, '/update', 10)
@@ -88,6 +90,7 @@ class ExtendedKalmanFilter(Node):
         w = msg.twist.twist.angular.z
         self.person_ekf.prediction_step(None)
         self.ekf.prediction_step([v, w])
+        self.get_logger().info('Receiving: "%s"' % msg)
 
     def measurement_callback(self, msg):
         if(msg.id_a == self.ekf.agent_id): 
@@ -145,12 +148,12 @@ class ExtendedKalmanFilter(Node):
         self.ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
         self.person_ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
 
-def main(args):
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('agent_id', type=int, help='Integer agent id for this EKF node')
-    parser.add_argument('robot_state', nargs=3, type=float, help='Initial robot state: x y theta')
-    parser.add_argument('person_state', nargs=4, type=float, help='Initial person state: x y vx vy')
-    parsed_args, ros_args = parser.parse_known_args(args[1:])
+    parser.add_argument('--robot_state', nargs=3, type=float, default=[0.0, 0.0, 0.0], help='Initial robot state: x y theta')
+    parser.add_argument('--person_state', nargs=4, type=float, default=[0.0, 0.0, 0.0, 0.0], help='Initial person state: x y vx vy')
+    parsed_args, ros_args = parser.parse_known_args(sys.argv[1:])
 
     rclpy.init(args=ros_args)
 
@@ -165,4 +168,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()

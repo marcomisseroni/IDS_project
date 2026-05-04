@@ -3,9 +3,15 @@
 <package format="3">
   <name>localization</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Package used to localize the agents</description>
   <maintainer email="marco.misseroni@studenti.unitn.it">marco</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache License 2.0</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>numpy</exec_depend>
+  <exec_depend>argparse</exec_depend>
+  <exec_depend>sys</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
