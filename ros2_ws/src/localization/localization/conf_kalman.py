@@ -17,3 +17,6 @@ Q_p[2, 0] = dt**3 / 2
 Q_p[2, 2] = dt**2
 Q_p[3, 1] = dt**3 / 2
 Q_p[3, 3] = dt**2
+
+# period to publish the estimated state
+Tp = 0.1
