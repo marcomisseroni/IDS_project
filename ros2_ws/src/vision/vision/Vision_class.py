@@ -6,7 +6,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import time
-from vision import vision_params as conf_limo
+from limo_description import conf_limo
 
 class Vision:
 #  _____       _ _   _       _ _          _   _             

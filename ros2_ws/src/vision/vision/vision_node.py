@@ -6,14 +6,11 @@ from message_filters import Subscriber, ApproximateTimeSynchronizer
 from project_interfaces.msg import Measurement
 from vision.Vision_class import Vision
 import cv2
-from limo_description import conf_limo
 
 '''
 Node that reads from /camera topic the current frame, elaborates the image with the vision class
 and sends the message in the /measurement topic
 '''
-
-import numpy as np
 
 def image_msg_to_numpy(msg):
     # converting the image in the correct format for opencv
@@ -45,7 +42,6 @@ class Vision_node(Node):
         # callback only when we have rgb and depth informations
         self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=10, slop=0.05)
         self.ts.registerCallback(self.synced_callback)
-        prova = conf_limo.width
 
     def synced_callback(self, rgb_msg, depth_msg):
         self.get_logger().info('Received image')

@@ -9,7 +9,7 @@ import sys
 from localization.agent_type import AgentType
 from localization.localization_system import EKF
 # configuration file containing convariances, ...
-import localization.conf_kalman as conf_kalman
+from limo_description import conf_limo as conf_kalman
 # message types used
 from nav_msgs.msg import Odometry
 from project_interfaces.msg import Measurement
