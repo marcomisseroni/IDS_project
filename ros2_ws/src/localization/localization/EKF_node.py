@@ -85,12 +85,12 @@ class ExtendedKalmanFilter(Node):
             10)
         
     def odometry_callback(self, msg):
-        self.get_logger().info('Message received: "%s"' % msg.data)
+        self.get_logger().info('Message received: "%s"' % msg)
         self.last_callback_time = self.actual_callback_time
         self.actual_callback_time = self.get_clock().now()
 
         if(self.last_callback_time is not None):
-            dt = self.actual_callback_time - self.last_callback_time
+            dt = (self.actual_callback_time - self.last_callback_time).nanoseconds * 1e-9
             self.ekf.dt = dt
             self.person_ekf.dt = dt
 
@@ -129,7 +129,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.phi = self.ekf.phi
         msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)
-        self.get_logger().info('Publishing: "%s"' % msg_out.data)
+        self.get_logger().info('Publishing: "%s"' % msg_out)
         self.landmark_msg_count += 1
 
     def info_callback(self, msg):
@@ -149,7 +149,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.w1 = W1
         msg_out.w2 = W2
         self.pub_update.publish(msg_out)
-        self.get_logger().info('Publishing: "%s"' % msg_out.data)
+        self.get_logger().info('Publishing: "%s"' % msg_out)
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.update_msg_count += 1
