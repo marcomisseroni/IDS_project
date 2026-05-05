@@ -15,6 +15,7 @@ from nav_msgs.msg import Odometry
 from project_interfaces.msg import Measurement
 from project_interfaces.msg import Landmark
 from project_interfaces.msg import Update
+from project_interfaces.msg import State
 
 #  ______ _  ________               _      
 # |  ____| |/ /  ____|             | |     
@@ -51,6 +52,13 @@ class ExtendedKalmanFilter(Node):
         EKF.agent_dims[1] = self.ekf.n
         EKF.agent_dims[2] = self.ekf.n
         EKF.agent_dims[3] = self.person_ekf.n
+        # messages count
+        self.state_msg_count = 0
+        self.landmark_msg_count = 0
+        self.update_msg_count = 0
+        # timer to publish the estimated state
+        self.state_timer = self.create_timer(conf_kalman.Tp, self.state_timer_callback)
+        self.pub_state = self.create_publisher(State, '/state', 10)
         # topic on which the node publishes
         self.pub_info = self.create_publisher(Landmark, '/info', 10)
         self.pub_update = self.create_publisher(Update, '/update', 10)
@@ -112,6 +120,7 @@ class ExtendedKalmanFilter(Node):
                 self.get_logger().info('Publishing: "%s"' % msg_out)
                 self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
+                self.update_msg_count += 1
 
         if(msg.id_b != self.ekf.agent_id): return 
         msg_out = Landmark()
@@ -121,6 +130,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)
         self.get_logger().info('Publishing: "%s"' % msg_out.data)
+        self.landmark_msg_count += 1
 
     def info_callback(self, msg):
         if(msg.id_a != self.ekf.agent_id): return
@@ -142,11 +152,21 @@ class ExtendedKalmanFilter(Node):
         self.get_logger().info('Publishing: "%s"' % msg_out.data)
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
+        self.update_msg_count += 1
 
     def update_callback(self, msg):
         if(msg.id_a == self.ekf.agent_id): return
         self.ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
         self.person_ekf.update_step(msg.ra, msg.gamma_a, msg.gamma_b, msg.w1, msg.w2, msg.id_a, msg.id_b)
+
+    def state_timer_callback(self):
+        msg = State()
+        msg.x = self.ekf.state[0]
+        msg.y = self.ekf.state[1]
+        msg.theta = self.ekf.state[2]
+        self.pub_state.publish(msg)
+        self.get_logger().info('Publishing: "%s"' % self.ekf.state)
+        self.state_msg_count += 1
 
 def main():
     parser = argparse.ArgumentParser()
