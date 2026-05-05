@@ -16,11 +16,20 @@ and sends the message in the /measurement topic
 import numpy as np
 
 def image_msg_to_numpy(msg):
+    # converting the image in the correct format for opencv
     if msg.encoding not in ['bgr8', 'rgb8']:
         raise ValueError(f"Encoding not supported: {msg.encoding}")
     frame = np.frombuffer(msg.data, dtype=np.uint8)
     frame = frame.reshape((msg.height, msg.width, 3))
+    if msg.encoding == 'rgb8':
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     return frame
+
+def depth_msg_to_numpy(msg):
+    frame = np.frombuffer(msg.data, dtype=np.uint16)
+    frame = frame.reshape((msg.height, msg.width))
+    depth = frame.astype('float32')
+    return depth
 
 class Vision_node(Node):
 
@@ -42,13 +51,10 @@ class Vision_node(Node):
         self.get_logger().info('Received image')
         # converting the images in the correct format
         frame = image_msg_to_numpy(rgb_msg)
-        #frame_d = image_msg_to_numpy(depth_msg)
+        frame_d = depth_msg_to_numpy(depth_msg)
 
-        cv2.imshow("prova",rgb_msg)
-        cv2.waitKey(1)
-        '''
         # elaborating the data
-        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, frame_d, visualize=False)
+        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, frame_d, visualize=True)
 
         # publishing te data in 4 different messages (if we have a measure)
         # limo0 measured
@@ -87,7 +93,6 @@ class Vision_node(Node):
             msg.y = target[1]
             msg.dtheta = 0.0
             self.pub_measurement.publish(msg)
-        '''
     
 def main(args=None):
     rclpy.init()

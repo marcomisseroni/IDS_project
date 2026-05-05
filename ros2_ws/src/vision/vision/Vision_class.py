@@ -46,7 +46,6 @@ class Vision:
         self.model = YOLO("yolov8n-seg.pt")
         self.fpx = conf_limo.fpx # focal length (px)
         self.rx = conf_limo.rx #resolution of the camera along x
-        self.n_d = conf_limo.n_d # number of depth channels
         self.T_limo_camera = self.translate([conf_limo.x_camera, conf_limo.y_camera, conf_limo.z_camera])
         # type of aruco library used
         self.aruco_type = "DICT_6X6_50"
@@ -333,21 +332,19 @@ class Vision:
     def target_estimation_RGBD(self, xc, depth, mask):
         # angle in respect to the camera
         tan_theta = 1/self.fpx*(self.rx/2-xc)
-        # converting the image in HSV
-        hsv = cv2.cvtColor(depth, cv2.COLOR_BGR2HSV)
-        mask = cv2.resize(mask, (hsv.shape[1], hsv.shape[0]))
-        h_channel = hsv[:, :, 0] # values from 0 to 179
-        h_values = h_channel[mask > 0]
+        mask = cv2.resize(mask, (conf_limo.rx_depth, conf_limo.ry_depth))
+        values = depth[(mask > 0) & (depth > 0)]
         # median of the depth values inside the mask
-        depth_val = np.median(h_values)
-        D = 2970/self.n_d*depth_val + 30
+        D = np.median(values)
 
         # distances
         x_relative = D
         y_relative = D*tan_theta
         # transforming the reading in the limo RF
         target = self.translate([x_relative, y_relative, 0])
-        target_limoRF = self.T_limo_camera @ target
+        #target_limoRF = self.T_limo_camera @ target
+        # depth values should be in the limo rf
+        target_limoRF = target
         # result in meters
         x = self.get_point(target_limoRF)[0]/1000.0
         y = self.get_point(target_limoRF)[1]/1000.0
@@ -373,7 +370,7 @@ class Vision:
         # estimated position of the target (if found)
         if (mask is not None) and x1!=0:
             x_target, y_target, frame_d = self.target_estimation_RGBD(xc, frame_d, mask)
-            target = [x_target, y_target, 0]
+            target = np.array([x_target, y_target, 0])
 
         # --------------- LIMOS ----------------------
         # measuring the aruco positions
@@ -382,9 +379,9 @@ class Vision:
         # estimating the limo positions
         limo_RF = self.limo_estimation(aruco_pos, aruco_rot)
         # saving the values in the form [x,y,th] for each limo
-        limo0 = [self.get_point(limo_RF[0])[0], self.get_point(limo_RF[0])[1], self.get_z_angle(limo_RF[0])]
-        limo1 = [self.get_point(limo_RF[1])[0], self.get_point(limo_RF[1])[1], self.get_z_angle(limo_RF[1])]
-        limo2 = [self.get_point(limo_RF[2])[0], self.get_point(limo_RF[2])[1], self.get_z_angle(limo_RF[2])]      
+        limo0 = np.array([self.get_point(limo_RF[0])[0], self.get_point(limo_RF[0])[1], self.get_z_angle(limo_RF[0])])
+        limo1 = np.array([self.get_point(limo_RF[1])[0], self.get_point(limo_RF[1])[1], self.get_z_angle(limo_RF[1])])
+        limo2 = np.array([self.get_point(limo_RF[2])[0], self.get_point(limo_RF[2])[1], self.get_z_angle(limo_RF[2])])     
 
 
         # -------------- Visualization --------------------
@@ -401,8 +398,12 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot0[:3,:3], self.get_point(RF_plot0), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
+            # transforming the depth image in a visualizable format
+            depth_norm = cv2.normalize(frame_d, None, 0, 255, cv2.NORM_MINMAX)
+            depth_norm = depth_norm.astype('uint8')
+            depth_3ch = np.stack((depth_norm,)*3, axis=-1)
             # showing the video with the target
-            combined = np.hstack((cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth)), frame_d))
+            combined = np.hstack((cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth)), depth_3ch))
             combined_resized = cv2.resize(combined, (conf_limo.rx_depth*2, conf_limo.ry_depth))
             cv2.imshow("Vision", combined_resized)
             cv2.waitKey(1)
