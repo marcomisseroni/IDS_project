@@ -23,7 +23,8 @@ class EKFPlot(Node):
         self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
 
     def admin_callback(self, msg):
-        if(msg.data == 'stop'):
+        if(msg.data == 'stop_ekf'):
+            self.get_logger().info('Called admin_callback: stop_ekf')
             self.limo_states = np.array(self.limo_states)
             self.person_states = np.array(self.person_states)
             self.plot()
@@ -46,7 +47,7 @@ class EKFPlot(Node):
         y = msg.y
         theta = msg.theta
         self.limo_states.append((x, y, theta))
-        if(self.start_time == None):
+        if self.start_time is None:
             self.start_time = self.get_clock().now()
             self.t.append(0)
         else:
