@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'person_sim'
+package_name = 'plots'
 
 setup(
     name=package_name,
@@ -15,8 +15,8 @@ setup(
     zip_safe=True,
     maintainer='marco',
     maintainer_email='marco.misseroni@studenti.unitn.it',
-    description='Node that simulates the position of a person',
-    license='Apache-2.0',
+    description='TODO: Package description',
+    license='TODO: License declaration',
     extras_require={
         'test': [
             'pytest',
@@ -24,7 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'person_sim_node = person_sim.person_sim_node:main',
+            'EKF_plot_node = plots.EKF_plot_node:main'
         ],
     },
 )

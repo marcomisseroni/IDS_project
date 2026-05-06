@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>person_sim</name>
+  <name>plots</name>
   <version>0.0.0</version>
-  <description>Node that simulates the position of a person</description>
+  <description>TODO: Package description</description>
   <maintainer email="marco.misseroni@studenti.unitn.it">marco</maintainer>
-  <license>Apache-2.0</license>
+  <license>TODO: License declaration</license>
 
   <exec_depend>rclpy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
   <exec_depend>numpy</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
