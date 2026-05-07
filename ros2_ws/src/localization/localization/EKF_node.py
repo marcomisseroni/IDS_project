@@ -215,7 +215,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('agent_id', type=int, help='Integer agent id for this EKF node')
     parser.add_argument('--robot_state', nargs=3, type=float, default=[0.0, 0.0, 0.0], help='Initial robot state: x y theta')
-    parser.add_argument('--person_state', nargs=4, type=float, default=[0.0, 0.0, 0.0, 0.0], help='Initial person state: x y vx vy')
+    parser.add_argument('--person_state', nargs=4, type=float, default=[0.0, -3.0, 0.0, 0.0], help='Initial person state: x y vx vy')
     parsed_args, ros_args = parser.parse_known_args(sys.argv[1:])
 
     rclpy.init(args=ros_args)
