@@ -129,6 +129,12 @@ An example is:
 ros2 topic pub /test std_msgs/msg/Bool "data: false"
 ```
 
+Actual message to start ekf
+
+```
+ros2 topic pub --once /admin std_msgs/msg/String "{data: 'start_ekf'}"
+```
+
 ## Commands for LIMO
 
 To access the LIMO using SSH protocol you can use: `ssh agilex@192.168.1.34` where the last number could be different. The password is: `agx`. 

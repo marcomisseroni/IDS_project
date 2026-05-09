@@ -14,7 +14,8 @@ def generate_launch_description():
             package='vision',
             namespace='',
             executable='vision_node',
-            name='vision_node'
+            name='vision_node',
+            arguments=['2']
         ),
         Node(
             package='plots',

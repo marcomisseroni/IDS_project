@@ -1,3 +1,5 @@
+import os
+os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import rclpy
 from rclpy.node import Node
 import numpy as np
@@ -40,11 +42,11 @@ class Vision_node(Node):
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
         # callback only when we have rgb and depth informations
-        self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=10, slop=0.05)
+        self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=1, slop=0.05)
         self.ts.registerCallback(self.synced_callback)
 
     def synced_callback(self, rgb_msg, depth_msg):
-        self.get_logger().info('Received image')
+        #self.get_logger().info('Received image')
         # converting the images in the correct format
         frame = image_msg_to_numpy(rgb_msg)
         frame_d = depth_msg_to_numpy(depth_msg)

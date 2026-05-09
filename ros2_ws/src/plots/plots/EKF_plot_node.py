@@ -3,6 +3,8 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from project_interfaces.msg import State
+import os
+os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -31,7 +33,7 @@ class EKFPlot(Node):
 
     def admin_callback(self, msg):
         if(msg.data == 'stop_ekf'):
-            self.get_logger().info('Called admin_callback: stop_ekf')
+            #self.get_logger().info('Called admin_callback: stop_ekf')
             self.is_running = False
             self.plot_limo_states()
 
@@ -144,16 +146,16 @@ class EKFPlot(Node):
         else:
             self.t.append((self.get_clock().now() - self.start_time).nanoseconds * 1e-9)
 
-        if self.is_running:
-            self.get_logger().info('CALLED: limo_state_callback')
+        #if self.is_running:
+            #self.get_logger().info('CALLED: limo_state_callback')
 
     def person_state_callback(self, msg):
         x = msg.x
         y = msg.y
         self.person_states.append((x, y))
 
-        if self.is_running:
-            self.get_logger().info('CALLED: person_state_callback')
+        #if self.is_running:
+            #self.get_logger().info('CALLED: person_state_callback')
 
 def main():
 

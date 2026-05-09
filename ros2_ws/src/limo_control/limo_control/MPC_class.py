@@ -1,11 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from adam.casadi.computations import KinDynComputations
 import casadi as cs
 import time
-from matplotlib.patches import Rectangle
-from matplotlib.animation import FuncAnimation
-from matplotlib.patches import Circle
 from limo_description import conf_limo as limo
 
 class MPC:
@@ -23,7 +19,7 @@ class MPC:
 
         # MPC settings
         self.dt_MPC = dt # time step MPC
-        self.N = conf_limo.N  # time horizon MPC
+        self.N = limo.N  # time horizon MPC
 
         # create the dynamics function
         x = cs.SX.sym('x', self.nx)

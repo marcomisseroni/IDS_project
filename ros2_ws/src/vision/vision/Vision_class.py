@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.linalg import logm, expm
 import cv2
+import os
+os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt

@@ -108,7 +108,7 @@ class ExtendedKalmanFilter(Node):
         w = msg.twist.twist.angular.z
         self.person_ekf.prediction_step(None)
         self.ekf.prediction_step([v, w])
-        self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')
+        #self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')
 
     def measurement_callback(self, msg):
         if(not self.is_running): return
@@ -132,7 +132,7 @@ class ExtendedKalmanFilter(Node):
                 self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.update_msg_count += 1
-                self.get_logger().info(f'Measuring person position: x={msg.x}, y={msg.y}')
+                #self.get_logger().info(f'Measuring person position: x={msg.x}, y={msg.y}')
 
         if(msg.id_b != self.ekf.agent_id): return 
         msg_out = Landmark()
@@ -141,7 +141,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.phi = self.ekf.phi
         msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)
-        self.get_logger().info('Publishing state on pub_info: "%s"' % msg_out.state)
+        #self.get_logger().info('Publishing state on pub_info: "%s"' % msg_out.state)
         self.landmark_msg_count += 1
 
     def info_callback(self, msg):
@@ -162,7 +162,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.w1 = np.asarray(W1, dtype=float).ravel().tolist()
         msg_out.w2 = np.asarray(W2, dtype=float).ravel().tolist()
         self.pub_update.publish(msg_out)
-        self.get_logger().info('Publishing on update')
+        #self.get_logger().info('Publishing on update')
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.update_msg_count += 1
@@ -180,22 +180,24 @@ class ExtendedKalmanFilter(Node):
 
         self.ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
-        self.get_logger().info('Update callback')
+        #self.get_logger().info('Update callback')
 
     def state_timer_callback(self):
         if(not self.is_running): return
         msg_limo = State()
+        msg_limo.id = self.ekf.agent_id
         msg_limo.x = self.ekf.state[0]
         msg_limo.y = self.ekf.state[1]
         msg_limo.theta = self.ekf.state[2]
         msg_person = State()
+        msg_person.id = 3
         msg_person.x = self.person_ekf.state[0]
         msg_person.y = self.person_ekf.state[1]
         msg_person.theta = 0.0
         self.pub_limo_state.publish(msg_limo)
         self.pub_person_state.publish(msg_person)
-        self.get_logger().info('Publishing: "%s"' % self.ekf.state)
-        self.get_logger().info('Publishing: "%s"' % self.person_ekf.state)
+        #self.get_logger().info('Publishing: "%s"' % self.ekf.state)
+        #self.get_logger().info('Publishing: "%s"' % self.person_ekf.state)
         self.state_msg_count += 1
 
     def admin_callback(self, msg):

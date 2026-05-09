@@ -1,71 +1,130 @@
 import rclpy
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from project_interfaces.msg import State
+from limo_control.MPC_class import MPC
+from message_filters import Subscriber
+from limo_description import conf_limo
+from scipy.optimize import linear_sum_assignment
 import numpy as np
 
 class MPC_node(Node):
 
-    def __init__(self, state_init):
+    def __init__(self, id):
         super().__init__('MPC_node')
         # subscibed topics
-        self.rgb_sub = Subscriber(self, Image, '/camera/color/image_raw') # in the limo probably /camera/color/image_raw
-        self.depth_sub = Subscriber(self, Image, '/camera/depth/image_raw') # in the limo probably /camera/depth/image_raw
+        self.limo_sub = self.create_subscription(State, '/limo_state', self.limo_states_callback, 10)
+        self.target_sub = self.create_subscription(State, '/person_state', self.target_states_callback, 10)
+        # timer for MPC callback every dt
+        self.mpc_timer = self.create_timer(conf_limo.dt_MPC, self.MPC_callback)
         # publishing topic
-        self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
-        self.vision_obj = Vision()
-        # callback only when we have rgb and depth informations
-        self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=10, slop=0.05)
-        self.ts.registerCallback(self.synced_callback)
+        self.pub_input = self.create_publisher(Twist, '/cmd_vel', 10)
 
-    def synced_callback(self, rgb_msg, depth_msg):
-        self.get_logger().info('Received image')
-        # converting the images in the correct format
-        frame = image_msg_to_numpy(rgb_msg)
-        frame_d = depth_msg_to_numpy(depth_msg)
+        # assigning the id's
+        ids = [0, 1, 2]
+        ids.remove(id)
+        self.id = id
+        self.id_1 = ids[0]
+        self.id_2 = ids[1]
 
-        # elaborating the data
-        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, frame_d, visualize=True)
+        # buffer vector with latest:
+        # - self state information
+        self.state = conf_limo.limo_init[id]
+        # - target state information
+        self.target = conf_limo.target_init
+        # - other limo number 1 state information
+        self.limo_1 = conf_limo.limo_init[self.id_1]
+        self.limo_2 = conf_limo.limo_init[self.id_2]
+        # - center of the formation
+        self.center = np.array([0,0])
 
-        # publishing te data in 4 different messages (if we have a measure)
-        # limo0 measured
-        if limo0[0] != 0:
-            msg = Measurement()
-            msg.id_a = self.id
-            msg.id_b = 0
-            msg.x = limo0[0]
-            msg.y = limo0[1]
-            msg.dtheta = limo0[2]
-            self.pub_measurement.publish(msg)
-        # limo1
-        if limo1[0] != 0:
-            msg = Measurement()
-            msg.id_a = self.id
-            msg.id_b = 1
-            msg.x = limo1[0]
-            msg.y = limo1[1]
-            msg.dtheta = limo1[2]
-            self.pub_measurement.publish(msg)
-        # limo2
-        if limo2[0] != 0:
-            msg = Measurement()
-            msg.id_a = self.id
-            msg.id_b = 2
-            msg.x = limo2[0]
-            msg.y = limo2[1]
-            msg.dtheta = limo2[2]
-            self.pub_measurement.publish(msg)
-        # target
-        if target[0] != 0:
-            msg = Measurement()
-            msg.id_a = self.id
-            msg.id_b = 3
-            msg.x = target[0]
-            msg.y = target[1]
-            msg.dtheta = 0.0
-            self.pub_measurement.publish(msg)
+        # MPC object
+        self.mpc_obj = MPC(self.state, conf_limo.dt_MPC)
+        self.mpc_obj.create_OCP_problem()
+
+        self.warmstart = True # to keep track if we need to do the warm start or not
+        self.sol = None
+
+
+    def target_states_callback(self, msg):
+        # updating the target estimated position with the new informations
+        self.target = np.array([msg.x, msg.y])
     
+    def limo_states_callback(self, msg):
+        # depending on the limo that sends the message i need to update the buffers
+        val = np.array([msg.x, msg.y, msg.theta])
+        if(msg.id == self.id):
+            self.state = val
+        elif(msg.id == self.id_1):
+            self.limo_1 = val
+        elif(msg.id == self.id_2):
+            self.limo_2 == val
+
+    def MPC_callback(self):
+        # computing the desired position for current step
+        des_pos = self.desired_pos()
+        if(self.warmstart):
+            self.warmstart = False
+            self.sol = self.mpc_obj.warm_start(des_pos, self.limo_1, self.limo_2, conf_limo.r_collision, self.target)
+        else:
+            self.sol = self.mpc_obj.MPC_step(
+                self.sol, self.state, des_pos, self.limo_1, self.limo_2, conf_limo.r_collision, self.target)
+        # publishing the inputs
+        inputs = self.sol.value(self.mpc_obj.U[0])
+        self.get_logger().info('Publishing: "%s"' % inputs)
+
+
+
+#  _____            _              _                   
+# |  __ \          (_)            | |                  
+# | |  | | ___  ___ _ _ __ ___  __| |  _ __   ___  ___ 
+# | |  | |/ _ \/ __| | '__/ _ \/ _` | | '_ \ / _ \/ __|
+# | |__| |  __/\__ \ | | |  __/ (_| | | |_) | (_) \__ \
+# |_____/ \___||___/_|_|  \___|\__,_| | .__/ \___/|___/
+#                                     | |              
+#                                     |_|              
+
+    def desired_pos(self):
+        # ------------- new center position --------------------
+        # angle between previous center and new target
+        alpha = np.arctan2(self.target[1]-self.center[1], self.target[0]-self.center[0])
+        # distance to move the center
+        d = np.sqrt( (self.target[1]-self.center[1])**2 + (self.target[0]-self.center[0])**2 ) - conf_limo.dist
+        # new center
+        old_center = self.center
+        self.center = np.array([self.center[0]+d*np.cos(alpha), self.center[1]+d*np.sin(alpha)])
+
+        # -------------- position of each limo -----------------
+        # three possible positions
+        # - p0: along the target direction
+        alpha0 = np.arctan2(self.target[1]-self.center[1], self.target[0]-self.center[0])
+        p0 = np.array([self.center[0]+conf_limo.r_circle*np.cos(alpha0), self.center[1]+conf_limo.r_circle*np.sin(alpha0)])
+        # - p1: rotated by 120° clockwise
+        alpha1 = alpha0 + np.pi*2/3
+        p1 = np.array([self.center[0]+conf_limo.r_circle*np.cos(alpha1), self.center[1]+conf_limo.r_circle*np.sin(alpha1)])
+        # - p2: rotated by 120° counterclockwise
+        alpha2 = alpha0 - np.pi*2/3
+        p2 = np.array([self.center[0]+conf_limo.r_circle*np.cos(alpha2), self.center[1]+conf_limo.r_circle*np.sin(alpha2)])
+
+        # -------------- choice of the position of each limo -----------------
+        positions = np.array([p0, p1, p2])
+        limo_positions = np.array([self.state[:2], self.limo_1[:2], self.limo_2[:2]])
+        cost_matrix = np.zeros((3, 3))
+        for i in range(3):
+            for j in range(3):
+                cost_matrix[i, j] = np.linalg.norm(limo_positions[i] - positions[j])
+
+        # solve the assignment problem: rows vector contains the limo indices, cols vector contains the position indices
+        # example: rows = [0, 1, 2], cols = [2, 0, 1] so limo0 --> p2, limo1 --> p0, limo2 --> p1
+        rows, cols = linear_sum_assignment(cost_matrix)
+        
+        # returning the desired position (x,y,0)
+        return np.array([positions[cols[0]][0], positions[cols[0]][1], 0])
+ 
 def main(args=None):
     rclpy.init()
-    node = Vision_node(id=2)
+    id = 2
+    node = MPC_node(id)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

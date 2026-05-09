@@ -6,6 +6,15 @@ import numpy as np
 # | |____ _| |_| |  | | |__| |    | |__| / ____ \| |/ ____ \ 
 # |______|_____|_|  |_|\____/     |_____/_/    \_\_/_/    \_\
 
+# initial positions
+r_circle = 0.5 # raidus of the circle around the central position
+limo_init = np.array([
+    [r_circle,0,0], # limo0
+    [-r_circle*np.cos(60*np.pi/180),r_circle*np.sin(60*np.pi/180),0], #limo1
+    [-r_circle*np.cos(60*np.pi/180),-r_circle*np.sin(60*np.pi/180),0] #limo2
+])
+target_init = np.array([2,0])
+
 # ----------------- LIMO --------------------
 # limo wheel radius
 r = 0.096288/2
@@ -46,10 +55,10 @@ Tp = 0.1
 # ---------------- CONTROLS -------------------
 # distance between target and center
 dist = 1.5
-# raidus of the circle around the central position
-r_circle = 0.5
-# simulation steps for MPC
-N_sim = 100
+# time horizon MPC (number of steps)
+N = 10
+# MPC timestep
+dt_MPC = 0.1
 
 # ------------- CAMERA ------------------------
 rx = 640 #resolution of the camera along x

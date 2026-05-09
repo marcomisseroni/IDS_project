@@ -35,8 +35,10 @@ Q = np.identity(3) * 0.001
 dist = 1.5
 # raidus of the circle around the central position
 r_circle = 0.5
-# simulation steps for MPC
-N_sim = 100
+# time horizon MPC (number of steps)
+N = 10
+# MPC timestep
+dt_MPC = 0.1
 
 # ------------- CAMERA ------------------------
 rx = 1920 #resolution of the camera along x
