@@ -9,11 +9,11 @@ import numpy as np
 # initial positions
 r_circle = 0.5 # raidus of the circle around the central position
 limo_init = np.array([
-    [r_circle,0,0], # limo0
-    [-r_circle*np.cos(60*np.pi/180),r_circle*np.sin(60*np.pi/180),0], #limo1
-    [-r_circle*np.cos(60*np.pi/180),-r_circle*np.sin(60*np.pi/180),0] #limo2
+    [r_circle,0.0,0.0], # limo0
+    [-r_circle*np.cos(60*np.pi/180),r_circle*np.sin(60*np.pi/180),0.0], #limo1
+    [-r_circle*np.cos(60*np.pi/180),-r_circle*np.sin(60*np.pi/180),0.0] #limo2
 ])
-target_init = np.array([2,0])
+target_init = np.array([2.0,0.0])
 
 # ----------------- LIMO --------------------
 # limo wheel radius

@@ -118,6 +118,11 @@ Navigate to the workspace folder `ros2_ws` and run: `ros2 run package_name node_
 Navigate to the launch directory and use `ros2 launch launch_file.py`.
 If the launch file is provided by a package then use `ros2 launch <package_name> <launch_file_name>`
 
+Actual launch file command
+```
+ros2 launch launch/launch_file.py
+```
+
 ## Useful terminal commands
 
 To read what is published on a topic from the terminal you can use: `ros2 topic echo /topic_name`.
@@ -134,6 +139,7 @@ Actual message to start ekf
 ```
 ros2 topic pub --once /admin std_msgs/msg/String "{data: 'start_ekf'}"
 ```
+Other commands: start_ekf, stop_ekf, start_mpc, stop_mpc
 
 ## Commands for LIMO
 

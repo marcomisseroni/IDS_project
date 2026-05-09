@@ -38,6 +38,8 @@ class ExtendedKalmanFilter(Node):
     def __init__(self, initial_state, initial_person_pos, args):
         
         super().__init__('extended_kalman_filter')
+        initial_state = conf_kalman.limo_init[args]
+        initial_person_pos = np.hstack((conf_kalman.target_init,np.array([0.0,0.0])))
         # kalman for the limo and the person
         self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON)
         self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT)

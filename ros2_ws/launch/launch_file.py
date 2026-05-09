@@ -18,6 +18,13 @@ def generate_launch_description():
             arguments=['2']
         ),
         Node(
+            package='limo_control',
+            namespace='',
+            executable='MPC_node',
+            name='MPC_node',
+            arguments=['2']
+        ),
+        Node(
             package='plots',
             namespace='',
             executable='EKF_plot_node',

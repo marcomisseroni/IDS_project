@@ -6,6 +6,7 @@ from limo_control.MPC_class import MPC
 from message_filters import Subscriber
 from limo_description import conf_limo
 from scipy.optimize import linear_sum_assignment
+from std_msgs.msg import String
 import numpy as np
 
 class MPC_node(Node):
@@ -15,10 +16,12 @@ class MPC_node(Node):
         # subscibed topics
         self.limo_sub = self.create_subscription(State, '/limo_state', self.limo_states_callback, 10)
         self.target_sub = self.create_subscription(State, '/person_state', self.target_states_callback, 10)
+        self.admin_sub = self.create_subscription(String, '/admin', self.admin_callback, 10)
         # timer for MPC callback every dt
         self.mpc_timer = self.create_timer(conf_limo.dt_MPC, self.MPC_callback)
         # publishing topic
         self.pub_input = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.start = False
 
         # assigning the id's
         ids = [0, 1, 2]
@@ -61,6 +64,9 @@ class MPC_node(Node):
             self.limo_2 == val
 
     def MPC_callback(self):
+        # checking if the MPC has to start
+        if(not self.start): return
+
         # computing the desired position for current step
         des_pos = self.desired_pos()
         if(self.warmstart):
@@ -69,10 +75,24 @@ class MPC_node(Node):
         else:
             self.sol = self.mpc_obj.MPC_step(
                 self.sol, self.state, des_pos, self.limo_1, self.limo_2, conf_limo.r_collision, self.target)
+
         # publishing the inputs
         inputs = self.sol.value(self.mpc_obj.U[0])
-        self.get_logger().info('Publishing: "%s"' % inputs)
-
+        msg = Twist()
+        msg.linear.x = inputs[0]
+        msg.linear.y = 0.0
+        msg.linear.z = 0.0
+        msg.angular.x = 0.0
+        msg.angular.y = 0.0
+        msg.angular.z = inputs[1]
+        self.pub_input.publish(msg)
+        
+    def admin_callback(self, msg):
+        # used to start/stop the mpc
+        if(msg.data == 'start_mpc'):
+            self.start = True
+        elif(msg.data == 'stop_mpc'):
+            self.start = False
 
 
 #  _____            _              _                   
