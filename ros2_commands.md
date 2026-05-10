@@ -134,12 +134,12 @@ An example is:
 ros2 topic pub /test std_msgs/msg/Bool "data: false"
 ```
 
-Actual message to start ekf
+Another example, to start the looping the `EKF_node.py` you can use:
 
 ```
 ros2 topic pub --once /admin std_msgs/msg/String "{data: 'start_ekf'}"
 ```
-Other commands: start_ekf, stop_ekf, start_mpc, stop_mpc
+It can be also used to stop such node with: `start_ekf`. Similarly for the `MPC_node.py` you can use: `start_mpc` and `stop_mpc`.
 
 ## Commands for LIMO
 
