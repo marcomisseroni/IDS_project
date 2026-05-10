@@ -39,7 +39,7 @@ class MPC_node(Node):
         self.limo_1 = conf_limo.limo_init[self.id_1]
         self.limo_2 = conf_limo.limo_init[self.id_2]
         # - center of the formation
-        self.center = np.array([0,0])
+        self.center = conf_limo.initial_center
 
         # MPC object
         self.mpc_obj = MPC(self.state, conf_limo.dt_MPC)

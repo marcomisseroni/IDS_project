@@ -12,7 +12,10 @@ class MPC:
 #  _| |_| | | | | |_| | (_| | | |/ / (_| | |_| | (_) | | | |
 # |_____|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_|                                                          
                                                                                                        
-    def __init__(self, x_init, dt):
+    def __init__(
+            self, 
+            x_init: np.ndarray, 
+            dt: float):
         # states and inputs size
         self.nx = 3 # size of state vector x = [x,y,theta]
         self.nu = 2 # size of control vector u = [v, w]
@@ -107,7 +110,14 @@ class MPC:
         self.opti.solver("ipopt", self.opts)
 
     # warm starting the solver to 
-    def warm_start(self, x_des, x1, x2, r, target):
+    def warm_start(
+            self, 
+            x_des: np.ndarray, 
+            x1: np.ndarray, 
+            x2: np.ndarray, 
+            r: float, 
+            target: np.ndarray
+            ) -> cs.OptiSol:
         # Solve the problem to convergence the first time
         self.opti.set_value(self.param_x_des, x_des)
         self.opti.set_value(self.param_x_init, self.x_init)
@@ -123,7 +133,16 @@ class MPC:
         return sol
 
                                                                                                    
-    def MPC_step(self, sol, x, x_des, x1, x2, r, target):
+    def MPC_step(
+            self, 
+            sol: cs.OptiSol, 
+            x: np.ndarray, 
+            x_des: np.ndarray, 
+            x1: np.ndarray, 
+            x2: np.ndarray, 
+            r: float, 
+            target: np.ndarray
+            ) -> cs.OptiSol:
         # use current solution as initial guess for next problem
         for t in range(self.N):
             # the values are shifted by 1 timestep

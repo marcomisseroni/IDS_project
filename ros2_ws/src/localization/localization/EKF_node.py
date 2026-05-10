@@ -63,7 +63,7 @@ class ExtendedKalmanFilter(Node):
         self.landmark_msg_count = 0
         self.update_msg_count = 0
         # timer to publish the estimated state
-        self.state_timer = self.create_timer(conf_kalman.Tp, self.state_timer_callback)
+        self.state_timer = self.create_timer(conf_kalman.dt_MPC, self.state_timer_callback)
         self.pub_limo_state = self.create_publisher(State, '/limo_state', 10)
         self.pub_person_state = self.create_publisher(State, '/person_state', 10)
         # topic on which the node publishes

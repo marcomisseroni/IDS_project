@@ -63,14 +63,21 @@ class Vision:
                                                                                                                                                       
                                                                                                                                                     
     # from rotation matrix to transformation matrix
-    def rotate(self, rot):
+    def rotate(
+            self, 
+            rot: np.ndarray
+            ) -> np.ndarray:
         R = np.zeros((4,4))
         R[:3,:3] = rot
         R[3,3] = 1
         return R
 
     # given the rotation axis ("X","Y","Z") it returns the rotation matrix
-    def rotate_angle(self, axis, theta):
+    def rotate_angle(
+            self, 
+            axis: str, 
+            theta: float
+            ) -> np.ndarray:
         axis = axis.upper()
         R = np.eye(4)
         if(axis == "X"):
@@ -93,23 +100,37 @@ class Vision:
         return R
 
     # from translation vector to translation matrix
-    def translate(self, t):
+    def translate(
+            self, 
+            t: np.ndarray
+            ) -> np.ndarray:
         T = np.eye(4)
         T[:3,3] = t
         return T
 
     # get coordinates of the point in the center of the reference frame
-    def get_point(self, RF):
+    def get_point(
+            self, 
+            RF: np.ndarray
+            ) -> np.ndarray:
         return RF[:3,3]
 
     # get the angle of the reference frame along z
-    def get_z_angle(self, RF):
+    def get_z_angle(
+            self, 
+            RF: np.ndarray
+            ) -> float:
         # assuming only rotation along z
         theta = np.arctan2(RF[1,0], RF[0,0])
         return theta
 
     # print the aruco number on the image and the bounding box
-    def aruco_display(self, corners, ids, image):
+    def aruco_display(
+            self, 
+            corners: list[np.ndarray], 
+            ids: np.ndarray, 
+            image: np.ndarray
+            ) -> np.ndarray:
         if len(corners) > 0:
             ids = ids.flatten()
             for (markerCorner, markerID) in zip(corners, ids):
@@ -134,7 +155,14 @@ class Vision:
         return image
 
     # estimate the aruco pose
-    def aruco_pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients, aruco_size):
+    def aruco_pose_estimation(
+            self, 
+            frame: np.ndarray, 
+            aruco_dict_type: int, 
+            matrix_coefficients: np.ndarray, 
+            distortion_coefficients: np.ndarray, 
+            aruco_size: float
+            ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         # converting the image to grayscale and improving the values for the aruco detection
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
@@ -182,7 +210,11 @@ class Vision:
         return frame, aruco_pos, aruco_rot
 
     # estimate the limo positions
-    def limo_estimation(self, aruco_pos, aruco_rot):
+    def limo_estimation(
+            self, 
+            aruco_pos: np.ndarray, 
+            aruco_rot: np.ndarray
+            ) -> np.ndarray:
         # limo aruco positions
         L = conf_limo.L # half of limo width (along y)
         H = conf_limo.H # distance from back aruco to center of the limo (along x)
@@ -294,7 +326,10 @@ class Vision:
 #                  __/ |                                                      
 #                 |___/                                                       
 
-    def detect_target(self, frame):
+    def detect_target(
+            self, 
+            frame: np.ndarray
+            ) -> tuple[int, int, int, int, int, np.ndarray | None]:
         results = self.model(frame, verbose=False)
         detected_objects = []
         # we want the closest (biggest) person position
@@ -331,7 +366,12 @@ class Vision:
                             mask = (mask * 255).astype(np.uint8)
         return x_1, x_2, y_1, y_2, x_target, mask
 
-    def target_estimation_RGBD(self, xc, depth, mask):
+    def target_estimation_RGBD(
+            self, 
+            xc: int, 
+            depth: np.ndarray, 
+            mask: np.ndarray
+            ) -> tuple[float, float, np.ndarray]:
         # angle in respect to the camera
         tan_theta = 1/self.fpx*(self.rx/2-xc)
         mask = cv2.resize(mask, (conf_limo.rx_depth, conf_limo.ry_depth))
@@ -362,7 +402,12 @@ class Vision:
 # | |  | | (_| | | | | | | | | |_| | | | | (__| |_| | (_) | | | |
 # |_|  |_|\__,_|_|_| |_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|
                                                                                                                                 
-    def vision_main(self, frame, frame_d, visualize=False):
+    def vision_main(
+            self, 
+            frame: np.ndarray, 
+            frame_d: np.ndarray, 
+            visualize: bool = False
+            ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         # initializing the values
         target=np.zeros(3); limo0=np.zeros(3); limo1=np.zeros(3); limo2=np.zeros(3)
 

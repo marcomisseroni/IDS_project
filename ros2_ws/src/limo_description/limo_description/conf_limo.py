@@ -15,6 +15,10 @@ limo_init = np.array([
 ])
 target_init = np.array([2.0,0.0])
 
+x_center_init = limo_init[:, 0].mean()
+y_center_init = limo_init[:, 1].mean()
+initial_center = np.array([x_center_init, y_center_init])
+
 # ----------------- LIMO --------------------
 # limo wheel radius
 r = 0.096288/2
