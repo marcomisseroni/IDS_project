@@ -143,6 +143,8 @@ It can be also used to stop such node with: `start_ekf`. Similarly for the `MPC_
 
 ## Commands for LIMO
 
+Connect to the wifi OptiTrack.speed with the password `60A84A244BECD`
+
 To access the LIMO using SSH protocol you can use: `ssh agilex@192.168.1.34` where the last number could be different. The password is: `agx`. 
 
 To work on the same domain of the LIMO with your own computer you can check the *ROS DOMAIN* with: `echo $ROS_DOMAIN_ID` on the LIMO and then set the same *ROS DOMAIN* on your computer using:  `export ROS_DOMAIN_ID=x`.
@@ -154,5 +156,9 @@ It's possible to play a pre-recorded *bag play*, which replay all the messages s
 ### Firewall deactivation for windows users
 
 In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then go to `privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva`.
+
+
+Cose da fare:
+- capire update persona
 
 
