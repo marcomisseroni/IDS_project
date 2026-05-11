@@ -10,3 +10,6 @@ __pycache__/
 
 # VSCode (opzionale)
 .vscode/
+
+# MP4
+*.mp4:Zone.Identifier
