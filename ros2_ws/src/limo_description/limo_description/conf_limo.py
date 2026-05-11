@@ -9,9 +9,9 @@ import numpy as np
 # initial positions
 r_circle = 0.5 # raidus of the circle around the central position
 limo_init = np.array([
-    [r_circle,0.0,0.0], # limo0
+    [-r_circle*np.cos(60*np.pi/180),-r_circle*np.sin(60*np.pi/180),0.0], #limo2
     [-r_circle*np.cos(60*np.pi/180),r_circle*np.sin(60*np.pi/180),0.0], #limo1
-    [-r_circle*np.cos(60*np.pi/180),-r_circle*np.sin(60*np.pi/180),0.0] #limo2
+    [r_circle,0.0,0.0] # limo0
 ])
 target_init = np.array([2.0,0.0])
 
@@ -27,13 +27,13 @@ b = 0.175
 # limo wheelbase (length)
 w = 0.2
 # limo collision radius
-r_collision = 0.2
+r_collision = 0.02
 # limo max speed (in datasheet 1m/s)
-v_max = 1
-v_min = -1
+v_max = 0.1
+v_min = -0.1
 # limo max yaw rate 2*v_max/(b/2)
-w_max = 0.1*4*v_max/b
-w_min = -0.1*4*v_max/b
+w_max = 0.3*4*v_max/b
+w_min = -0.3*4*v_max/b
 
 # -------------- KALMAN ----------------------
 # measurement covariance
@@ -58,7 +58,7 @@ Tp = 0.1
 
 # ---------------- CONTROLS -------------------
 # distance between target and center
-dist = 1.5
+dist = 1.0
 # time horizon MPC (number of steps)
 N = 10
 # MPC timestep

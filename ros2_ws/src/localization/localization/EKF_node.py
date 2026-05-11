@@ -108,6 +108,8 @@ class ExtendedKalmanFilter(Node):
 
         v = msg.twist.twist.linear.x
         w = msg.twist.twist.angular.z
+        self.person_ekf.state[2] = 0.0
+        self.person_ekf.state[3] = 0.0
         self.person_ekf.prediction_step(None)
         self.ekf.prediction_step([v, w])
         #self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')

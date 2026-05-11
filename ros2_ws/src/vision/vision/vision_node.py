@@ -42,7 +42,7 @@ class Vision_node(Node):
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
         # callback only when we have rgb and depth informations
-        self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub], queue_size=1, slop=0.05)
+        self.ts = ApproximateTimeSynchronizer([self.rgb_sub, self.depth_sub],queue_size=5,slop=0.1)
         self.ts.registerCallback(self.synced_callback)
 
     def synced_callback(self, rgb_msg, depth_msg):
