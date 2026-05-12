@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 import numpy as np
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from message_filters import Subscriber, ApproximateTimeSynchronizer
 from project_interfaces.msg import Measurement
 from vision.Vision_class import Vision
@@ -30,14 +31,29 @@ def depth_msg_to_numpy(msg):
     depth = frame.astype('float32')
     return depth
 
+def compressed_image_msg_to_numpy(msg):
+    np_arr = np.frombuffer(msg.data, dtype=np.uint8)
+    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    if frame is None:
+        raise ValueError("Failed to decode compressed image")
+    return frame
+
+def compressed_depth_to_numpy(msg):
+    np_arr = np.frombuffer(msg.data, np.uint8)
+    depth = cv2.imdecode(
+        np_arr,
+        cv2.IMREAD_UNCHANGED
+    )
+    return depth
+
 class Vision_node(Node):
 
     def __init__(self,id=0):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = Subscriber(self, Image, '/camera/color/image_raw') # in the limo probably /camera/color/image_raw
-        self.depth_sub = Subscriber(self, Image, '/camera/depth/image_raw') # in the limo probably /camera/depth/image_raw
+        self.rgb_sub = Subscriber(self, CompressedImage, '/out/compressed')
+        self.depth_sub = Subscriber(self, CompressedImage, '/out/compressed_depth')
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
@@ -46,10 +62,10 @@ class Vision_node(Node):
         self.ts.registerCallback(self.synced_callback)
 
     def synced_callback(self, rgb_msg, depth_msg):
-        #self.get_logger().info('Received image')
+        self.get_logger().info('received_imge')
         # converting the images in the correct format
-        frame = image_msg_to_numpy(rgb_msg)
-        frame_d = depth_msg_to_numpy(depth_msg)
+        frame = compressed_image_msg_to_numpy(rgb_msg)
+        frame_d = compressed_depth_to_numpy(depth_msg)
 
         # elaborating the data
         target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, frame_d, visualize=True)

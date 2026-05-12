@@ -151,6 +151,9 @@ To work on the same domain of the LIMO with your own computer you can check the 
 
 To launch the camera node on the LIMO you can use: `ros2 launch orbbec_camera dabai.launch.py`.
 
+To run the image compression node on the limo: `ros2 run image_transport republish raw compressed --ros-args --remap in:=/camera/color/image_raw`.
+`ros2 run image_transport republish raw compressedDepth  --ros-args  -r in:=/camera/depth/image_raw`
+
 It's possible to play a pre-recorded *bag play*, which replay all the messages shared on all the corresponding topics using `ros2 bag play <bag_name>`.
 
 ### Firewall deactivation for windows users
