@@ -29,11 +29,11 @@ w = 0.2
 # limo collision radius
 r_collision = 0.02
 # limo max speed (in datasheet 1m/s)
-v_max = 0.1
-v_min = -0.1
+v_max = 0.3
+v_min = -0.3
 # limo max yaw rate 2*v_max/(b/2)
-w_max = 0.3*4*v_max/b
-w_min = -0.3*4*v_max/b
+w_max = 0.1*4*v_max/b
+w_min = -0.1*4*v_max/b
 
 # -------------- KALMAN ----------------------
 # measurement covariance
@@ -58,7 +58,7 @@ Tp = 0.1
 
 # ---------------- CONTROLS -------------------
 # distance between target and center
-dist = 1.0
+dist = 2.0
 # time horizon MPC (number of steps)
 N = 10
 # MPC timestep
