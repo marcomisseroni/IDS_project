@@ -58,6 +58,7 @@ class ExtendedKalmanFilter(Node):
         EKF.agent_dims[1] = self.ekf.n
         EKF.agent_dims[2] = self.ekf.n
         EKF.agent_dims[3] = self.person_ekf.n
+        self.ekf._cross_cov_set()
         # messages count
         self.state_msg_count = 0
         self.landmark_msg_count = 0

@@ -78,7 +78,7 @@ class MPC:
         cost = 0
         for k in range(self.N):
             # control penality  
-            cost += self.w_v * self.U[k][0].T @ self.U[k][0]
+            cost += self.w_v * self.U[k].T @ self.U[k]
             # dynamics contraint
             self.opti.subject_to(self.X[k+1] == self.X[k] + self.dt_MPC * self.f(self.X[k], self.U[k]))
 

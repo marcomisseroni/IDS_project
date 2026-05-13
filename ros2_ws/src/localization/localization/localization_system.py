@@ -103,6 +103,10 @@ class EKF:
         
         if self.agent_type != AgentType.ROBOT:
             raise RuntimeError("measurement() is supported only for robot observers")
+
+        if not self.cross_cov:
+            self._cross_cov_set()
+
         self.Ha = self.meas_model.Ha(b_agent_type, b_state, self.state)
         self.Hb = self.meas_model.Hb(b_agent_type, b_state, self.state)
         piab = self.cross_cov[(min(self.agent_id, id_b), max(self.agent_id, id_b))]
