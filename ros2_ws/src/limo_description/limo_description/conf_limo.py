@@ -60,9 +60,9 @@ Tp = 0.1
 # distance between target and center
 dist = 1.5
 # time horizon MPC (number of steps)
-N = 50
+N = 20
 # MPC timestep
-dt_MPC = 0.5
+dt_MPC = 0.2
 
 # ------------- CAMERA ------------------------
 rx = 640 #resolution of the camera along x

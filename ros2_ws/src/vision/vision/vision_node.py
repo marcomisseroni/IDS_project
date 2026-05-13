@@ -54,8 +54,8 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = self.create_subscription(CompressedImage, '/out/compressed', self.rgb_callback, 1)
-        self.depth_sub = self.create_subscription(CompressedImage, '/out/compressedDepth', self.depth_callback, 1)
+        self.rgb_sub = self.create_subscription(CompressedImage, '/camera/color/image_raw/compressed', self.rgb_callback, 1)
+        self.depth_sub = self.create_subscription(Image, '/camera/depth/image_raw/compressedDepth', self.depth_callback, 1)
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
@@ -63,14 +63,17 @@ class Vision_node(Node):
         self.frame_d = None
     
     def depth_callback(self, msg):
-        print("formato:", msg.format)
+        self.get_logger().info("received depth")
         # converting the images in the correct format
         self.frame_d = compressed_depth_to_numpy(msg)
 
+
+
     def rgb_callback(self, rgb_msg):
+        self.get_logger().info("received rgb")
         # converting the images in the correct format
         frame = compressed_image_msg_to_numpy(rgb_msg)
-        
+
         if(self.frame_d is not None):
             # elaborating the data
             target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, self.frame_d, visualize=True)
