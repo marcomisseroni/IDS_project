@@ -6,7 +6,7 @@ The goal is to enable a team of mobile robots (LIMO) to collaboratively localize
 
 ---
 
-## 🚀 System Overview
+## System Overview
 
 The system consists of three LIMO mobile robots that cooperatively track a moving person while maintaining a coordinated formation around the target. The robots combine vision-based perception, cooperative state estimation, and model-based control to ensure consistent relative positioning with respect to the human agent.
 
@@ -14,9 +14,9 @@ Each robot operates with local sensing and contributes to a shared estimation pr
 
 ---
 
-## 🧠 Core Methods
+## Core Methods
 
-### 🔹 Cooperative State Estimation
+### Cooperative State Estimation
 - Implemented an **Interacting Multiple Model / decentralized EKF-based cooperative localization framework**
 - Enables **inter-robot relative measurements**
 - Fusion of:
@@ -28,14 +28,14 @@ This allows consistent multi-agent localization even under partial observability
 
 ---
 
-### 🔹 Perception (Vision)
+### Perception (Vision)
 - **YOLO-based detection** for human tracking
 - Marker-based detection for inter-robot observations
 - Multi-source visual fusion for robust target identification
 
 ---
 
-### 🔹 Control
+### Control
 - **Model Predictive Control (MPC)** for trajectory tracking and formation maintenance
 - Each robot computes local control actions to:
   - track the moving target
@@ -44,7 +44,7 @@ This allows consistent multi-agent localization even under partial observability
 
 ---
 
-## 🤖 System Architecture
+## System Architecture
 
 Each LIMO robot runs a local pipeline:
 
@@ -64,7 +64,7 @@ Communication between agents is handled using ROS2 topics.
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - Python
 - ROS2
@@ -77,7 +77,7 @@ Communication between agents is handled using ROS2 topics.
 
 ---
 
-## 📊 Key Features
+## Key Features
 
 - Decentralized multi-robot state estimation
 - Cooperative localization using inter-agent measurements
@@ -89,7 +89,7 @@ Communication between agents is handled using ROS2 topics.
 
 ---
 
-## 🎯 Objectives
+## Objectives
 
 - Maintain a dynamic formation of robots around a moving human target
 - Achieve robust multi-robot tracking of a moving human
@@ -99,7 +99,7 @@ Communication between agents is handled using ROS2 topics.
 
 ---
 
-## 👤 Author
+## Author
 
 Marco Misseroni and Federico Battisti  
 MSc Mechatronics Engineering – Electronics and Robotics  
