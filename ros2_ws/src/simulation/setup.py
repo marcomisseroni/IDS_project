@@ -27,6 +27,7 @@ setup(
             'sim_odometry_node = simulation.sim_odometry_node:main',
             'sim_camera_node = simulation.sim_camera_node:main',
             'sim_vision_node = simulation.sim_vision_node:main',
+            'sim_EKF_node = simulation.sim_EKF_node:main',
         ],
     },
 )
