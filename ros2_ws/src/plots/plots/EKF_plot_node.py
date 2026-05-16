@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from project_interfaces.msg import State
+from project_interfaces.msg import MPCprediction
 import os
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import matplotlib.pyplot as plt
@@ -17,6 +18,8 @@ class EKFPlot(Node):
         self.limo_states = []
         self.person_states = []
         self.t = []
+        self.x_pred = []
+        self.y_pred = []
 
         self.start_time = None
         self.is_running = True
@@ -30,6 +33,7 @@ class EKFPlot(Node):
         self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 10)
         self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
         self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
+        self.sub_mpc_pred = self.create_subscription(MPCprediction, '/mpc_prediction', self.mpc_pred_callback, 10)
 
     def admin_callback(self, msg):
         if(msg.data == 'stop_ekf'):
@@ -84,6 +88,9 @@ class EKFPlot(Node):
             person_y_values = person_states[:, 1]
             self.ax.plot(person_x_values, person_y_values, '-', color='tab:green', label='person trajectory')
             self.ax.plot(person_x_values[-1], person_y_values[-1], 'o', color='tab:green', label='person')
+
+        if self.x_pred is not None:
+            self.ax.plot(self.x_pred, self.y_pred, '--', color='orange')
 
         theta = states[-1, 2]
         arrow_length = 0.4
@@ -156,6 +163,10 @@ class EKFPlot(Node):
 
         #if self.is_running:
             #self.get_logger().info('CALLED: person_state_callback')
+
+    def mpc_pred_callback(self, msg):
+        self.x_pred = msg.x
+        self.y_pred = msg.y
 
 def main():
 

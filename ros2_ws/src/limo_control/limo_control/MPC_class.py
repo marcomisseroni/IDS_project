@@ -67,7 +67,7 @@ class MPC:
         self.X, self.U = [], []
         for k in range(self.N+1): 
             self.X += [self.opti.variable(self.nx)]
-        for k in range(self.N): 
+        for k in range(self.N):
             self.U += [self.opti.variable(self.nu)]
             self.opti.subject_to(self.opti.bounded(self.u_min, self.U[-1], self.u_max))
 

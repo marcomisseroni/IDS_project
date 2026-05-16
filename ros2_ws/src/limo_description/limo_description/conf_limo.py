@@ -69,9 +69,14 @@ rx = 640 #resolution of the camera along x
 rx_depth = 640 # resolution of the depth camera along x
 ry_depth = 400
 # from camera calibration
-fpx = 489.49 # focal length (px)
-intrinsic_camera = np.array(((489.488, 0, 314.035),(0, 489.488, 219.010),(0,0,1)))
-distortion = np.array((0.0719, -0.0947, -9.58e-06, 0.00142, 0.0))
+#fpx = 489.49 # focal length (px)
+#intrinsic_camera = np.array(((489.488, 0, 314.035),(0, 489.488, 219.010),(0,0,1)))
+#distortion = np.array((0.0719, -0.0947, -9.58e-06, 0.00142, 0.0))
+
+fpx = 1.30092897e+03 # focal length (px)
+intrinsic_camera = np.array(((1.30092897e+03, 0.0, 9.73008095e+02),(0.0, 1.30280592e+03, 7.22305051e+02),(0,0,1)))
+distortion = np.array((0.15521988, -0.57432332, -0.00566708, -0.00113189,  0.68733757))
+
 # relative position of the camera in respect to the limo RF
 x_camera = 0.086 #(m)
 y_camera = 0    #(m)

@@ -2,6 +2,7 @@ import numpy as np
 from scipy.linalg import logm, expm
 import cv2
 import os
+import sys
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import matplotlib
 matplotlib.use('TkAgg')
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import time
 from limo_description import conf_limo
+cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
 
 class Vision:
 #  _____       _ _   _       _ _          _   _             
@@ -18,7 +20,8 @@ class Vision:
 #  _| |_| | | | | |_| | (_| | | |/ / (_| | |_| | (_) | | | |
 # |_____|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_| 
 
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         # type of aruco library used
         self.aruco_type = "DICT_6X6_50"
         # dictionary with different aruco sets
@@ -190,6 +193,7 @@ class Vision:
         if len(corners) > 0:
             for i in range(0, len(ids)):
                 # aruco on a limo
+                #self.logger.info(f"id {ids[i][0]}")
                 if(ids[i][0] < 9):
                     # tvec is the translation vector [x=right, y=bottom, z=forward]
                     rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(
@@ -428,9 +432,9 @@ class Vision:
         # --------------- TARGET ----------------------
         # reading the aruco values on the target
         if(aruco_pos[9][0] != 0):
-            RF_target = self.translate(aruco_pos[9]) @ self.rotate(aruco_rot[9])
+            RF_target = self.T_limo_camera @ self.translate(aruco_pos[9]) @ self.rotate(aruco_rot[9])
         else:
-            RF_target = self.translate(aruco_pos[10]) @ self.rotate(aruco_rot[10])
+            RF_target = self.T_limo_camera @ self.translate(aruco_pos[10]) @ self.rotate(aruco_rot[10])
         target = np.array([self.get_point(RF_target)[0], self.get_point(RF_target)[1], 0])
 
         # -------------- Visualization --------------------

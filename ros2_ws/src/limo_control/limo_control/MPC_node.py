@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from project_interfaces.msg import State
+from project_interfaces.msg import MPCprediction
 from limo_control.MPC_class import MPC
 from message_filters import Subscriber
 from limo_description import conf_limo
@@ -21,6 +22,8 @@ class MPC_node(Node):
         self.mpc_timer = self.create_timer(conf_limo.dt_MPC, self.MPC_callback)
         # publishing topic
         self.pub_input = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.pub_predictions = self.create_publisher(MPCprediction, '/mpc_prediction', 10)
+
         self.start = False
 
         # assigning the id's
@@ -86,6 +89,16 @@ class MPC_node(Node):
         msg.angular.y = 0.0
         msg.angular.z = inputs[1]
         self.pub_input.publish(msg)
+
+        # publishing the predicted states
+        pred_states = np.zeros((conf_limo.N, 3))
+        for i in range(conf_limo.N):
+            pred_states[i,:] = self.sol.value(self.mpc_obj.X[i])
+        msg = MPCprediction()
+        msg.x = pred_states[:,0].tolist()
+        msg.y = pred_states[:,1].tolist()
+        msg.theta = pred_states[:,2].tolist()
+        self.pub_predictions.publish(msg)
         
     def admin_callback(self, msg):
         # used to start/stop the mpc
