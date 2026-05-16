@@ -17,26 +17,17 @@ def numpy_to_image_msg(frame, encoding='bgr8'):
 class ImagePublisher(Node):
     def __init__(self):
         super().__init__('image_publisher')
-        self.pub_rgb = self.create_publisher(Image, '/camera', 10)
-        self.pub_depth = self.create_publisher(Image, '/depth', 10)
-        #self.bridge = CvBridge()
-        self.timer = self.create_timer(0.1, self.publish_image)
+        self.pub_rgb = self.create_publisher(Image, '/camera/color/image_raw', 1)
+        self.timer = self.create_timer(0.033, self.publish_image)
 
-        self.cap = cv2.VideoCapture("src/simulation/RGB3.mp4")
-        self.cap_d = cv2.VideoCapture("src/simulation/depth3.mp4")
+        self.cap = cv2.VideoCapture("src/simulation/aruco_target.mp4")
 
     def publish_image(self):
         ret, frame = self.cap.read()
-        ret_d, frame_d = self.cap_d.read()
-        if ret and ret_d:
+        if ret:
             # publishing rgb frame
-            #rgb = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')
             rgb = numpy_to_image_msg(frame, encoding='bgr8')
             self.pub_rgb.publish(rgb)
-            # publishing depth frame
-            #depth = self.bridge.cv2_to_imgmsg(frame_d, encoding='bgr8')
-            depth = numpy_to_image_msg(frame_d, encoding='bgr8')
-            self.pub_depth.publish(depth)
 
             self.get_logger().info('Publishing image')
         else:

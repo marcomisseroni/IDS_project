@@ -160,8 +160,7 @@ class Vision:
             frame: np.ndarray, 
             aruco_dict_type: int, 
             matrix_coefficients: np.ndarray, 
-            distortion_coefficients: np.ndarray, 
-            aruco_size: float
+            distortion_coefficients: np.ndarray
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         # converting the image to grayscale and improving the values for the aruco detection
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -184,15 +183,20 @@ class Vision:
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, cv2.aruco_dict, parameters=parameters)
 
         # vector containing all the aruco positions and rotation in this frame
-        aruco_pos = np.zeros((9, 3)) # 9 possible aruco ids and 3 elements for each one (x,y,z)
-        aruco_rot = np.zeros((9, 3, 3)) # 9 possible aruco and 3x3 rotation matrix
+        aruco_pos = np.zeros((11, 3)) # 11 possible aruco ids and 3 elements for each one (x,y,z)
+        aruco_rot = np.zeros((11, 3, 3)) # 11 possible aruco and 3x3 rotation matrix
 
         # if we have detected any aruco in the image
         if len(corners) > 0:
             for i in range(0, len(ids)):
-                # tvec is the translation vector [x=right, y=bottom, z=forward]
-                rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(
-                    corners[i], aruco_size, matrix_coefficients, distortion_coefficients)
+                # aruco on a limo
+                if(ids[i][0] < 9):
+                    # tvec is the translation vector [x=right, y=bottom, z=forward]
+                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(
+                        corners[i], conf_limo.aruco_size, matrix_coefficients, distortion_coefficients)
+                else:
+                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(
+                        corners[i], conf_limo.aruco_size_target, matrix_coefficients, distortion_coefficients)
                 cv2.aruco.drawDetectedMarkers(frame, corners)
                 # plotting the RF
                 cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)
@@ -404,25 +408,16 @@ class Vision:
                                                                                                                                 
     def vision_main(
             self, 
-            frame: np.ndarray, 
-            frame_d: np.ndarray, 
+            frame: np.ndarray,  
             visualize: bool = False
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         # initializing the values
         target=np.zeros(3); limo0=np.zeros(3); limo1=np.zeros(3); limo2=np.zeros(3)
 
-        # --------------- TARGET ----------------------
-        # using YOLO to detect the target in the frame
-        x1, x2, y1, y2, xc, mask = self.detect_target(frame)
-        # estimated position of the target (if found)
-        if (mask is not None) and x1!=0:
-            x_target, y_target, frame_d = self.target_estimation_RGBD(xc, frame_d, mask)
-            target = np.array([x_target, y_target, 0])
-
         # --------------- LIMOS ----------------------
         # measuring the aruco positions
         output, aruco_pos, aruco_rot = self.aruco_pose_estimation(frame, self.ARUCO_DICT[self.aruco_type], conf_limo.intrinsic_camera,
-                                                                  conf_limo.distortion, conf_limo.aruco_size)
+                                                                  conf_limo.distortion)
         # estimating the limo positions
         limo_RF = self.limo_estimation(aruco_pos, aruco_rot)
         # saving the values in the form [x,y,th] for each limo
@@ -430,28 +425,29 @@ class Vision:
         limo1 = np.array([self.get_point(limo_RF[1])[0], self.get_point(limo_RF[1])[1], self.get_z_angle(limo_RF[1])])
         limo2 = np.array([self.get_point(limo_RF[2])[0], self.get_point(limo_RF[2])[1], self.get_z_angle(limo_RF[2])])     
 
+        # --------------- TARGET ----------------------
+        # reading the aruco values on the target
+        if(aruco_pos[9][0] != 0):
+            RF_target = self.translate(aruco_pos[9]) @ self.rotate(aruco_rot[9])
+        else:
+            RF_target = self.translate(aruco_pos[10]) @ self.rotate(aruco_rot[10])
+        target = np.array([self.get_point(RF_target)[0], self.get_point(RF_target)[1], 0])
 
         # -------------- Visualization --------------------
         if(visualize):
             output = frame
-            # target box and centroid
-            if xc != None:
-                cv2.rectangle(output, (x1, y1), (x2, y2), (0, 0, 255), 2)
             # to plot the RF i need to return in the aruco RF
             T_aruco_camera = self.rotate_angle("Z", -np.pi/2) @ self.rotate_angle("X", -np.pi/2)
             RF_plot0 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[0]
             RF_plot1 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[1]
             RF_plot2 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ limo_RF[2]
+            RF_plot3 = np.linalg.inv(T_aruco_camera) @ np.linalg.inv(self.T_limo_camera) @ RF_target
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot0[:3,:3], self.get_point(RF_plot0), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
-            # transforming the depth image in a visualizable format
-            depth_norm = cv2.normalize(frame_d, None, 0, 255, cv2.NORM_MINMAX)
-            depth_norm = depth_norm.astype('uint8')
-            depth_3ch = np.stack((depth_norm,)*3, axis=-1)
-            # showing the video with the target
-            combined = np.hstack((cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth)), depth_3ch))
-            combined_resized = cv2.resize(combined, (conf_limo.rx_depth*2, conf_limo.ry_depth))
-            cv2.imshow("Vision", combined_resized)
+            cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot3[:3,:3], self.get_point(RF_plot3), 0.1)
+            # showing the video
+            resized = cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth))
+            cv2.imshow("Vision", resized)
             cv2.waitKey(1)
         return target, limo0, limo1, limo2 # outputs in the form [x,y,th]

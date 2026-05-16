@@ -54,67 +54,57 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = self.create_subscription(CompressedImage, '/camera/color/image_raw/compressed', self.rgb_callback, 1)
-        self.depth_sub = self.create_subscription(Image, '/camera/depth/image_raw/compressedDepth', self.depth_callback, 1)
+        self.rgb_sub = self.create_subscription(CompressedImage, '/out/compressed', self.rgb_callback, 1)
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
         self.vision_obj = Vision()
-        # storing the last depth image
-        self.frame_d = None
-    
-    def depth_callback(self, msg):
-        self.get_logger().info("received depth")
-        # converting the images in the correct format
-        self.frame_d = compressed_depth_to_numpy(msg)
 
 
 
     def rgb_callback(self, rgb_msg):
-        self.get_logger().info("received rgb")
         # converting the images in the correct format
         frame = compressed_image_msg_to_numpy(rgb_msg)
 
-        if(self.frame_d is not None):
-            # elaborating the data
-            target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, self.frame_d, visualize=True)
+        # elaborating the data
+        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, visualize=True)
 
-            # publishing te data in 4 different messages (if we have a measure)
-            # limo0 measured
-            if limo0[0] != 0:
-                msg = Measurement()
-                msg.id_a = self.id
-                msg.id_b = 0
-                msg.x = limo0[0]
-                msg.y = limo0[1]
-                msg.dtheta = limo0[2]
-                self.pub_measurement.publish(msg)
-            # limo1
-            if limo1[0] != 0:
-                msg = Measurement()
-                msg.id_a = self.id
-                msg.id_b = 1
-                msg.x = limo1[0]
-                msg.y = limo1[1]
-                msg.dtheta = limo1[2]
-                self.pub_measurement.publish(msg)
-            # limo2
-            if limo2[0] != 0:
-                msg = Measurement()
-                msg.id_a = self.id
-                msg.id_b = 2
-                msg.x = limo2[0]
-                msg.y = limo2[1]
-                msg.dtheta = limo2[2]
-                self.pub_measurement.publish(msg)
-            # target
-            if target[0] != 0:
-                msg = Measurement()
-                msg.id_a = self.id
-                msg.id_b = 3
-                msg.x = target[0]
-                msg.y = target[1]
-                msg.dtheta = 0.0
-                self.pub_measurement.publish(msg)
+        # publishing te data in 4 different messages (if we have a measure)
+        # limo0 measured
+        if limo0[0] != 0:
+            msg = Measurement()
+            msg.id_a = self.id
+            msg.id_b = 0
+            msg.x = limo0[0]
+            msg.y = limo0[1]
+            msg.dtheta = limo0[2]
+            self.pub_measurement.publish(msg)
+        # limo1
+        if limo1[0] != 0:
+            msg = Measurement()
+            msg.id_a = self.id
+            msg.id_b = 1
+            msg.x = limo1[0]
+            msg.y = limo1[1]
+            msg.dtheta = limo1[2]
+            self.pub_measurement.publish(msg)
+        # limo2
+        if limo2[0] != 0:
+            msg = Measurement()
+            msg.id_a = self.id
+            msg.id_b = 2
+            msg.x = limo2[0]
+            msg.y = limo2[1]
+            msg.dtheta = limo2[2]
+            self.pub_measurement.publish(msg)
+        # target
+        if target[0] != 0:
+            msg = Measurement()
+            msg.id_a = self.id
+            msg.id_b = 3
+            msg.x = target[0]
+            msg.y = target[1]
+            msg.dtheta = 0.0
+            self.pub_measurement.publish(msg)
     
 def main(args=None):
     rclpy.init()
