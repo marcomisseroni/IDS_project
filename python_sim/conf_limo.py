@@ -22,6 +22,8 @@ v_min = -1
 # limo max yaw rate 2*v_max/(b/2)
 w_max = 0.1*4*v_max/b
 w_min = -0.1*4*v_max/b
+# Simulated steps
+N_sim = 100
 
 # ----------------- SENSORS -------------------
 # lidar covariance
