@@ -96,11 +96,6 @@ class EKFPlot(Node):
         if self.x_pred is not None:
             self.ax.plot(self.x_pred, self.y_pred, '--', color='orange')
 
-        if measurement is not None:
-            meas_x_values = measurement[:, 0]
-            meas_y_values = measurement[:, 1]
-            self.ax.plot(meas_x_values[-1], meas_y_values[-1], 'o', color='tab:red', label='meas')
-
         theta = states[-1, 2]
         arrow_length = 0.4
         self.ax.arrow(

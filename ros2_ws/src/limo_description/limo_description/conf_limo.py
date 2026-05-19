@@ -58,7 +58,7 @@ Tp = 0.1
 
 # ---------------- CONTROLS -------------------
 # distance between target and center
-dist = 1.5
+dist = 1.0
 # time horizon MPC (number of steps)
 N = 20
 # MPC timestep
