@@ -3,6 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from project_interfaces.msg import State
 from project_interfaces.msg import MPCprediction
+from project_interfaces.msg import Desired
 from limo_control.MPC_class import MPC
 from message_filters import Subscriber
 from limo_description import conf_limo
@@ -23,6 +24,7 @@ class MPC_node(Node):
         # publishing topic
         self.pub_input = self.create_publisher(Twist, '/cmd_vel', 10)
         self.pub_predictions = self.create_publisher(MPCprediction, '/mpc_prediction', 10)
+        self.pub_pos_des = self.create_publisher(Desired, '/desired', 10)
 
         self.start = False
 
@@ -118,14 +120,15 @@ class MPC_node(Node):
 #                                     |_|              
 
     def desired_pos(self):
+        old_center = np.array([(self.state[0] + self.limo_1[0] +  self.limo_2[0]) / 3, (self.state[1] + self.limo_1[1] +  self.limo_2[1]) / 3])
+
         # ------------- new center position --------------------
         # angle between previous center and new target
-        alpha = np.arctan2(self.target[1]-self.center[1], self.target[0]-self.center[0])
+        alpha = np.arctan2(self.target[1]-old_center[1], self.target[0]-old_center[0])
         # distance to move the center
-        d = np.sqrt( (self.target[1]-self.center[1])**2 + (self.target[0]-self.center[0])**2 ) - conf_limo.dist
-        # new center
-        old_center = self.center
-        self.center = np.array([self.center[0]+d*np.cos(alpha), self.center[1]+d*np.sin(alpha)])
+        d = np.sqrt( (self.target[1]-old_center[1])**2 + (self.target[0]-old_center[0])**2 ) - conf_limo.dist
+
+        self.center = np.array([old_center[0]+d*np.cos(alpha), old_center[1]+d*np.sin(alpha)])
 
         # -------------- position of each limo -----------------
         # three possible positions
@@ -138,6 +141,15 @@ class MPC_node(Node):
         # - p2: rotated by 120° counterclockwise
         alpha2 = alpha0 - np.pi*2/3
         p2 = np.array([self.center[0]+conf_limo.r_circle*np.cos(alpha2), self.center[1]+conf_limo.r_circle*np.sin(alpha2)])
+
+        msg = Desired()
+        msg.x0 = p0[0]
+        msg.y0 = p0[1]
+        msg.x1 = p1[0]
+        msg.y1 = p1[1]
+        msg.x2 = p2[0]
+        msg.y2 = p2[1]
+        self.pub_pos_des.publish(msg)
 
         # -------------- choice of the position of each limo -----------------
         positions = np.array([p0, p1, p2])
@@ -152,7 +164,9 @@ class MPC_node(Node):
         rows, cols = linear_sum_assignment(cost_matrix)
         
         # returning the desired position (x,y,0)
-        return np.array([positions[cols[0]][0], positions[cols[0]][1], 0])
+        #return np.array([positions[cols[0]][0], positions[cols[0]][1], 0])
+        return np.array([self.target[0], self.target[1], 0])
+
  
 def main(args=None):
     rclpy.init()

@@ -42,7 +42,7 @@ class MPC:
         self.w_p = 1e4 # final position weigth
         self.w_v = 1e-2 # velocity weight
         self.w_final_v = 1e-2 # final velocity cost weight
-        self.w_a = 0.0 # weigth on the angle of the limo in respect to the target
+        self.w_a = 1e-4 # weigth on the angle of the limo in respect to the target
 
 #   ____   _____ _____             _               
 #  / __ \ / ____|  __ \           | |              

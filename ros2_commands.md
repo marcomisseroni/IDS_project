@@ -150,6 +150,7 @@ To access the LIMO using SSH protocol you can use: `ssh agilex@192.168.1.34` whe
 To work on the same domain of the LIMO with your own computer you can check the *ROS DOMAIN* with: `echo $ROS_DOMAIN_ID` on the LIMO and then set the same *ROS DOMAIN* on your computer using:  `export ROS_DOMAIN_ID=x`.
 
 To launch the camera node on the LIMO you can use: `ros2 launch orbbec_camera dabai.launch.py`.
+To launch the odometry node: `ros2 launch limo_bringup limo_start.launch.py`.
 
 To run the image compression node on the limo: `ros2 run image_transport republish raw compressed --ros-args --remap in:=/camera/color/image_raw`.
 `ros2 run image_transport republish raw compressedDepth  --ros-args  -r in:=/camera/depth/image_raw`

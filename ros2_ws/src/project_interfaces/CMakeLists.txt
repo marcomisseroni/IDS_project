@@ -31,6 +31,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Update.msg"
   "msg/State.msg"
   "msg/MPCprediction.msg"
+  "msg/Desired.msg"
 )
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
