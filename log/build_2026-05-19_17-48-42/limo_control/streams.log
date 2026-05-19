@@ -1,0 +1,39 @@
+[1.675s] Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/limo_control': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/limo_control build --build-base /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build install --record /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/install.log --single-version-externally-managed install_data
+[2.083s] running egg_info
+[2.099s] creating ../../../build/limo_control/limo_control.egg-info
+[2.099s] writing ../../../build/limo_control/limo_control.egg-info/PKG-INFO
+[2.100s] writing dependency_links to ../../../build/limo_control/limo_control.egg-info/dependency_links.txt
+[2.101s] writing entry points to ../../../build/limo_control/limo_control.egg-info/entry_points.txt
+[2.101s] writing requirements to ../../../build/limo_control/limo_control.egg-info/requires.txt
+[2.101s] writing top-level names to ../../../build/limo_control/limo_control.egg-info/top_level.txt
+[2.101s] writing manifest file '../../../build/limo_control/limo_control.egg-info/SOURCES.txt'
+[2.145s] reading manifest file '../../../build/limo_control/limo_control.egg-info/SOURCES.txt'
+[2.147s] writing manifest file '../../../build/limo_control/limo_control.egg-info/SOURCES.txt'
+[2.150s] running build
+[2.150s] running build_py
+[2.150s] creating /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control
+[2.150s] copying limo_control/MPC_class.py -> /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control
+[2.151s] copying limo_control/MPC_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control
+[2.151s] copying limo_control/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control
+[2.152s] running install
+[2.154s] running install_lib
+[2.173s] creating /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control
+[2.173s] copying /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control/MPC_class.py -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control
+[2.173s] copying /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control/MPC_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control
+[2.173s] copying /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build/lib/limo_control/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control
+[2.173s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control/MPC_class.py to MPC_class.cpython-310.pyc
+[2.176s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control/MPC_node.py to MPC_node.cpython-310.pyc
+[2.177s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control/__init__.py to __init__.cpython-310.pyc
+[2.177s] running install_data
+[2.177s] creating /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/share/ament_index/resource_index/packages
+[2.177s] copying resource/limo_control -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/share/ament_index/resource_index/packages
+[2.177s] copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/share/limo_control
+[2.177s] creating /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/share/limo_control/param
+[2.178s] copying param/limo_params.yaml -> /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/share/limo_control/param
+[2.178s] running install_egg_info
+[2.200s] Copying ../../../build/limo_control/limo_control.egg-info to /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages/limo_control-0.0.0-py3.10.egg-info
+[2.203s] running install_scripts
+[2.481s] Installing EKF_node script to /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/limo_control
+[2.481s] Installing MPC_node script to /home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/limo_control
+[2.482s] writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/build/limo_control/install.log'
+[2.588s] Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/limo_control' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/build/limo_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/install/limo_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/limo_control build --build-base /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/build install --record /home/marco/marco/uni/magistrale/IDS_project/build/limo_control/install.log --single-version-externally-managed install_data

@@ -1,0 +1,2 @@
+[console_scripts]
+EKF_plot_node = plots.EKF_plot_node:main

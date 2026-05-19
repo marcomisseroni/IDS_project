@@ -1,0 +1,31 @@
+running egg_info
+creating ../../../build/plots/plots.egg-info
+writing ../../../build/plots/plots.egg-info/PKG-INFO
+writing dependency_links to ../../../build/plots/plots.egg-info/dependency_links.txt
+writing entry points to ../../../build/plots/plots.egg-info/entry_points.txt
+writing requirements to ../../../build/plots/plots.egg-info/requires.txt
+writing top-level names to ../../../build/plots/plots.egg-info/top_level.txt
+writing manifest file '../../../build/plots/plots.egg-info/SOURCES.txt'
+reading manifest file '../../../build/plots/plots.egg-info/SOURCES.txt'
+writing manifest file '../../../build/plots/plots.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/marco/marco/uni/magistrale/IDS_project/build/plots/build/lib/plots
+copying plots/EKF_plot_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/plots/build/lib/plots
+copying plots/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/build/plots/build/lib/plots
+running install
+running install_lib
+creating /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots
+copying /home/marco/marco/uni/magistrale/IDS_project/build/plots/build/lib/plots/EKF_plot_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots
+copying /home/marco/marco/uni/magistrale/IDS_project/build/plots/build/lib/plots/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots/EKF_plot_node.py to EKF_plot_node.cpython-310.pyc
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/marco/marco/uni/magistrale/IDS_project/install/plots/share/ament_index/resource_index/packages
+copying resource/plots -> /home/marco/marco/uni/magistrale/IDS_project/install/plots/share/ament_index/resource_index/packages
+copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/install/plots/share/plots
+running install_egg_info
+Copying ../../../build/plots/plots.egg-info to /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/python3.10/site-packages/plots-0.0.0-py3.10.egg-info
+running install_scripts
+Installing EKF_plot_node script to /home/marco/marco/uni/magistrale/IDS_project/install/plots/lib/plots
+writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/build/plots/install.log'

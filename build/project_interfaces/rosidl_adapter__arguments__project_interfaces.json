@@ -1,0 +1,10 @@
+{
+  "package_name": "project_interfaces",
+  "non_idl_tuples": [
+    "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/project_interfaces:msg/Measurement.msg",
+    "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/project_interfaces:msg/Landmark.msg",
+    "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/project_interfaces:msg/Update.msg",
+    "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/project_interfaces:msg/State.msg",
+    "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/project_interfaces:msg/MPCprediction.msg"
+  ]
+}

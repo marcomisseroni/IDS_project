@@ -1,0 +1,29 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/landmark__type_support_c.cpp.o"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/landmark__type_support_c.cpp.o.d"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/measurement__type_support_c.cpp.o"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/measurement__type_support_c.cpp.o.d"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/mp_cprediction__type_support_c.cpp.o"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/mp_cprediction__type_support_c.cpp.o.d"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/state__type_support_c.cpp.o"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/state__type_support_c.cpp.o.d"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/update__type_support_c.cpp.o"
+  "CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/update__type_support_c.cpp.o.d"
+  "libproject_interfaces__rosidl_typesupport_fastrtps_c.pdb"
+  "libproject_interfaces__rosidl_typesupport_fastrtps_c.so"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/landmark__rosidl_typesupport_fastrtps_c.h"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/landmark__type_support_c.cpp"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/measurement__rosidl_typesupport_fastrtps_c.h"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/measurement__type_support_c.cpp"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/mp_cprediction__rosidl_typesupport_fastrtps_c.h"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/mp_cprediction__type_support_c.cpp"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/state__rosidl_typesupport_fastrtps_c.h"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/state__type_support_c.cpp"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/update__rosidl_typesupport_fastrtps_c.h"
+  "rosidl_typesupport_fastrtps_c/project_interfaces/msg/detail/update__type_support_c.cpp"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/project_interfaces__rosidl_typesupport_fastrtps_c.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

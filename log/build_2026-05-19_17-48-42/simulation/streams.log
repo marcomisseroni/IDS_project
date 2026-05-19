@@ -1,0 +1,45 @@
+[1.645s] Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/simulation': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/build/simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/simulation build --build-base /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build install --record /home/marco/marco/uni/magistrale/IDS_project/build/simulation/install.log --single-version-externally-managed install_data
+[2.415s] running egg_info
+[2.442s] creating ../../../build/simulation/simulation.egg-info
+[2.442s] writing ../../../build/simulation/simulation.egg-info/PKG-INFO
+[2.442s] writing dependency_links to ../../../build/simulation/simulation.egg-info/dependency_links.txt
+[2.442s] writing entry points to ../../../build/simulation/simulation.egg-info/entry_points.txt
+[2.442s] writing requirements to ../../../build/simulation/simulation.egg-info/requires.txt
+[2.442s] writing top-level names to ../../../build/simulation/simulation.egg-info/top_level.txt
+[2.442s] writing manifest file '../../../build/simulation/simulation.egg-info/SOURCES.txt'
+[2.484s] reading manifest file '../../../build/simulation/simulation.egg-info/SOURCES.txt'
+[2.485s] writing manifest file '../../../build/simulation/simulation.egg-info/SOURCES.txt'
+[2.486s] running build
+[2.486s] running build_py
+[2.486s] creating /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.486s] copying simulation/sim_vision_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.486s] copying simulation/sim_odometry_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.489s] copying simulation/sim_camera_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.489s] copying simulation/sim_EKF_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.489s] copying simulation/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation
+[2.489s] running install
+[2.498s] running install_lib
+[2.545s] creating /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.548s] copying /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation/sim_vision_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.549s] copying /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation/sim_odometry_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.550s] copying /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation/sim_camera_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.550s] copying /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation/sim_EKF_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.550s] copying /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build/lib/simulation/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation
+[2.550s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation/sim_vision_node.py to sim_vision_node.cpython-310.pyc
+[2.553s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation/sim_odometry_node.py to sim_odometry_node.cpython-310.pyc
+[2.554s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation/sim_camera_node.py to sim_camera_node.cpython-310.pyc
+[2.555s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation/sim_EKF_node.py to sim_EKF_node.cpython-310.pyc
+[2.560s] byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation/__init__.py to __init__.cpython-310.pyc
+[2.560s] running install_data
+[2.560s] creating /home/marco/marco/uni/magistrale/IDS_project/install/simulation/share/ament_index/resource_index/packages
+[2.560s] copying resource/simulation -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/share/ament_index/resource_index/packages
+[2.560s] copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/install/simulation/share/simulation
+[2.560s] running install_egg_info
+[2.586s] Copying ../../../build/simulation/simulation.egg-info to /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages/simulation-0.0.0-py3.10.egg-info
+[2.586s] running install_scripts
+[3.052s] Installing sim_EKF_node script to /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/simulation
+[3.056s] Installing sim_camera_node script to /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/simulation
+[3.056s] Installing sim_odometry_node script to /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/simulation
+[3.056s] Installing sim_vision_node script to /home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/simulation
+[3.056s] writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/build/simulation/install.log'
+[3.346s] Invoked command in '/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/simulation' returned '0': PYTHONPATH=/home/marco/marco/uni/magistrale/IDS_project/build/simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/marco/marco/uni/magistrale/IDS_project/install/simulation/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/simulation build --build-base /home/marco/marco/uni/magistrale/IDS_project/build/simulation/build install --record /home/marco/marco/uni/magistrale/IDS_project/build/simulation/install.log --single-version-externally-managed install_data

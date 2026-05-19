@@ -1,0 +1,4 @@
+gmake[2]: *** [CMakeFiles/compressed_depth_image_transport.dir/build.make:104: CMakeFiles/compressed_depth_image_transport.dir/src/manifest.cpp.o] Interrupt
+gmake[2]: *** [CMakeFiles/compressed_depth_image_transport.dir/build.make:90: CMakeFiles/compressed_depth_image_transport.dir/src/compressed_depth_subscriber.cpp.o] Interrupt
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/compressed_depth_image_transport.dir/all] Interrupt
+gmake: *** [Makefile:146: all] Interrupt

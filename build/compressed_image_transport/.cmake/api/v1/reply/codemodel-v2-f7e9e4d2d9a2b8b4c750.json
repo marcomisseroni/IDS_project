@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-6e416c6365eba039e1c8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "compressed_image_transport",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "compressed_image_transport::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-compressed_image_transport-e44f541c8f2a05da4746.json",
+					"name" : "compressed_image_transport",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "compressed_image_transport_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-compressed_image_transport_uninstall-4fae210e96ab2397abcb.json",
+					"name" : "compressed_image_transport_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-084bc56837d70fe9d229.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/marco/marco/uni/magistrale/IDS_project/build/compressed_image_transport",
+		"source" : "/home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/image_transport_plugins/compressed_image_transport"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

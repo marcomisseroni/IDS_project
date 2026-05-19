@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "theora_image_transport__rs",
+		"source" : "/home/marco/marco/uni/magistrale/IDS_project/build/theora_image_transport/theora_image_transport__rs"
+	}
+}
