@@ -62,20 +62,20 @@ dist = 1.5
 # time horizon MPC (number of steps)
 N = 20
 # MPC timestep
-dt_MPC = 0.2
+dt_MPC = 0.1
 
 # ------------- CAMERA ------------------------
 rx = 640 #resolution of the camera along x
 rx_depth = 640 # resolution of the depth camera along x
-ry_depth = 400
+ry_depth = 480
 # from camera calibration
-#fpx = 489.49 # focal length (px)
-#intrinsic_camera = np.array(((489.488, 0, 314.035),(0, 489.488, 219.010),(0,0,1)))
-#distortion = np.array((0.0719, -0.0947, -9.58e-06, 0.00142, 0.0))
+fpx = 489.49 # focal length (px)
+intrinsic_camera = np.array(((489.488, 0, 314.035),(0, 489.488, 219.010),(0,0,1)))
+distortion = np.array((0.0719, -0.0947, -9.58e-06, 0.00142, 0.0))
 
-fpx = 1.30092897e+03 # focal length (px)
-intrinsic_camera = np.array(((1.30092897e+03, 0.0, 9.73008095e+02),(0.0, 1.30280592e+03, 7.22305051e+02),(0,0,1)))
-distortion = np.array((0.15521988, -0.57432332, -0.00566708, -0.00113189,  0.68733757))
+#fpx = 1.30092897e+03 # focal length (px)
+#intrinsic_camera = np.array(((1.30092897e+03, 0.0, 9.73008095e+02),(0.0, 1.30280592e+03, 7.22305051e+02),(0,0,1)))
+#distortion = np.array((0.15521988, -0.57432332, -0.00566708, -0.00113189,  0.68733757))
 
 # relative position of the camera in respect to the limo RF
 x_camera = 0.086 #(m)
@@ -88,4 +88,4 @@ L = 0.1367/2 # half of limo width (along y)
 H = 0.170 # distance from back aruco to center of the limo (along x)
 h = 0.0188 # distance from side arucos to center of the limo (along x)
 aruco_size = 0.080 # (m)
-aruco_size_target = 0.193 # (m)
+aruco_size_target = 0.144 # (m)

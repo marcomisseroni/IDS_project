@@ -4,6 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from project_interfaces.msg import State
 from project_interfaces.msg import MPCprediction
+from project_interfaces.msg import Measurement
 import os
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import matplotlib.pyplot as plt
@@ -17,6 +18,7 @@ class EKFPlot(Node):
         super().__init__('ekf_plot')
         self.limo_states = []
         self.person_states = []
+        self.meas = []
         self.t = []
         self.x_pred = []
         self.y_pred = []
@@ -34,6 +36,7 @@ class EKFPlot(Node):
         self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
         self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
         self.sub_mpc_pred = self.create_subscription(MPCprediction, '/mpc_prediction', self.mpc_pred_callback, 10)
+        self.sub_meas = self.create_subscription(Measurement, '/measurement', self.meas_callback, 10)
 
     def admin_callback(self, msg):
         if(msg.data == 'stop_ekf'):
@@ -77,6 +80,7 @@ class EKFPlot(Node):
 
         states = np.asarray(self.limo_states, dtype=float)
         person_states = np.asarray(self.person_states, dtype=float) if len(self.person_states) > 0 else None
+        measurement = np.asarray(self.meas, dtype=float) if len(self.meas) > 0 else None
         x_values = states[:, 0]
         y_values = states[:, 1]
 
@@ -91,6 +95,11 @@ class EKFPlot(Node):
 
         if self.x_pred is not None:
             self.ax.plot(self.x_pred, self.y_pred, '--', color='orange')
+
+        if measurement is not None:
+            meas_x_values = measurement[:, 0]
+            meas_y_values = measurement[:, 1]
+            self.ax.plot(meas_x_values[-1], meas_y_values[-1], 'o', color='tab:red', label='meas')
 
         theta = states[-1, 2]
         arrow_length = 0.4
@@ -163,6 +172,11 @@ class EKFPlot(Node):
 
         #if self.is_running:
             #self.get_logger().info('CALLED: person_state_callback')
+
+    def meas_callback(self, msg):
+        x = msg.x
+        y = msg.y
+        self.meas.append((x, y))
 
     def mpc_pred_callback(self, msg):
         self.x_pred = msg.x

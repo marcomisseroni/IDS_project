@@ -212,9 +212,12 @@ class Vision:
                 # transforming in the camera correct RF (x=forward, y=left, z=top)
                 T_aruco_camera = self.rotate_angle("Z", -np.pi/2) @ self.rotate_angle("X", -np.pi/2)
                 T_camera = T_aruco_camera @ T
-                # saving the values
-                aruco_pos[ids[i][0],:] = self.get_point(T_camera)
-                aruco_rot[ids[i][0],:,:] = T_camera[:3,:3]
+                if(ids[i][0]<10):
+                    # saving the values
+                    aruco_pos[ids[i][0],:] = self.get_point(T_camera)
+                    aruco_rot[ids[i][0],:,:] = T_camera[:3,:3]
+                else:
+                    print("Detected a wrong aruco")
         return frame, aruco_pos, aruco_rot
 
     # estimate the limo positions
