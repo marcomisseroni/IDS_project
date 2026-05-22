@@ -89,3 +89,6 @@ H = 0.170 # distance from back aruco to center of the limo (along x)
 h = 0.0188 # distance from side arucos to center of the limo (along x)
 aruco_size = 0.080 # (m)
 aruco_size_target = 0.144 # (m)
+
+# ------------ MEASUREMENT ROUTER -------------------------
+Tm = 0.05

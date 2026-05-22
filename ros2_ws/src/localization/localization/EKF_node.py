@@ -79,7 +79,7 @@ class ExtendedKalmanFilter(Node):
             10)
         self.sub_measurement = self.create_subscription(
             Measurement,
-            '/measurement',
+            '/measurement_routed',
             self.measurement_callback,
             10)
         self.sub_info = self.create_subscription(

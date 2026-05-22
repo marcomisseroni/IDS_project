@@ -12,7 +12,7 @@ import cv2
 
 '''
 Node that reads from /camera topic the current frame, elaborates the image with the vision class
-and sends the message in the /measurement topic
+and sends the message in the /measurement_raw topic
 '''
 
 def image_msg_to_numpy(msg):
@@ -56,7 +56,7 @@ class Vision_node(Node):
         # subscibed topics
         self.rgb_sub = self.create_subscription(CompressedImage, '/camera/color/image_raw/compressed', self.rgb_callback, 1)
         # publishing topic
-        self.pub_measurement = self.create_publisher(Measurement, '/measurement', 10)
+        self.pub_measurement = self.create_publisher(Measurement, '/measurement_raw', 10)
         self.vision_obj = Vision(self.get_logger())
 
 
