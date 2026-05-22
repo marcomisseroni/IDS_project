@@ -1,5 +1,0 @@
-gmake[2]: *** [CMakeFiles/ogg_saver.dir/build.make:76: CMakeFiles/ogg_saver.dir/src/ogg_saver.cpp.o] Interrupt
-gmake[1]: *** [CMakeFiles/Makefile2:641: CMakeFiles/ogg_saver.dir/all] Interrupt
-gmake[2]: *** [CMakeFiles/theora_image_transport_component.dir/build.make:90: CMakeFiles/theora_image_transport_component.dir/src/theora_subscriber.cpp.o] Interrupt
-gmake[1]: *** [CMakeFiles/Makefile2:614: CMakeFiles/theora_image_transport_component.dir/all] Interrupt
-gmake: *** [Makefile:146: all] Interrupt

@@ -30,6 +30,7 @@ setup(
         'console_scripts': [
             'EKF_node = limo_control.EKF_node:main',
             'MPC_node = limo_control.MPC_node:main',
+            'measurement_router = limo_control.measurement_router:main',
         ],
     },
 )

@@ -8,9 +8,9 @@ from limo_description import conf_limo as conf_limo
 
 class MeasurementRouter(Node):
 
-    def _int_(self):
-        super()._init_('measurement_router')
-        
+    def __init__(self):
+        super().__init__('measurement_router')
+
         # topics to subscribe
         self.sub_meas1 = self.create_subscription(Measurement, '/measurement_raw', self.meas_callback, 10)
 
@@ -57,3 +57,14 @@ class MeasurementRouter(Node):
                 self.meas = [None] * n
                 self.idx = (idx + 1) % n
                 return
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = MeasurementRouter()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
