@@ -66,15 +66,15 @@ class ExtendedKalmanFilter(Node):
         self.update_msg_count = 0
         # timer to publish the estimated state
         self.state_timer = self.create_timer(conf_kalman.dt_MPC, self.state_timer_callback)
-        self.pub_limo_state = self.create_publisher(State, '/limo_state', 10)
-        self.pub_person_state = self.create_publisher(State, '/person_state', 10)
+        self.pub_limo_state = self.create_publisher(State, 'limo_state', 10)
+        self.pub_person_state = self.create_publisher(State, 'person_state', 10)
         # topic on which the node publishes
         self.pub_info = self.create_publisher(Landmark, '/info', 10)
         self.pub_update = self.create_publisher(Update, '/update', 10)
         # topic subscription
         self.sub_odometry = self.create_subscription(
             Odometry,
-            '/odom',
+            'odom',
             self.odometry_callback,
             10)
         self.sub_measurement = self.create_subscription(
@@ -89,12 +89,12 @@ class ExtendedKalmanFilter(Node):
             10)
         self.sub_update = self.create_subscription(
             Update,
-            'update',
+            '/update',
             self.update_callback,
             10)
         self.sub_admin = self.create_subscription(
             String,
-            'admin',
+            '/admin',
             self.admin_callback,
             10)
         

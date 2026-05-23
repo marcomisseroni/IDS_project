@@ -54,7 +54,7 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = self.create_subscription(CompressedImage, '/camera/color/image_raw/compressed', self.rgb_callback, 1)
+        self.rgb_sub = self.create_subscription(CompressedImage, 'camera/color/image_raw/compressed', self.rgb_callback, 1)
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement_raw', 10)
         self.vision_obj = Vision(self.get_logger())

@@ -37,11 +37,11 @@ class EKFPlot(Node):
 
         # subs
         self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 10)
-        self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
-        self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
-        self.sub_mpc_pred = self.create_subscription(MPCprediction, '/mpc_prediction', self.mpc_pred_callback, 10)
-        self.sub_meas = self.create_subscription(Measurement, '/measurement', self.meas_callback, 10)
-        self.sub_des = self.create_subscription(Desired, '/desired', self.des_callback, 10)
+        self.sub_ekf_limo = self.create_subscription(State, 'limo_state', self.limo_state_callback, 10)
+        self.sub_ekf_person = self.create_subscription(State, 'person_state', self.person_state_callback, 10)
+        self.sub_mpc_pred = self.create_subscription(MPCprediction, 'mpc_prediction', self.mpc_pred_callback, 10)
+        self.sub_meas = self.create_subscription(Measurement, '/measurement_routed', self.meas_callback, 10)
+        self.sub_des = self.create_subscription(Desired, 'desired', self.des_callback, 10)
 
     def admin_callback(self, msg):
         if(msg.data == 'stop_ekf'):
