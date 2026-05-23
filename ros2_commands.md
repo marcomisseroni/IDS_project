@@ -147,10 +147,12 @@ Connect to the wifi OptiTrack.speed with the password `60A84A244BECD`
 
 To access the LIMO using SSH protocol you can use: `ssh agilex@192.168.1.34` where the last number could be different. The password is: `agx`. 
 
-To work on the same domain of the LIMO with your own computer you can check the *ROS DOMAIN* with: `echo $ROS_DOMAIN_ID` on the LIMO and then set the same *ROS DOMAIN* on your computer using:  `export ROS_DOMAIN_ID=x`.
+To work on the same domain of the LIMO with your own computer you can check the *ROS DOMAIN* with: `echo $ROS_DOMAIN_ID` on the LIMO and then set the same *ROS DOMAIN* on your computer using:  `export ROS_DOMAIN_ID=2`.
 
 To launch the camera node on the LIMO you can use: `ros2 launch orbbec_camera dabai.launch.py`.
 To launch the odometry node: `ros2 launch limo_bringup limo_start.launch.py`.
+
+To launch the nodes with a namespace: `ros2 launch orbbec_camera dabai.launch.py \ --ros-args -r __ns:=/limo0`
 
 To run the image compression node on the limo: `ros2 run image_transport republish raw compressed --ros-args --remap in:=/camera/color/image_raw`.
 `ros2 run image_transport republish raw compressedDepth  --ros-args  -r in:=/camera/depth/image_raw`
@@ -160,9 +162,5 @@ It's possible to play a pre-recorded *bag play*, which replay all the messages s
 ### Firewall deactivation for windows users
 
 In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then go to `privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva`.
-
-
-Cose da fare:
-- capire update persona
 
 

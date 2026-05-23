@@ -164,8 +164,8 @@ class MPC_node(Node):
         rows, cols = linear_sum_assignment(cost_matrix)
         
         # returning the desired position (x,y,0)
-        #return np.array([positions[cols[0]][0], positions[cols[0]][1], 0])
-        return np.array([self.target[0], self.target[1], 0])
+        return np.array([positions[cols[0]][0], positions[cols[0]][1], 0])
+        #return np.array([self.target[0], self.target[1], 0])
 
  
 def main(args=None):
