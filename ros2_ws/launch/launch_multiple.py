@@ -68,7 +68,7 @@ def generate_launch_description():
         ),
         Node(
             package='plots',
-            namespace='limo0',
+            namespace='',
             executable='EKF_plot_node',
             name='ekf_plot_node'
         ),

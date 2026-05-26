@@ -17,18 +17,24 @@ class EKFPlot(Node):
     def __init__(self):
 
         super().__init__('ekf_plot')
-        self.limo_states = []
+        self.limo0_states = []
+        self.limo1_states = []
+        self.limo2_states = []
+
         self.person_states = []
-        self.meas = []
-        self.t = []
-        self.x_pred = []
-        self.y_pred = []
+
+        self.x_pred0 = []
+        self.y_pred0 = []
+        self.x_pred1 = []
+        self.y_pred1 = []
+        self.x_pred2 = []
+        self.y_pred2 = []
+
         self.des0 = []
         self.des1 = []
         self.des2 = []
 
-        self.start_time = None
-        self.is_running = True
+        self.is_running = False
 
         self.fig, self.ax = plt.subplots(figsize=(8, 8))
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=100, cache_frame_data=False)
@@ -37,17 +43,21 @@ class EKFPlot(Node):
 
         # subs
         self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 10)
-        self.sub_ekf_limo = self.create_subscription(State, 'limo_state', self.limo_state_callback, 10)
-        self.sub_ekf_person = self.create_subscription(State, 'person_state', self.person_state_callback, 10)
-        self.sub_mpc_pred = self.create_subscription(MPCprediction, 'mpc_prediction', self.mpc_pred_callback, 10)
-        self.sub_meas = self.create_subscription(Measurement, '/measurement_routed', self.meas_callback, 10)
-        self.sub_des = self.create_subscription(Desired, 'desired', self.des_callback, 10)
+        # ekf subscription for the three robots
+        self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
+        self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
+        # mpc subscription for the three limos
+        self.sub_mpc_pred0 = self.create_subscription(MPCprediction, '/limo0/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo0"), 10)
+        self.sub_mpc_pred1 = self.create_subscription(MPCprediction, '/limo1/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo1"), 10)
+        self.sub_mpc_pred2 = self.create_subscription(MPCprediction, '/limo2/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo2"), 10)
+        # desired state calculated by limo0
+        self.sub_des = self.create_subscription(Desired, '/limo0/desired', self.des_callback, 10)
 
     def admin_callback(self, msg):
+        if(msg.data == 'start_ekf'):
+            self.is_running = True
         if(msg.data == 'stop_ekf'):
-            #self.get_logger().info('Called admin_callback: stop_ekf')
             self.is_running = False
-            self.plot_limo_states()
 
     def _make_window_non_intrusive(self):
         try:
@@ -74,40 +84,54 @@ class EKFPlot(Node):
             pass
 
     def update_plot(self, _frame):
-        self.ax.cla()
-
-        if len(self.limo_states) == 0:
-            self.ax.set_title('Waiting for limo_state and person_state...')
-            self.ax.set_xlabel('x [m]')
-            self.ax.set_ylabel('y [m]')
-            self.ax.grid(True)
+        if self.is_running == False:
             return
 
-        states = np.asarray(self.limo_states, dtype=float)
+        self.ax.cla()
+
+        states0 = np.asarray(self.limo0_states, dtype=float) if len(self.limo0_states) > 0 else None
+        states1 = np.asarray(self.limo1_states, dtype=float) if len(self.limo1_states) > 0 else None
+        states2 = np.asarray(self.limo2_states, dtype=float) if len(self.limo2_states) > 0 else None
         person_states = np.asarray(self.person_states, dtype=float) if len(self.person_states) > 0 else None
-        measurement = np.asarray(self.meas, dtype=float) if len(self.meas) > 0 else None
         des = np.asarray(self.des0, dtype=float) if len(self.des0) > 0 else None
-        x_values = states[:, 0]
-        y_values = states[:, 1]
 
-        self.ax.plot(x_values, y_values, '-', color='tab:blue', label='trajectory')
-        self.ax.plot(x_values[-1], y_values[-1], 'o', color='tab:red', label='robot')
+        # limo0 plot
+        if states0 is not None:
+            self.ax.plot(states0[:, 0], states0[:, 1], '-', color='tab:blue')
+            self.ax.plot(states0[-1, 0],states0[-1, 1], 'o', color='tab:blue', label='limo0')
+            self.get_logger().info(f'limo0 {states0[-1,0]}')
+        # limo1 plot
+        if states1 is not None:
+            self.ax.plot(states1[:, 0], states1[:, 1], '-', color='tab:orange')
+            self.ax.plot(states1[-1, 0],states1[-1, 1], 'o', color='tab:orange', label='limo1')
+            self.get_logger().info(f'limo1 {states1[-1,0]}')
+        # limo2 plot
+        if states2 is not None: 
+            self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green')
+            self.ax.plot(states2[-1, 0],states2[-1, 1], 'o', color='tab:green', label='limo2')
+            self.get_logger().info(f'limo2 {states2[-1,0]}')
 
+        # target plot
         if person_states is not None:
             person_x_values = person_states[:, 0]
             person_y_values = person_states[:, 1]
-            self.ax.plot(person_x_values, person_y_values, '-', color='tab:green', label='person trajectory')
-            self.ax.plot(person_x_values[-1], person_y_values[-1], 'o', color='tab:green', label='person')
+            self.ax.plot(person_x_values, person_y_values, '-', color='tab:red')
+            self.ax.plot(person_x_values[-1], person_y_values[-1], 'o', color='tab:red', label='person')
 
-        if self.x_pred is not None:
-            self.ax.plot(self.x_pred, self.y_pred, '--', color='orange')
+        # mpc predictions
+        if self.x_pred0 is not None:
+            self.ax.plot(self.x_pred0, self.y_pred0, '--', color='cyan')
+        if self.x_pred1 is not None:
+            self.ax.plot(self.x_pred1, self.y_pred1, '--', color='pink')
+        if self.x_pred2 is not None:
+            self.ax.plot(self.x_pred2, self.y_pred2, '--', color='olive')
         
         if des is not None:
-            self.ax.plot(self.des0[0], self.des0[1], 'o')
-            self.ax.plot(self.des1[0], self.des1[1], 'o')
-            self.ax.plot(self.des2[0], self.des2[1], 'o')
+            self.ax.plot(self.des0[0], self.des0[1], 'o', color='gray')
+            self.ax.plot(self.des1[0], self.des1[1], 'o', color='gray')
+            self.ax.plot(self.des2[0], self.des2[1], 'o', color='gray')
 
-
+        '''
         theta = states[-1, 2]
         arrow_length = 0.4
         self.ax.arrow(
@@ -121,78 +145,48 @@ class EKFPlot(Node):
             ec='tab:red',
             length_includes_head=True,
         )
+        '''
 
-        all_x_values = x_values
-        all_y_values = y_values
-        if person_states is not None:
-            all_x_values = np.concatenate([all_x_values, person_x_values])
-            all_y_values = np.concatenate([all_y_values, person_y_values])
-
-        x_margin = max(0.5, 0.15 * max(float(np.ptp(all_x_values)), 1e-6))
-        y_margin = max(0.5, 0.15 * max(float(np.ptp(all_y_values)), 1e-6))
-        self.ax.set_xlim(float(np.min(all_x_values)) - x_margin, float(np.max(all_x_values)) + x_margin)
-        self.ax.set_ylim(float(np.min(all_y_values)) - y_margin, float(np.max(all_y_values)) + y_margin)
+        self.ax.set_xlim(-2, 5)
+        self.ax.set_ylim(-2, 2)
 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.set_title('EKF robot animation')
         self.ax.set_xlabel('x [m]')
         self.ax.set_ylabel('y [m]')
-        self.ax.legend(loc='upper right')
         self.ax.grid(True)
-
-    def plot_limo_states(self):
-        if len(self.limo_states) == 0:
-            return
-
-        states = np.asarray(self.limo_states, dtype=float)
-
-        plt.figure()
-
-        plt.plot(self.t, states[:, 0], label="x")
-        plt.plot(self.t, states[:, 1], label="y")
-        plt.plot(self.t, states[:, 2], label="theta")
-
-        plt.xlabel("Time")
-        plt.ylabel("State value")
-        plt.legend()
-        plt.grid()
-        plt.show()
 
     def limo_state_callback(self, msg):
         x = msg.x
         y = msg.y
         theta = msg.theta
-        self.limo_states.append((x, y, theta))
-        if self.start_time is None:
-            self.start_time = self.get_clock().now()
-            self.t.append(0)
-        else:
-            self.t.append((self.get_clock().now() - self.start_time).nanoseconds * 1e-9)
-
-        #if self.is_running:
-            #self.get_logger().info('CALLED: limo_state_callback')
+        if msg.id == 0:
+            self.limo0_states.append((x, y, theta))
+        elif msg.id == 1:
+            self.limo1_states.append((x, y, theta))
+        elif msg.id == 2:
+            self.limo2_states.append((x, y, theta))
 
     def person_state_callback(self, msg):
         x = msg.x
         y = msg.y
         self.person_states.append((x, y))
 
-        #if self.is_running:
-            #self.get_logger().info('CALLED: person_state_callback')
-
-    def meas_callback(self, msg):
-        x = msg.x
-        y = msg.y
-        self.meas.append((x, y))
-
     def des_callback(self, msg):
         self.des0 = np.array([msg.x0, msg.y0])
         self.des1 = np.array([msg.x1, msg.y1])
         self.des2 = np.array([msg.x2, msg.y2])
 
-    def mpc_pred_callback(self, msg):
-        self.x_pred = msg.x
-        self.y_pred = msg.y
+    def mpc_pred_callback(self, msg, limo):
+        if limo == "limo0":
+            self.x_pred0 = msg.x
+            self.y_pred0 = msg.y
+        elif limo == "limo1":
+            self.x_pred1 = msg.x
+            self.y_pred1 = msg.y
+        else:
+            self.x_pred2 = msg.x
+            self.y_pred2 = msg.y
 
 def main():
 
