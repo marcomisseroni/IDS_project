@@ -163,4 +163,10 @@ It's possible to play a pre-recorded *bag play*, which replay all the messages s
 
 In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then go to `privacy e sicurezza -> sicurezza di windows -> firewall e protezione di rete -> reti private -> disattiva`.
 
+## Multi limo commands
 
+To launch the camera with the namespace: `ros2 launch orbbec_camera dabai.launch.py camera_name:=limo1`
+
+To launch the camera compression with the namespace: `ros2 run image_transport republish raw compressed --ros-args -r in:=/limo1/color/image_raw -r out/compressed:=/limo1/compressed`
+
+To launch the odometry with namespace: ` `
