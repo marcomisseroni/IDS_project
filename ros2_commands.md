@@ -165,8 +165,18 @@ In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then
 
 ## Multi limo commands
 
+IP:
+- Limo 0: 192.168.1.37
+- Limo 1: 192.168.1.35
+- Limo 2: 192.168.1.34
+
+
+### EXAMPLES FOR LIMO1:
+
 To launch the camera with the namespace: `ros2 launch orbbec_camera dabai.launch.py camera_name:=limo1`
 
 To launch the camera compression with the namespace: `ros2 run image_transport republish raw compressed --ros-args -r in:=/limo1/color/image_raw -r out/compressed:=/limo1/compressed`
 
 To launch the odometry with namespace: ` `
+
+To launch all the limo nodes: `ros2 launch launch/launch_multiple.py`

@@ -99,17 +99,17 @@ class EKFPlot(Node):
         if states0 is not None:
             self.ax.plot(states0[:, 0], states0[:, 1], '-', color='tab:blue')
             self.ax.plot(states0[-1, 0],states0[-1, 1], 'o', color='tab:blue', label='limo0')
-            self.get_logger().info(f'limo0 {states0[-1,0]}')
+            #self.get_logger().info(f'limo0 {states0[-1,0]}')
         # limo1 plot
         if states1 is not None:
             self.ax.plot(states1[:, 0], states1[:, 1], '-', color='tab:orange')
             self.ax.plot(states1[-1, 0],states1[-1, 1], 'o', color='tab:orange', label='limo1')
-            self.get_logger().info(f'limo1 {states1[-1,0]}')
+            #self.get_logger().info(f'limo1 {states1[-1,0]}')
         # limo2 plot
         if states2 is not None: 
             self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green')
             self.ax.plot(states2[-1, 0],states2[-1, 1], 'o', color='tab:green', label='limo2')
-            self.get_logger().info(f'limo2 {states2[-1,0]}')
+            #self.get_logger().info(f'limo2 {states2[-1,0]}')
 
         # target plot
         if person_states is not None:

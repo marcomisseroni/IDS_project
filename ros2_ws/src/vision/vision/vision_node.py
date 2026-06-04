@@ -3,6 +3,7 @@ os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 import rclpy
 from rclpy.node import Node
 import numpy as np
+import sys
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from message_filters import Subscriber, ApproximateTimeSynchronizer
@@ -54,7 +55,8 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        self.rgb_sub = self.create_subscription(CompressedImage, 'camera/color/image_raw/compressed', self.rgb_callback, 1)
+        topic = '/limo' + str(id) + '/compressed'
+        self.rgb_sub = self.create_subscription(CompressedImage, topic, self.rgb_callback, 1)
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement_raw', 10)
         self.vision_obj = Vision(self.get_logger())
@@ -62,6 +64,7 @@ class Vision_node(Node):
 
 
     def rgb_callback(self, rgb_msg):
+        self.get_logger().info(f'Received image from limo{self.id}')
         # converting the images in the correct format
         frame = compressed_image_msg_to_numpy(rgb_msg)
 
@@ -107,8 +110,9 @@ class Vision_node(Node):
             self.pub_measurement.publish(msg)
     
 def main(args=None):
-    rclpy.init()
-    node = Vision_node(id=2)
+    rclpy.init(args=args)
+    id=int(sys.argv[1])
+    node = Vision_node(id=id)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
