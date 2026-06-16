@@ -119,7 +119,7 @@ class EKF:
         Pba = phi_b @ piab.T @ self.phi.T
         r_a = z_ab - self.meas_model.h(b_agent_type, b_state, self.state)
         S_ab = R + self.Ha @ self.P @ self.Ha.T + self.Hb @ Pb @ self.Hb.T - self.Ha @ Pab @ self.Hb.T - self.Hb @ Pba @ self.Ha.T
-        inv_sqrt_S = sqrtm(np.linalg.inv(S_ab))
+        inv_sqrt_S = np.real(sqrtm(np.linalg.inv(S_ab)))
         gamma_a = (piab @ phi_b.T @ self.Hb.T - np.linalg.inv(self.phi) @ self.P @ self.Ha.T) @ inv_sqrt_S
         gamma_b = (np.linalg.inv(phi_b) @ Pb @ self.Hb.T - piab.T @ self.phi.T @ self.Ha.T) @ inv_sqrt_S
         W1 = phi_b.T @ self.Hb.T @ inv_sqrt_S

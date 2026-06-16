@@ -55,7 +55,7 @@ class Vision_node(Node):
         super().__init__('vision_node')
         self.id = id
         # subscibed topics
-        topic = '/limo' + str(id) + '/compressed'
+        topic = '/limo_' + str(id) + '/compressed'
         self.rgb_sub = self.create_subscription(CompressedImage, topic, self.rgb_callback, 1)
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement_raw', 10)
@@ -64,12 +64,12 @@ class Vision_node(Node):
 
 
     def rgb_callback(self, rgb_msg):
-        self.get_logger().info(f'Received image from limo{self.id}')
+        #self.get_logger().info(f'Received image from limo{self.id}')
         # converting the images in the correct format
         frame = compressed_image_msg_to_numpy(rgb_msg)
 
         # elaborating the data
-        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, visualize=True)
+        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, self.id, visualize=True)
 
         # publishing te data in 4 different messages (if we have a measure)
         # limo0 measured

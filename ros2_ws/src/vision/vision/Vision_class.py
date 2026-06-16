@@ -415,7 +415,8 @@ class Vision:
                                                                                                                                 
     def vision_main(
             self, 
-            frame: np.ndarray,  
+            frame: np.ndarray,
+            id: int,
             visualize: bool = False
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         # initializing the values
@@ -455,6 +456,6 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot3[:3,:3], self.get_point(RF_plot3), 0.1)
             # showing the video
             resized = cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth))
-            cv2.imshow("Vision", resized)
+            cv2.imshow(f"Limo {id}", resized)
             cv2.waitKey(1)
         return target, limo0, limo1, limo2 # outputs in the form [x,y,th]
