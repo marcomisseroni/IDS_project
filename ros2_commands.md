@@ -170,13 +170,14 @@ IP:
 - Limo 1: 192.168.1.35
 - Limo 2: 192.168.1.34
 
+The camera node is located in /limo_ros2_ws/install/orbbec_camera/share/orbbec_camera/launch
 
 ### EXAMPLES FOR LIMO1:
 
-To launch the camera with the namespace: `ros2 launch orbbec_camera dabai.launch.py camera_name:=limo1`
+To launch the camera with the namespace: `ros2 launch orbbec_camera dabai.launch.py camera_name:=$NAMESPACE color_fps:=10`
 
-To launch the camera compression with the namespace: `ros2 run image_transport republish raw compressed --ros-args -r in:=/limo1/color/image_raw -r out/compressed:=/limo1/compressed`
+To launch the camera compression with the namespace: `ros2 run image_transport republish raw compressed --ros-args -r in:=/$NAMESPACE/color/image_raw -r out/compressed:=/$NAMESPACE/compressed`
 
-To launch the odometry with namespace: ` `
+To launch the odometry with namespace: `namespace_launch`
 
 To launch all the limo nodes: `ros2 launch launch/launch_multiple.py`
