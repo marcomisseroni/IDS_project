@@ -5,7 +5,7 @@ import os
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 #from ultralytics import YOLO
 from limo_description import conf_limo
-cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
+#cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
 
 class Vision:
 #  _____       _ _   _       _ _          _   _             
@@ -50,7 +50,8 @@ class Vision:
         # type of aruco library used
         self.aruco_type = "DICT_6X6_50"
         arucoDict = cv2.aruco.getPredefinedDictionary(self.ARUCO_DICT[self.aruco_type])
-        arucoParams = cv2.aruco.DetectorParameters()
+        #arucoParams = cv2.aruco.DetectorParameters()
+        arucoParams = cv2.aruco.DetectorParameters_create()
 
 #                                  _____       _            _   _             
 #     /\                          |  __ \     | |          | | (_)            
@@ -166,7 +167,8 @@ class Vision:
         gray = clahe.apply(gray)
         # loading the correct aruco dictionary
         cv2.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
-        parameters = cv2.aruco.DetectorParameters()
+        #parameters = cv2.aruco.DetectorParameters()
+        parameters = cv2.aruco.DetectorParameters_create()
         parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
         parameters.cornerRefinementWinSize = 5
         parameters.cornerRefinementMaxIterations = 50
