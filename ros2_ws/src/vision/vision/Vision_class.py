@@ -4,9 +4,6 @@ import cv2
 import os
 import sys
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import time
 from limo_description import conf_limo
