@@ -50,8 +50,7 @@ class Vision:
         # type of aruco library used
         self.aruco_type = "DICT_6X6_50"
         arucoDict = cv2.aruco.getPredefinedDictionary(self.ARUCO_DICT[self.aruco_type])
-        #arucoParams = cv2.aruco.DetectorParameters()
-        arucoParams = cv2.aruco.DetectorParameters_create()
+        arucoParams = cv2.aruco.DetectorParameters()
 
 #                                  _____       _            _   _             
 #     /\                          |  __ \     | |          | | (_)            
@@ -126,7 +125,7 @@ class Vision:
     # print the aruco number on the image and the bounding box
     def aruco_display(
             self, 
-            corners: list[np.ndarray], 
+            corners, 
             ids: np.ndarray, 
             image: np.ndarray
             ) -> np.ndarray:
@@ -160,15 +159,14 @@ class Vision:
             aruco_dict_type: int, 
             matrix_coefficients: np.ndarray, 
             distortion_coefficients: np.ndarray
-            ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+            ):
         # converting the image to grayscale and improving the values for the aruco detection
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         gray = clahe.apply(gray)
         # loading the correct aruco dictionary
         cv2.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
-        #parameters = cv2.aruco.DetectorParameters()
-        parameters = cv2.aruco.DetectorParameters_create()
+        parameters = cv2.aruco.DetectorParameters()
         parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
         parameters.cornerRefinementWinSize = 5
         parameters.cornerRefinementMaxIterations = 50
@@ -379,7 +377,7 @@ class Vision:
             xc: int, 
             depth: np.ndarray, 
             mask: np.ndarray
-            ) -> tuple[float, float, np.ndarray]:
+            ):
         # angle in respect to the camera
         tan_theta = 1/self.fpx*(self.rx/2-xc)
         mask = cv2.resize(mask, (conf_limo.rx_depth, conf_limo.ry_depth))
@@ -415,7 +413,7 @@ class Vision:
             frame: np.ndarray,
             id: int,
             visualize: bool = False
-            ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+            ):
         # initializing the values
         target=np.zeros(3); limo0=np.zeros(3); limo1=np.zeros(3); limo2=np.zeros(3)
 
