@@ -2,10 +2,8 @@ import numpy as np
 from scipy.linalg import logm, expm
 import cv2
 import os
-import sys
 os.environ["QT_LOGGING_RULES"] = "*.warning=false"
-from ultralytics import YOLO
-import time
+#from ultralytics import YOLO
 from limo_description import conf_limo
 cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
 
@@ -333,7 +331,7 @@ class Vision:
 #    |_|\__,_|_|  \__, |\___|\__| |_____/ \___|\__\___|\___|\__|_|\___/|_| |_|
 #                  __/ |                                                      
 #                 |___/                                                       
-
+    '''
     def detect_target(
             self, 
             frame: np.ndarray
@@ -373,7 +371,7 @@ class Vision:
                             mask = np.squeeze(mask)
                             mask = (mask * 255).astype(np.uint8)
         return x_1, x_2, y_1, y_2, x_target, mask
-
+    '''
     def target_estimation_RGBD(
             self, 
             xc: int, 
