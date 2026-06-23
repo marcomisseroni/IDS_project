@@ -43,7 +43,7 @@ class Vision:
             "DICT_APRILTAG_36h10": cv2.aruco.DICT_APRILTAG_36h10,
             "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
         }
-        self.model = YOLO("yolov8n-seg.pt")
+        #self.model = YOLO("yolov8n-seg.pt")
         self.fpx = conf_limo.fpx # focal length (px)
         self.rx = conf_limo.rx #resolution of the camera along x
         self.T_limo_camera = self.translate([conf_limo.x_camera, conf_limo.y_camera, conf_limo.z_camera])
