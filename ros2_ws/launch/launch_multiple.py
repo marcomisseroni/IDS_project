@@ -33,7 +33,7 @@ def generate_launch_description():
         ),
         Node(
             package='vision',
-            namespace='limo_1',
+            namespace='/limo_1',
             executable='vision_node',
             name='vision_node',
             arguments=['1']
