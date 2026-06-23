@@ -172,6 +172,8 @@ IP:
 
 The camera node is located in /limo_ros2_ws/install/orbbec_camera/share/orbbec_camera/launch
 
+Run on each limo: `./limo.sh` and run on the main computer: `ros2 launch launch_multiple.py`
+
 ### EXAMPLES FOR LIMO1:
 
 To launch the camera with the namespace: `ros2 launch orbbec_camera dabai.launch.py camera_name:=$NAMESPACE color_fps:=10`

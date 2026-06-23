@@ -25,27 +25,6 @@ def generate_launch_description():
             arguments=['2']
         ),
         Node(
-            package='vision',
-            namespace='/limo_0',
-            executable='vision_node',
-            name='vision_node',
-            arguments=['0']
-        ),
-        Node(
-            package='vision',
-            namespace='/limo_1',
-            executable='vision_node',
-            name='vision_node',
-            arguments=['1']
-        ),
-        Node(
-            package='vision',
-            namespace='/limo_2',
-            executable='vision_node',
-            name='vision_node',
-            arguments=['2']
-        ),
-        Node(
             package='limo_control',
             namespace='/limo_0',
             executable='MPC_node',
