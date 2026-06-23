@@ -145,6 +145,10 @@ class ExtendedKalmanFilter(Node):
         msg_out = Landmark()
         msg_out.dim = self.ekf.n
         msg_out.state = self.ekf.state
+        print("-------------CHECK FOR ERROR----------------")
+        print(type(self.ekf.state))
+        print(self.ekf.state.shape)
+        print(self.ekf.state)
         msg_out.phi = self.ekf.phi
         msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)

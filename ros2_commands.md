@@ -181,3 +181,13 @@ To launch the camera compression with the namespace: `ros2 run image_transport r
 To launch the odometry with namespace: `namespace_launch`
 
 To launch all the limo nodes: `ros2 launch launch/launch_multiple.py`
+
+### DOCKER FOR LIMOS:
+
+To save the container, check its ID: `docker ps -a`.
+
+Create a new image: `docker commit <container_id> ros2_ids_full:latest`.
+
+Save the image on a file using: `docker save -o ros2_ids_full.tar ros2_ids_full:latest`.
+
+Once you moved the file onto another computer load it with: `docker load -i ros2_ids_full.tar` and then run the container using: `docker run -it ros2_ids_full:latest`.
