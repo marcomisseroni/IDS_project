@@ -54,7 +54,8 @@ class MeasurementRouter(Node):
 
             if self.meas[idx] is not None:
                 self.pub_meas.publish(self.meas[idx])
-                self.meas = [None] * n
+                # self.meas = [None] * n
+                self.meas[idx] = None
                 self.idx = (idx + 1) % n
                 return
 
