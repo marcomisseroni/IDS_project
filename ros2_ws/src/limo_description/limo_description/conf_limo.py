@@ -38,7 +38,7 @@ w_min = -w_max
 # -------------- KALMAN ----------------------
 # measurement covariance
 R_rr = np.identity(3) * 0.01
-R_rp = np.identity(2) * 0.05
+R_rp = np.identity(2) * 0.0025
 # model covariance
 Q = np.identity(3) * 0.001
 # time step

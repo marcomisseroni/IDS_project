@@ -164,3 +164,23 @@ class EKF:
             for j in range(i + 1, N):
 
                 self.cross_cov[(i, j)] -= gamma[i] @ gamma[j].T
+
+        self._reset_phi()
+
+    def _reset_phi(self):
+        # Fold the current (accumulated-since-last-reset) phi into the stored
+        # cross-covariance terms involving this agent, then reset phi to identity.
+        # This is algebraically equivalent to never resetting phi (Phi_future @ Phi_old
+        # is what would have been computed anyway), but keeps phi from growing
+        # unbounded over long runs, which otherwise amplifies any small inconsistency
+        # in the cross-covariance bookkeeping into large state corrections.
+        N = type(self).agent_id
+        for k in range(N):
+            if k == self.agent_id:
+                continue
+            i, j = min(self.agent_id, k), max(self.agent_id, k)
+            if i == self.agent_id:
+                self.cross_cov[(i, j)] = self.phi @ self.cross_cov[(i, j)]
+            else:
+                self.cross_cov[(i, j)] = self.cross_cov[(i, j)] @ self.phi.T
+        self.phi = np.identity(self.n)

@@ -120,6 +120,7 @@ class ExtendedKalmanFilter(Node):
 
     def measurement_callback(self, msg):
         if(not self.is_running): return
+        if(msg.x == conf_kalman.x_camera): return
         if(msg.id_a == self.ekf.agent_id): 
             if msg.id_b != self.person_ekf.agent_id:
                 self.measurement = np.array([msg.x, msg.y, msg.dtheta])
