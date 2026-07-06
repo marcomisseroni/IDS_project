@@ -167,7 +167,7 @@ In the settings look for `DEACTIVATE WINDOWS FIREWALL FOR PRIVATE NETWORKS` then
 
 IP:
 - Limo 0: 192.168.1.37
-- Limo 1: 192.168.1.35
+- Limo 1: 192.168.1.40
 - Limo 2: 192.168.1.34
 
 The camera node is located in /limo_ros2_ws/install/orbbec_camera/share/orbbec_camera/launch

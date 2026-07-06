@@ -11,6 +11,10 @@ ros2 launch motion_utils_ros limo_namespace_start.launch.py namespace:=$NAMESPAC
 
 NS_PID=$!
 
+cd ros2_ws
+source install/setup.bash
+cd ..
+
 ros2 run vision vision_node $NAMESPACE_NUMBER &
 
 VISION_PID=$!
