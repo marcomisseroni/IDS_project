@@ -96,26 +96,30 @@ class EKFPlot(Node):
         des = np.asarray(self.des0, dtype=float) if len(self.des0) > 0 else None
 
         # limo0 plot
+        arrow = 0.2
         if states0 is not None:
-            self.ax.plot(states0[:, 0], states0[:, 1], '-', color='tab:blue')
+            self.ax.plot(states0[:, 0], states0[:, 1], '-', color='tab:blue', alpha=0.2)
             self.ax.plot(states0[-1, 0],states0[-1, 1], 'o', color='tab:blue', label='limo0')
+            self.ax.quiver(states0[-1, 0], states0[-1, 1], arrow*np.cos(states0[-1, 2]), arrow*np.sin(states0[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:blue')
             #self.get_logger().info(f'limo0 {states0[-1,0]}')
         # limo1 plot
         if states1 is not None:
-            self.ax.plot(states1[:, 0], states1[:, 1], '-', color='tab:orange')
+            self.ax.plot(states1[:, 0], states1[:, 1], '-', color='tab:orange', alpha=0.2)
             self.ax.plot(states1[-1, 0],states1[-1, 1], 'o', color='tab:orange', label='limo1')
+            self.ax.quiver(states1[-1, 0], states1[-1, 1], arrow*np.cos(states1[-1, 2]), arrow*np.sin(states1[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:orange')
             #self.get_logger().info(f'limo1 {states1[-1,0]}')
         # limo2 plot
         if states2 is not None: 
-            self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green')
+            self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green', alpha=0.2)
             self.ax.plot(states2[-1, 0],states2[-1, 1], 'o', color='tab:green', label='limo2')
+            self.ax.quiver(states2[-1, 0], states2[-1, 1], arrow*np.cos(states2[-1, 2]), arrow*np.sin(states2[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:green')
             #self.get_logger().info(f'limo2 {states2[-1,0]}')
 
         # target plot
         if person_states is not None:
             person_x_values = person_states[:, 0]
             person_y_values = person_states[:, 1]
-            self.ax.plot(person_x_values, person_y_values, '-', color='tab:red')
+            self.ax.plot(person_x_values, person_y_values, '-', color='tab:red', alpha=0.2)
             self.ax.plot(person_x_values[-1], person_y_values[-1], 'o', color='tab:red', label='person')
 
         # mpc predictions
