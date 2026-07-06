@@ -17,6 +17,8 @@ from project_interfaces.msg import Measurement
 from project_interfaces.msg import Landmark
 from project_interfaces.msg import Update
 from project_interfaces.msg import State
+import matplotlib.pyplot as plt
+import time
 
 #  ______ _  ________               _      
 # |  ____| |/ /  ____|             | |     
@@ -97,6 +99,20 @@ class ExtendedKalmanFilter(Node):
             '/admin',
             self.admin_callback,
             10)
+        # values to plot
+        self.ra_plot = []
+        self.x_plot = []
+        self.ra_plot_x = []
+        plt.ion()
+        self.fig, self.ax = plt.subplots()
+        self.line, = self.ax.plot([], [], label="ra")
+        self.line, = self.ax.plot([], [], label="x")
+        self.ax.set_xlabel("Campione")
+        self.ax.set_ylabel("Valore")
+        self.ax.set_title("RA")
+        self.ax.grid(True)
+
+        plt.show(block=False)
         
     def odometry_callback(self, msg):
         if(not self.is_running): return
@@ -118,7 +134,6 @@ class ExtendedKalmanFilter(Node):
 
     def measurement_callback(self, msg):
         if(not self.is_running): return
-        if(msg.x == conf_kalman.x_camera): return
         if(msg.id_a == self.ekf.agent_id): 
             if msg.id_b != self.person_ekf.agent_id:
                 self.measurement = np.array([msg.x, msg.y, msg.dtheta])
@@ -141,7 +156,7 @@ class ExtendedKalmanFilter(Node):
                 self.update_msg_count += 1
                 #self.get_logger().info(f'Measuring person position: x={msg.x}, y={msg.y}')
 
-        if(msg.id_b != self.ekf.agent_id): return 
+        if(msg.id_b != self.ekf.agent_id): return
         msg_out = Landmark()
         msg_out.dim = self.ekf.n
         msg_out.state = self.ekf.state
@@ -152,7 +167,7 @@ class ExtendedKalmanFilter(Node):
         msg_out.phi = self.ekf.phi
         msg_out.p = self.ekf.P
         self.pub_info.publish(msg_out)
-        #self.get_logger().info('Publishing state on pub_info: "%s"' % msg_out.state)
+        self.get_logger().info('Publishing info')
         self.landmark_msg_count += 1
 
     def info_callback(self, msg):
@@ -178,6 +193,19 @@ class ExtendedKalmanFilter(Node):
         self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.update_msg_count += 1
 
+    def update_plot(self, value):
+        self.ra_plot.append(value[0])
+        self.ra_plot_x.append(len(self.ra_plot_x))
+
+        self.line.set_data(self.ra_plot_x, self.ra_plot)
+
+        self.ax.relim()
+        self.ax.autoscale_view()
+
+        self.fig.canvas.draw_idle()
+        self.fig.canvas.flush_events()
+        plt.pause(0.001)
+
     def update_callback(self, msg):
         if(not self.is_running): return
         if(msg.id_a == self.ekf.agent_id): return
@@ -192,6 +220,9 @@ class ExtendedKalmanFilter(Node):
         self.ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
         #self.get_logger().info('Update callback')
+
+        # update ra plot
+        self.update_plot(ra)
 
     def state_timer_callback(self):
         if(not self.is_running): return

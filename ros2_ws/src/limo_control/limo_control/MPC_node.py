@@ -16,8 +16,8 @@ class MPC_node(Node):
     def __init__(self, id):
         super().__init__('MPC_node')
         # subscibed topics
-        self.limo_sub = self.create_subscription(State, 'limo_state', self.limo_states_callback, 10)
-        self.target_sub = self.create_subscription(State, 'person_state', self.target_states_callback, 10)
+        self.limo_sub = self.create_subscription(State, '/limo_state', self.limo_states_callback, 10)
+        self.target_sub = self.create_subscription(State, '/person_state', self.target_states_callback, 10)
         self.admin_sub = self.create_subscription(String, '/admin', self.admin_callback, 10)
         # timer for MPC callback every dt
         self.mpc_timer = self.create_timer(conf_limo.dt_MPC, self.MPC_callback)
