@@ -42,21 +42,21 @@ class EKFPlot(Node):
         plt.show(block=False)
 
         # subs
-        self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 10)
+        self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 1)
         # ekf subscription for the three robots
         self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
         self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
         # mpc subscription for the three limos
-        self.sub_mpc_pred0 = self.create_subscription(MPCprediction, '/limo0/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo0"), 10)
-        self.sub_mpc_pred1 = self.create_subscription(MPCprediction, '/limo1/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo1"), 10)
-        self.sub_mpc_pred2 = self.create_subscription(MPCprediction, '/limo2/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo2"), 10)
+        self.sub_mpc_pred0 = self.create_subscription(MPCprediction, '/limo_0/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo0"), 10)
+        self.sub_mpc_pred1 = self.create_subscription(MPCprediction, '/limo_1/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo1"), 10)
+        self.sub_mpc_pred2 = self.create_subscription(MPCprediction, '/limo_2/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo2"), 10)
         # desired state calculated by limo0
-        self.sub_des = self.create_subscription(Desired, '/limo0/desired', self.des_callback, 10)
+        self.sub_des = self.create_subscription(Desired, '/limo_0/desired', self.des_callback, 10)
 
     def admin_callback(self, msg):
         if(msg.data == 'start_ekf'):
             self.is_running = True
-        if(msg.data == 'stop_ekf'):
+        elif(msg.data == 'stop_ekf'):
             self.is_running = False
 
     def _make_window_non_intrusive(self):

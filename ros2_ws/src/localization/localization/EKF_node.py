@@ -98,7 +98,7 @@ class ExtendedKalmanFilter(Node):
             String,
             '/admin',
             self.admin_callback,
-            10)
+            1)
         
     def odometry_callback(self, msg):
         if(not self.is_running): return
@@ -216,6 +216,7 @@ class ExtendedKalmanFilter(Node):
     def admin_callback(self, msg):
         if(msg.data == 'start_ekf'):
             self.is_running = True
+            self.get_logger().info('Started EKF')
         elif(msg.data == 'stop_ekf'):
             self.is_running = False
         else:
