@@ -20,9 +20,10 @@ class MeasPublisher(Node):
 
     def publish_meas(self):
         rc = conf_limo.r_circle + 0.2
-        tx = conf_limo.target_init[0] + 0.2
+        tx = conf_limo.target_init[0] + 0.2 + self.counter*0.01
         ty = self.counter*0.005
         self.counter = self.counter + 1
+        noise = 0.2
 
         msg = Measurement()
         msg.dtheta = 0.0
@@ -30,34 +31,34 @@ class MeasPublisher(Node):
         if self.idx == 0:
             msg.id_a = 0
             msg.id_b = 3
-            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
-            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1) + ty
+            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-noise, noise)
+            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-noise, noise) + ty
             self.idx = self.idx+1
         elif self.idx == 1:
             msg.id_a = 1
             msg.id_b = 3
-            msg.x = tx - rc + rm.uniform(-0.1, 0.1)
-            msg.y = 0.0 + rm.uniform(-0.1, 0.1) + ty
+            msg.x = tx - rc + rm.uniform(-noise, noise)
+            msg.y = 0.0 + 0.15 + rm.uniform(-noise, noise) + ty
             self.idx = self.idx+1
         elif self.idx == 2:
             msg.id_a = 2
             msg.id_b = 3
-            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
-            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1) + ty
+            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-noise, noise)
+            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-noise, noise) + ty
             self.idx = self.idx+1
 
         # each other measures
         elif self.idx == 3:
             msg.id_a = 0
             msg.id_b = 1
-            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
-            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-noise, noise)
+            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-noise, noise)
             self.idx = self.idx+1
         elif self.idx == 4:
             msg.id_a = 2
             msg.id_b = 1
-            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
-            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-noise, noise)
+            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-noise, noise)
             self.idx = 0
         self.pub_measurement.publish(msg)
         

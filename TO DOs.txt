@@ -21,3 +21,8 @@ TOPICS:
 
 
     Measurement handler (to decide who has to take the measurement):
+
+
+
+TODOS 06/07:
+- problema con aruco su limo

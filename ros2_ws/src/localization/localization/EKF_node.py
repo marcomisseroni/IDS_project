@@ -51,7 +51,6 @@ class ExtendedKalmanFilter(Node):
         self.actual_callback_time = None
         
         # to start
-        self.is_running = True
         self.measurement = None
         # id management
         self.ekf.agent_id = args
@@ -95,14 +94,8 @@ class ExtendedKalmanFilter(Node):
             '/update',
             self.update_callback,
             10)
-        self.sub_admin = self.create_subscription(
-            String,
-            '/admin',
-            self.admin_callback,
-            1)
-        
+
     def odometry_callback(self, msg):
-        if(not self.is_running): return
         self.last_callback_time = self.actual_callback_time
         self.actual_callback_time = self.get_clock().now()
 
@@ -120,14 +113,14 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')
 
     def measurement_callback(self, msg):
-        if(not self.is_running): return
-        #if(msg.x == conf_kalman.x_camera): return
+        if(msg.x == conf_kalman.x_camera): return
 
         if(msg.id_a == self.ekf.agent_id): 
             if msg.id_b != self.person_ekf.agent_id:
                 self.measurement = np.array([msg.x, msg.y, msg.dtheta])
             else:
                 self.measurement = np.array([msg.x, msg.y])
+                #self.get_logger().info(f'Measurement: {self.measurement}')
                 ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(self.person_ekf.state, self.person_ekf.phi, self.person_ekf.P, self.measurement, self.person_ekf.agent_id, self.person_ekf.agent_type)
                 msg_out = Update()
                 msg_out.id_a = self.ekf.agent_id
@@ -151,14 +144,13 @@ class ExtendedKalmanFilter(Node):
             msg_out.id_b = self.ekf.agent_id
             msg_out.dim = self.ekf.n
             msg_out.state = [float(x) for x in self.ekf.state.flatten()]
-            
+
             msg_out.phi = [float(x) for x in self.ekf.phi.flatten()]
             msg_out.p = [float(x) for x in self.ekf.P.flatten()]
             self.pub_info.publish(msg_out)
             self.landmark_msg_count += 1
 
     def info_callback(self, msg):
-        if(not self.is_running): return
         if(msg.id_a != self.ekf.agent_id): return
         state_b = msg.state
         phi_b = np.array(msg.phi).reshape((msg.dim, msg.dim))
@@ -182,7 +174,6 @@ class ExtendedKalmanFilter(Node):
 
 
     def update_callback(self, msg):
-        if(not self.is_running): return
         if(msg.id_a == self.ekf.agent_id): return
 
         measurement_dim = len(msg.ra)
@@ -197,7 +188,6 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info('Update callback')
 
     def state_timer_callback(self):
-        if(not self.is_running): return
         msg_limo = State()
         msg_limo.id = self.ekf.agent_id
         msg_limo.x = self.ekf.state[0]
@@ -213,15 +203,6 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info('Publishing: "%s"' % self.ekf.state)
         #self.get_logger().info('Publishing: "%s"' % self.person_ekf.state)
         self.state_msg_count += 1
-
-    def admin_callback(self, msg):
-        if(msg.data == 'start_ekf'):
-            self.is_running = True
-        elif(msg.data == 'stop_ekf'):
-            self.is_running = False
-        else:
-            print('ERROR: invalid command')
-            print('Usage: "start_ekf" to start the EKF_node, "stop_ekf" to stop the EKF_node')
 
 def main():
     if len(sys.argv) <= 1:

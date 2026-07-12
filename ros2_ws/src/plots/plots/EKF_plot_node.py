@@ -34,15 +34,12 @@ class EKFPlot(Node):
         self.des1 = []
         self.des2 = []
 
-        self.is_running = True
-
         self.fig, self.ax = plt.subplots(figsize=(8, 8))
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=100, cache_frame_data=False)
         self._make_window_non_intrusive()
         plt.show(block=False)
 
         # subs
-        self.sub_admin = self.create_subscription(String, '/admin', self.admin_callback, 1)
         # ekf subscription for the three robots
         self.sub_ekf_limo = self.create_subscription(State, '/limo_state', self.limo_state_callback, 10)
         self.sub_ekf_person = self.create_subscription(State, '/person_state', self.person_state_callback, 10)
@@ -52,12 +49,6 @@ class EKFPlot(Node):
         self.sub_mpc_pred2 = self.create_subscription(MPCprediction, '/limo_2/mpc_prediction', lambda msg: self.mpc_pred_callback(msg, "limo2"), 10)
         # desired state calculated by limo0
         self.sub_des = self.create_subscription(Desired, '/limo_0/desired', self.des_callback, 10)
-
-    def admin_callback(self, msg):
-        if(msg.data == 'start_ekf'):
-            self.is_running = True
-        elif(msg.data == 'stop_ekf'):
-            self.is_running = False
 
     def _make_window_non_intrusive(self):
         try:
@@ -84,11 +75,7 @@ class EKFPlot(Node):
             pass
 
     def update_plot(self, _frame):
-        if self.is_running == False:
-            return
-
         self.ax.cla()
-
         states0 = np.asarray(self.limo0_states, dtype=float) if len(self.limo0_states) > 0 else None
         states1 = np.asarray(self.limo1_states, dtype=float) if len(self.limo1_states) > 0 else None
         states2 = np.asarray(self.limo2_states, dtype=float) if len(self.limo2_states) > 0 else None
@@ -101,19 +88,16 @@ class EKFPlot(Node):
             self.ax.plot(states0[:, 0], states0[:, 1], '-', color='tab:blue', alpha=0.2)
             self.ax.plot(states0[-1, 0],states0[-1, 1], 'o', color='tab:blue', label='limo0')
             self.ax.quiver(states0[-1, 0], states0[-1, 1], arrow*np.cos(states0[-1, 2]), arrow*np.sin(states0[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:blue')
-            #self.get_logger().info(f'limo0 {states0[-1,0]}')
         # limo1 plot
         if states1 is not None:
             self.ax.plot(states1[:, 0], states1[:, 1], '-', color='tab:orange', alpha=0.2)
             self.ax.plot(states1[-1, 0],states1[-1, 1], 'o', color='tab:orange', label='limo1')
             self.ax.quiver(states1[-1, 0], states1[-1, 1], arrow*np.cos(states1[-1, 2]), arrow*np.sin(states1[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:orange')
-            #self.get_logger().info(f'limo1 {states1[-1,0]}')
         # limo2 plot
         if states2 is not None: 
             self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green', alpha=0.2)
             self.ax.plot(states2[-1, 0],states2[-1, 1], 'o', color='tab:green', label='limo2')
             self.ax.quiver(states2[-1, 0], states2[-1, 1], arrow*np.cos(states2[-1, 2]), arrow*np.sin(states2[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:green')
-            #self.get_logger().info(f'limo2 {states2[-1,0]}')
 
         # target plot
         if person_states is not None:
@@ -135,24 +119,8 @@ class EKFPlot(Node):
             self.ax.plot(self.des1[0], self.des1[1], 'o', color='gray')
             self.ax.plot(self.des2[0], self.des2[1], 'o', color='gray')
 
-        '''
-        theta = states[-1, 2]
-        arrow_length = 0.4
-        self.ax.arrow(
-            x_values[-1],
-            y_values[-1],
-            arrow_length * np.cos(theta),
-            arrow_length * np.sin(theta),
-            head_width=0.12,
-            head_length=0.16,
-            fc='tab:red',
-            ec='tab:red',
-            length_includes_head=True,
-        )
-        '''
-
         self.ax.set_xlim(-2, 5)
-        self.ax.set_ylim(-2, 2)
+        self.ax.set_ylim(-2, 5)
 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.set_title('EKF robot animation')
