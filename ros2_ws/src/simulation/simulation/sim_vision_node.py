@@ -5,6 +5,7 @@ from rclpy.node import Node
 import numpy as np
 from project_interfaces.msg import Measurement
 from limo_description import conf_limo
+import random as rm
 
 
 class MeasPublisher(Node):
@@ -13,32 +14,50 @@ class MeasPublisher(Node):
         self.id = id
         # publishing topic
         self.pub_measurement = self.create_publisher(Measurement, '/measurement_raw', 10)
-        self.timer = self.create_timer(0.02, self.publish_meas)
+        self.timer = self.create_timer(0.05, self.publish_meas)
         self.idx = 0
         self.counter = 0
 
     def publish_meas(self):
         rc = conf_limo.r_circle + 0.2
-        tx = conf_limo.target_init[0] + 0.2 + self.counter*0.001
+        tx = conf_limo.target_init[0] + 0.2
+        ty = self.counter*0.005
         self.counter = self.counter + 1
 
         msg = Measurement()
-        msg.id_b = 3
         msg.dtheta = 0.0
+        # target measures
         if self.idx == 0:
             msg.id_a = 0
-            msg.x = tx + rc*np.cos(60*np.pi/180)
-            msg.y = rc*np.sin(60*np.pi/180)
+            msg.id_b = 3
+            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1) + ty
             self.idx = self.idx+1
         elif self.idx == 1:
             msg.id_a = 1
-            msg.x = tx - rc
-            msg.y = 0.0
+            msg.id_b = 3
+            msg.x = tx - rc + rm.uniform(-0.1, 0.1)
+            msg.y = 0.0 + rm.uniform(-0.1, 0.1) + ty
             self.idx = self.idx+1
         elif self.idx == 2:
             msg.id_a = 2
-            msg.x = tx + rc*np.cos(60*np.pi/180)
-            msg.y = -rc*np.sin(60*np.pi/180)
+            msg.id_b = 3
+            msg.x = tx + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1) + ty
+            self.idx = self.idx+1
+
+        # each other measures
+        elif self.idx == 3:
+            msg.id_a = 0
+            msg.id_b = 1
+            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.y = rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            self.idx = self.idx+1
+        elif self.idx == 4:
+            msg.id_a = 2
+            msg.id_b = 1
+            msg.x = rc + rc*np.cos(60*np.pi/180) + rm.uniform(-0.1, 0.1)
+            msg.y = -rc*np.sin(60*np.pi/180) + rm.uniform(-0.1, 0.1)
             self.idx = 0
         self.pub_measurement.publish(msg)
         

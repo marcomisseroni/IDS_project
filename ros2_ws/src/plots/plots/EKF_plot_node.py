@@ -34,7 +34,7 @@ class EKFPlot(Node):
         self.des1 = []
         self.des2 = []
 
-        self.is_running = False
+        self.is_running = True
 
         self.fig, self.ax = plt.subplots(figsize=(8, 8))
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=100, cache_frame_data=False)
