@@ -119,9 +119,9 @@ class ExtendedKalmanFilter(Node):
             if msg.id_b != self.person_ekf.agent_id:
                 self.measurement = np.array([msg.x, msg.y, msg.dtheta])
             else:
-                self.measurement = np.array([msg.x, msg.y])
-                #self.get_logger().info(f'Measurement: {self.measurement}')
-                ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(self.person_ekf.state, self.person_ekf.phi, self.person_ekf.P, self.measurement, self.person_ekf.agent_id, self.person_ekf.agent_type)
+                person_measurement = np.array([msg.x, msg.y])
+                #self.get_logger().info(f'Measurement: {person_measurement}')
+                ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(self.person_ekf.state, self.person_ekf.phi, self.person_ekf.P, person_measurement, self.person_ekf.agent_id, self.person_ekf.agent_type)
                 msg_out = Update()
                 msg_out.id_a = self.ekf.agent_id
                 msg_out.id_b = msg.id_b
