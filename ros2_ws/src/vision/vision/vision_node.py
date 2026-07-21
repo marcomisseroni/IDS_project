@@ -9,6 +9,7 @@ from sensor_msgs.msg import CompressedImage
 from message_filters import Subscriber, ApproximateTimeSynchronizer
 from project_interfaces.msg import Measurement
 from vision.Vision_class import Vision
+from limo_description import conf_limo
 import cv2
 
 '''

@@ -32,6 +32,8 @@ class MeasurementRouter(Node):
             (2,1): 7,
             (2,3): 8,
         }
+        self.csv_file = open("data.csv", "w")
+        self.csv_file.write(f"id_a,id_b,x,y,dtheta\n")
 
     def meas_callback(self, msg):
 
@@ -40,6 +42,8 @@ class MeasurementRouter(Node):
 
         if idx is not None:
             self.meas[idx] = msg
+
+        self.csv_file.write(f"{msg.id_a},{msg.id_b},{msg.x},{msg.y},{msg.dtheta}\n")
 
 
     def meas_pub_callback(self):
@@ -54,8 +58,8 @@ class MeasurementRouter(Node):
 
             if self.meas[idx] is not None:
                 self.pub_meas.publish(self.meas[idx])
-                # self.meas = [None] * n
-                self.meas[idx] = None
+                self.meas = [None] * n
+                #self.meas[idx] = None
                 self.idx = (idx + 1) % n
                 return
 
@@ -66,6 +70,7 @@ def main(args=None):
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

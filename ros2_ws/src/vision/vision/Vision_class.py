@@ -432,8 +432,10 @@ class Vision:
         # reading the aruco values on the target
         if(aruco_pos[9][0] != 0):
             RF_target = self.T_limo_camera @ self.translate(aruco_pos[9]) @ self.rotate(aruco_rot[9])
-        else:
+        elif(aruco_pos[10][0] != 0):
             RF_target = self.T_limo_camera @ self.translate(aruco_pos[10]) @ self.rotate(aruco_rot[10])
+        else:
+            RF_target = np.zeros(3)
         target = np.array([self.get_point(RF_target)[0], self.get_point(RF_target)[1], 0])
 
         # -------------- Visualization --------------------

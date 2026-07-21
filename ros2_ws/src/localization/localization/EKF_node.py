@@ -113,7 +113,6 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')
 
     def measurement_callback(self, msg):
-        if(msg.x == conf_kalman.x_camera): return
 
         if(msg.id_a == self.ekf.agent_id): 
             if msg.id_b != self.person_ekf.agent_id:
