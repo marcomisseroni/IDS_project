@@ -35,6 +35,9 @@ class MeasurementRouter(Node):
         self.csv_file = open("data.csv", "w")
         self.csv_file.write(f"id_a,id_b,x,y,dtheta\n")
 
+        self.csv_file_routed = open("data_routed.csv", "w")
+        self.csv_file_routed.write(f"id_a,id_b,x,y,dtheta\n")
+
     def meas_callback(self, msg):
 
         key = (msg.id_a, msg.id_b)
@@ -47,21 +50,19 @@ class MeasurementRouter(Node):
 
 
     def meas_pub_callback(self):
-
         n = len(self.meas)
-
         if all(m is None for m in self.meas):
             return
-        
         for i in range(n):
             idx = (self.idx + i) % n
-
             if self.meas[idx] is not None:
+                self.csv_file_routed.write(f"{self.meas[idx].id_a},{self.meas[idx].id_b},{self.meas[idx].x},{self.meas[idx].y},{self.meas[idx].dtheta}\n")
                 self.pub_meas.publish(self.meas[idx])
-                self.meas = [None] * n
-                #self.meas[idx] = None
+                #self.meas = [None] * n
+                self.meas[idx] = None
                 self.idx = (idx + 1) % n
                 return
+            
 
 
 def main(args=None):

@@ -23,7 +23,7 @@ class MeasPublisher(Node):
         tx = conf_limo.target_init[0] + 0.2 + self.counter*0.01
         ty = self.counter*0.005
         self.counter = self.counter + 1
-        noise = 0.2
+        noise = 1
 
         msg = Measurement()
         msg.dtheta = 0.0
