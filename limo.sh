@@ -3,7 +3,7 @@
 source /opt/ros/foxy/setup.bash
 source ~/.bashrc
 
-ros2 launch orbbec_camera dabai.launch.py camera_name:=$NAMESPACE color_fps:=30 &
+ros2 launch orbbec_camera dabai.launch.py camera_name:=$NAMESPACE color_fps:=10 &
 
 CAM_PID=$!
 
