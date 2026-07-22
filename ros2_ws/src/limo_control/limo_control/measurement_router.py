@@ -5,6 +5,10 @@ from rclpy.node import Node
 # message types used
 from project_interfaces.msg import Measurement
 from limo_description import conf_limo as conf_limo
+from pathlib import Path
+
+ROOT_ROS_WS = Path(__file__).parent.parent.parent.parent.parent.parent.parent
+CSV_PATH = ROOT_ROS_WS / "csv_data"
 
 class MeasurementRouter(Node):
 
@@ -32,10 +36,10 @@ class MeasurementRouter(Node):
             (2,1): 7,
             (2,3): 8,
         }
-        self.csv_file = open("data.csv", "w")
+        self.csv_file = open(CSV_PATH / "data.csv", "w")
         self.csv_file.write(f"id_a,id_b,x,y,dtheta\n")
 
-        self.csv_file_routed = open("data_routed.csv", "w")
+        self.csv_file_routed = open(CSV_PATH / "data_routed.csv", "w")
         self.csv_file_routed.write(f"id_a,id_b,x,y,dtheta\n")
 
     def meas_callback(self, msg):
@@ -62,15 +66,23 @@ class MeasurementRouter(Node):
                 self.meas[idx] = None
                 self.idx = (idx + 1) % n
                 return
-            
+
+    def destroy_node(self):
+        self.csv_file.close()
+        self.csv_file_routed.close()
+        super().destroy_node()
 
 
 def main(args=None):
     rclpy.init(args=args)
     node = MeasurementRouter()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
