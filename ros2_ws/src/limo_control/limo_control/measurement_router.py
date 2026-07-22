@@ -40,7 +40,9 @@ class MeasurementRouter(Node):
         self.csv_file.write(f"id_a,id_b,x,y,dtheta\n")
 
         self.csv_file_routed = open(CSV_PATH / "data_routed.csv", "w")
-        self.csv_file_routed.write(f"id_a,id_b,x,y,dtheta\n")
+        self.csv_file_routed.write(f"id_a,id_b,x,y,dtheta,msg_id\n")
+
+        self.msg_id = 0
 
     def meas_callback(self, msg):
 
@@ -60,7 +62,8 @@ class MeasurementRouter(Node):
         for i in range(n):
             idx = (self.idx + i) % n
             if self.meas[idx] is not None:
-                self.csv_file_routed.write(f"{self.meas[idx].id_a},{self.meas[idx].id_b},{self.meas[idx].x},{self.meas[idx].y},{self.meas[idx].dtheta}\n")
+                self.csv_file_routed.write(f"{self.meas[idx].id_a},{self.meas[idx].id_b},{self.meas[idx].x},{self.meas[idx].y},{self.meas[idx].dtheta},{self.msg_id}\n")
+                self.msg_id += 1
                 self.pub_meas.publish(self.meas[idx])
                 #self.meas = [None] * n
                 self.meas[idx] = None
@@ -78,11 +81,12 @@ def main(args=None):
     node = MeasurementRouter()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':
