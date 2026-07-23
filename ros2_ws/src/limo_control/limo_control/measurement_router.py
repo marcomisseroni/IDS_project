@@ -36,20 +36,34 @@ class MeasurementRouter(Node):
             (2,1): 7,
             (2,3): 8,
         }
+        # csvs
         self.csv_file = open(CSV_PATH / "data.csv", "w")
         self.csv_file.write(f"id_a,id_b,x,y,dtheta\n")
 
         self.csv_file_routed = open(CSV_PATH / "data_routed.csv", "w")
         self.csv_file_routed.write(f"id_a,id_b,x,y,dtheta,msg_id\n")
 
+        # msg id to reconstruct the order
         self.msg_id = 0
+
+        # threshold
+        self.th = 1.0
+
+    def check_th(self, idx, msg):
+        if self.meas[idx] is None:
+            return True
+        if (abs(self.meas[idx].x - msg.x) > self.th or
+           abs(self.meas[idx].y - msg.y) > self.th or
+           abs(self.meas[idx].dtheta - msg.dtheta) > self.th):
+            return False
+        return True
 
     def meas_callback(self, msg):
 
         key = (msg.id_a, msg.id_b)
         idx = self.map_idx.get(key)
 
-        if idx is not None:
+        if idx is not None and self.check_th(idx, msg):
             self.meas[idx] = msg
 
         self.csv_file.write(f"{msg.id_a},{msg.id_b},{msg.x},{msg.y},{msg.dtheta}\n")
