@@ -37,6 +37,7 @@ class MeasurementModel:
         delta_x = (b_state[0] - a_state[0]) * np.cos(a_state[2]) + (b_state[1] - a_state[1]) * np.sin(a_state[2])
         delta_y = (b_state[1] - a_state[1]) * np.cos(a_state[2]) + (a_state[0] - b_state[0]) * np.sin(a_state[2])
         delta_theta = b_state[2] - a_state[2]
+        delta_theta = np.arctan2(np.sin(delta_theta), np.cos(delta_theta))
         return np.array([delta_x, delta_y, delta_theta])
     
     def h_robot_person(

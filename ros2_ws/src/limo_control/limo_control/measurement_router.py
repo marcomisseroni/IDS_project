@@ -81,8 +81,8 @@ class MeasurementRouter(Node):
                 self.csv_file_routed.write(f"{self.meas[idx].id_a},{self.meas[idx].id_b},{self.meas[idx].x},{self.meas[idx].y},{self.meas[idx].dtheta},{self.msg_id}\n")
                 self.msg_id += 1
                 self.pub_meas.publish(self.meas[idx])
-                #self.meas = [None] * n
-                self.meas[idx] = None
+                self.meas = [None] * n
+                #self.meas[idx] = None
                 self.idx = (idx + 1) % n
                 return
 

@@ -29,14 +29,15 @@ class EKF:
     agent_dims = {}
 
     def __init__(
-            self, 
-            initial_state: np.ndarray, 
+            self,
+            initial_state: np.ndarray,
             R_rr: np.ndarray,
-            R_rp: np.ndarray, 
-            Q: np.ndarray, 
+            R_rp: np.ndarray,
+            Q: np.ndarray,
             dt: float,
-            agent_type: AgentType):
-        
+            agent_type: AgentType,
+            P0: np.ndarray = None):
+
         self.agent_type = agent_type
         if self.agent_type == AgentType.ROBOT:
             self.model = MobileRobotModel()
@@ -44,7 +45,7 @@ class EKF:
             self.model = PersonModel()
         else:
             raise ValueError(f"Unsupported agent_type: {self.agent_type}")
-        
+
         self.meas_model = MeasurementModel(R_rr, R_rp)
         self.u = np.array([0, 0])
         self.state = initial_state.copy()
@@ -55,7 +56,7 @@ class EKF:
         self.G = self.model.G(self.state, self.u, self.dt)
         self.Ha = None
         self.Hb = None
-        self.P = np.identity(self.n)
+        self.P = P0.copy() if P0 is not None else np.identity(self.n)
         self.phi = np.identity(self.n)
         self.cross_cov = {}
         self.gamma = None
@@ -118,6 +119,8 @@ class EKF:
         Pab = self.phi @ piab @ phi_b.T
         Pba = phi_b @ piab.T @ self.phi.T
         r_a = z_ab - self.meas_model.h(b_agent_type, b_state, self.state)
+        if b_agent_type == AgentType.ROBOT:
+            r_a[2] = np.arctan2(np.sin(r_a[2]), np.cos(r_a[2]))
         S_ab = R + self.Ha @ self.P @ self.Ha.T + self.Hb @ Pb @ self.Hb.T - self.Ha @ Pab @ self.Hb.T - self.Hb @ Pba @ self.Ha.T
         inv_sqrt_S = np.real(sqrtm(np.linalg.inv(S_ab)))
         gamma_a = (piab @ phi_b.T @ self.Hb.T - np.linalg.inv(self.phi) @ self.P @ self.Ha.T) @ inv_sqrt_S

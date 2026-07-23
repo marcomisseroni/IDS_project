@@ -37,12 +37,15 @@ w_min = -w_max
 
 # -------------- KALMAN ----------------------
 # measurement covariance
-R_rr = np.identity(3) * 0.01
+R_rr = np.identity(3) * 0.1
 R_rp = np.identity(2) * 0.0025
 # model covariance
 Q = np.identity(3) * 0.001
 # time step
 dt = 0.1
+# initial state covariance
+P0_rr = np.identity(3) * 0.1
+P0_p = np.identity(4) * 0.1
 # person model covariance
 Q_p = np.zeros((4, 4))
 Q_p[0, 0] = dt**4 / 4
@@ -92,4 +95,4 @@ aruco_size = 0.080 # (m)
 aruco_size_target = 0.144 # (m)
 
 # ------------ MEASUREMENT ROUTER -------------------------
-Tm = 0.05
+Tm = 0.25

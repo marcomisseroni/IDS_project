@@ -19,6 +19,7 @@ from project_interfaces.msg import Update
 from project_interfaces.msg import State
 import matplotlib.pyplot as plt
 import time
+from pathlib import Path
 
 #  ______ _  ________               _      
 # |  ____| |/ /  ____|             | |     
@@ -35,6 +36,9 @@ It includes both the localization of the limo and the person, so each Limo has a
 information about the person.
 '''
 
+ROOT_ROS_WS = Path(__file__).parent.parent.parent.parent.parent.parent.parent
+CSV_PATH = ROOT_ROS_WS / "csv_data"
+
 class ExtendedKalmanFilter(Node):
 
     def __init__(self, initial_state, initial_person_pos, args):
@@ -43,12 +47,18 @@ class ExtendedKalmanFilter(Node):
         initial_state = conf_kalman.limo_init[args]
         initial_person_pos = np.hstack((conf_kalman.target_init,np.array([0.0,0.0])))
         # kalman for the limo and the person
-        self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON)
-        self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT)
+        self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON, conf_kalman.P0_p)
+        self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT, conf_kalman.P0_rr)
         
         # variables to compute dt
         self.last_callback_time = None
         self.actual_callback_time = None
+
+        # csv
+        self.csv_file_pred = open(CSV_PATH / f"pred_states_{args}.csv", "w")
+        self.csv_file_pred.write(f"id,x,y,theta\n")
+        self.csv_file_upd = open(CSV_PATH / f"upd_states_{args}.csv", "w")
+        self.csv_file_upd.write(f"id,x,y,theta\n")
         
         # to start
         self.measurement = None
@@ -68,6 +78,9 @@ class ExtendedKalmanFilter(Node):
         self.update_msg_count = 0
         # timer to publish the estimated state
         self.state_timer = self.create_timer(conf_kalman.dt_MPC, self.state_timer_callback)
+        # timer that fills in with a zero-velocity prediction whenever the last
+        # prediction (real or filler) is older than dt, e.g. odometry missing/too slow
+        self.predict_timer = self.create_timer(conf_kalman.dt, self.predict_check_callback)
         self.pub_limo_state = self.create_publisher(State, '/limo_state', 10)
         self.pub_person_state = self.create_publisher(State, '/person_state', 10)
         # topic on which the node publishes
@@ -96,6 +109,19 @@ class ExtendedKalmanFilter(Node):
             10)
 
     def odometry_callback(self, msg):
+        v = msg.twist.twist.linear.x
+        w = msg.twist.twist.angular.z
+        self._predict(v, w)
+
+    def predict_check_callback(self):
+        if self.actual_callback_time is None:
+            self._predict(0.0, 0.0)
+            return
+        elapsed = (self.get_clock().now() - self.actual_callback_time).nanoseconds * 1e-9
+        if elapsed >= conf_kalman.dt:
+            self._predict(0.0, 0.0)
+
+    def _predict(self, v, w):
         self.last_callback_time = self.actual_callback_time
         self.actual_callback_time = self.get_clock().now()
 
@@ -104,13 +130,12 @@ class ExtendedKalmanFilter(Node):
             self.ekf.dt = dt
             self.person_ekf.dt = dt
 
-        v = msg.twist.twist.linear.x
-        w = msg.twist.twist.angular.z
         self.person_ekf.state[2] = 0.0
         self.person_ekf.state[3] = 0.0
         self.person_ekf.prediction_step(None)
         self.ekf.prediction_step([v, w])
-        #self.get_logger().info(f'Receiving odometry message: v={v}, w={w}')
+        self.csv_file_pred.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
+        self.csv_file_pred.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
 
     def measurement_callback(self, msg):
 
@@ -135,6 +160,8 @@ class ExtendedKalmanFilter(Node):
                 self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
                 self.update_msg_count += 1
+                self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
+                self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
                 #self.get_logger().info(f'id_a: {msg_out.id_a}, id_b: {msg_out.id_b}')
 
         if(msg.id_b == self.ekf.agent_id):
@@ -169,6 +196,8 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info('Publishing on update')
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
+        self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
+        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
         self.update_msg_count += 1
 
 
@@ -184,6 +213,8 @@ class ExtendedKalmanFilter(Node):
 
         self.ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
         self.person_ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
+        self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
+        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
         #self.get_logger().info('Update callback')
 
     def state_timer_callback(self):
@@ -203,6 +234,11 @@ class ExtendedKalmanFilter(Node):
         #self.get_logger().info('Publishing: "%s"' % self.person_ekf.state)
         self.state_msg_count += 1
 
+    def destroy_node(self):
+        self.csv_file_pred.close()
+        self.csv_file_upd.close()
+        super().destroy_node()
+
 def main():
     if len(sys.argv) <= 1:
         print("Usage: ros2 run localization EKF_node limo_ID [--robot_state x y theta] [--person_state x y vx vy]")
@@ -219,9 +255,14 @@ def main():
     initial_robot_state = np.array(parsed_args.robot_state)
     initial_person_state = np.array(parsed_args.person_state)
     extended_kalman_filter = ExtendedKalmanFilter(initial_robot_state, initial_person_state, parsed_args.agent_id)
-    rclpy.spin(extended_kalman_filter)
-    extended_kalman_filter.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(extended_kalman_filter)
+    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
+        pass
+    finally:
+        extended_kalman_filter.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':
