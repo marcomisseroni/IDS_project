@@ -52,9 +52,11 @@ class MeasurementRouter(Node):
     def check_th(self, idx, msg):
         if self.meas[idx] is None:
             return True
+        dtheta_diff = self.meas[idx].dtheta - msg.dtheta
+        dtheta_diff = abs(np.arctan2(np.sin(dtheta_diff), np.cos(dtheta_diff)))
         if (abs(self.meas[idx].x - msg.x) > self.th or
            abs(self.meas[idx].y - msg.y) > self.th or
-           abs(self.meas[idx].dtheta - msg.dtheta) > self.th):
+           dtheta_diff > self.th):
             return False
         return True
 
