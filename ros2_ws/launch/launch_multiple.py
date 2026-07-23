@@ -47,6 +47,13 @@ def generate_launch_description():
             arguments=['2']
         ),
         Node(
+            package='localization',
+            namespace='',
+            executable='EKF_node',
+            name='person_ekf_node',
+            arguments=['--person']
+        ),
+        Node(
             package='plots',
             namespace='',
             executable='EKF_plot_node',

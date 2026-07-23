@@ -11,67 +11,78 @@ from localization.localization_system import EKF
 # configuration file containing convariances, ...
 from limo_description import conf_limo as conf_kalman
 # message types used
-from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from project_interfaces.msg import Measurement
 from project_interfaces.msg import Landmark
 from project_interfaces.msg import Update
 from project_interfaces.msg import State
-import matplotlib.pyplot as plt
-import time
 from pathlib import Path
 
-#  ______ _  ________               _      
-# |  ____| |/ /  ____|             | |     
-# | |__  | ' /| |__ _ __   ___   __| | ___ 
+#  ______ _  ________               _
+# |  ____| |/ /  ____|             | |
+# | |__  | ' /| |__ _ __   ___   __| | ___
 # |  __| |  < |  __| '_ \ / _ \ / _` |/ _ \
 # | |____| . \| |  | | | | (_) | (_| |  __/
 # |______|_|\_\_|  |_| |_|\___/ \__,_|\___|
-#             ______                       
-#            |______|                      
+#             ______
+#            |______|
 
 '''
-Node that implements the Extended Kalman Filter.
-It includes both the localization of the limo and the person, so each Limo has also the 
-information about the person.
+Node that implements the Extended Kalman Filter for one agent: either a limo
+(one instance per robot, selected by its agent_id) or the person (a single
+instance, launched with --person). The person is the only single source of
+truth for its own state - unlike the robots it is never the "measuring" side
+of a measurement (id_a), only the "measured" side (id_b), so the id_a-only
+branches below are simply never triggered when running as the person.
 '''
 
 ROOT_ROS_WS = Path(__file__).parent.parent.parent.parent.parent.parent.parent
 CSV_PATH = ROOT_ROS_WS / "csv_data"
 
+PERSON_ID = 3
+ROBOT_DIM = 3
+PERSON_DIM = 4
+
 class ExtendedKalmanFilter(Node):
 
-    def __init__(self, initial_state, initial_person_pos, args):
-        
-        super().__init__('extended_kalman_filter')
-        initial_state = conf_kalman.limo_init[args]
-        initial_person_pos = np.hstack((conf_kalman.target_init,np.array([0.0,0.0])))
-        # kalman for the limo and the person
-        self.person_ekf = EKF(initial_person_pos, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON, conf_kalman.P0_p)
-        self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT, conf_kalman.P0_rr)
-        
+    def __init__(self, agent_id, is_person=False):
+
+        super().__init__('person_ekf_node' if is_person else 'extended_kalman_filter')
+        self.is_person = is_person
+
+        if is_person:
+            agent_id = PERSON_ID
+            initial_state = np.hstack((conf_kalman.target_init, np.array([0.0, 0.0])))
+            self.ekf = EKF(initial_state, None, None, conf_kalman.Q_p, conf_kalman.dt, AgentType.PERSON, conf_kalman.P0_p)
+        else:
+            initial_state = conf_kalman.limo_init[agent_id]
+            self.ekf = EKF(initial_state, conf_kalman.R_rr, conf_kalman.R_rp, conf_kalman.Q, conf_kalman.dt, AgentType.ROBOT, conf_kalman.P0_rr)
+
         # variables to compute dt
         self.last_callback_time = None
         self.actual_callback_time = None
 
         # csv
-        self.csv_file_pred = open(CSV_PATH / f"pred_states_{args}.csv", "w")
+        suffix = "person" if is_person else str(agent_id)
+        self.csv_file_pred = open(CSV_PATH / f"pred_states_{suffix}.csv", "w")
         self.csv_file_pred.write(f"id,x,y,theta\n")
-        self.csv_file_upd = open(CSV_PATH / f"upd_states_{args}.csv", "w")
+        self.csv_file_upd = open(CSV_PATH / f"upd_states_{suffix}.csv", "w")
         self.csv_file_upd.write(f"id,x,y,theta\n")
-        
+
         # to start
-        self.measurement = None
+        # pending measurements this agent still needs to complete, keyed by
+        # the id_b of the measured agent (avoids mismatching a measurement
+        # with the wrong /info reply if multiple targets are measured
+        # in quick succession)
+        self.pending_measurements = {}
         # id management
-        self.ekf.agent_id = args
-        self.person_ekf.agent_id = 3
+        self.ekf.agent_id = agent_id
         EKF.agent_id = 4
-        EKF.agent_dims[0] = self.ekf.n
-        EKF.agent_dims[1] = self.ekf.n
-        EKF.agent_dims[2] = self.ekf.n
-        EKF.agent_dims[3] = self.person_ekf.n
+        EKF.agent_dims[0] = ROBOT_DIM
+        EKF.agent_dims[1] = ROBOT_DIM
+        EKF.agent_dims[2] = ROBOT_DIM
+        EKF.agent_dims[PERSON_ID] = PERSON_DIM
         self.ekf._cross_cov_set()
-        self.person_ekf._cross_cov_set()
         # messages count
         self.state_msg_count = 0
         self.landmark_msg_count = 0
@@ -80,18 +91,19 @@ class ExtendedKalmanFilter(Node):
         self.state_timer = self.create_timer(conf_kalman.dt_MPC, self.state_timer_callback)
         # timer that fills in with a zero-velocity prediction whenever the last
         # prediction (real or filler) is older than dt, e.g. odometry missing/too slow
+        # (always the case for the person, which has no odometry of its own)
         self.predict_timer = self.create_timer(conf_kalman.dt, self.predict_check_callback)
-        self.pub_limo_state = self.create_publisher(State, '/limo_state', 10)
-        self.pub_person_state = self.create_publisher(State, '/person_state', 10)
+        self.pub_state = self.create_publisher(State, '/person_state' if is_person else '/limo_state', 10)
         # topic on which the node publishes
         self.pub_info = self.create_publisher(Landmark, '/info', 10)
         self.pub_update = self.create_publisher(Update, '/update', 10)
         # topic subscription
-        self.sub_odometry = self.create_subscription(
-            Odometry,
-            'odom',
-            self.odometry_callback,
-            10)
+        if not is_person:
+            self.sub_odometry = self.create_subscription(
+                Odometry,
+                'odom',
+                self.odometry_callback,
+                10)
         self.sub_measurement = self.create_subscription(
             Measurement,
             '/measurement_routed',
@@ -128,41 +140,20 @@ class ExtendedKalmanFilter(Node):
         if(self.last_callback_time is not None):
             dt = (self.actual_callback_time - self.last_callback_time).nanoseconds * 1e-9
             self.ekf.dt = dt
-            self.person_ekf.dt = dt
 
-        self.person_ekf.state[2] = 0.0
-        self.person_ekf.state[3] = 0.0
-        self.person_ekf.prediction_step(None)
+        if self.is_person:
+            self.ekf.state[2] = 0.0
+            self.ekf.state[3] = 0.0
         self.ekf.prediction_step([v, w])
-        self.csv_file_pred.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
-        self.csv_file_pred.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
+        self.csv_file_pred.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
 
     def measurement_callback(self, msg):
 
-        if(msg.id_a == self.ekf.agent_id): 
-            if msg.id_b != self.person_ekf.agent_id:
-                self.measurement = np.array([msg.x, msg.y, msg.dtheta])
+        if(msg.id_a == self.ekf.agent_id):
+            if msg.id_b == PERSON_ID:
+                self.pending_measurements[msg.id_b] = np.array([msg.x, msg.y])
             else:
-                person_measurement = np.array([msg.x, msg.y])
-                #self.get_logger().info(f'Measurement: {person_measurement}')
-                ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(self.person_ekf.state, self.person_ekf.phi, self.person_ekf.P, person_measurement, self.person_ekf.agent_id, self.person_ekf.agent_type)
-                msg_out = Update()
-                msg_out.id_a = self.ekf.agent_id
-                msg_out.id_b = msg.id_b
-                msg_out.dim_a = self.ekf.n
-                msg_out.dim_b = self.person_ekf.n
-                msg_out.ra = np.asarray(ra, dtype=float).ravel().tolist()
-                msg_out.gamma_a = np.asarray(gamma_a, dtype=float).ravel().tolist()
-                msg_out.gamma_b = np.asarray(gamma_b, dtype=float).ravel().tolist()
-                msg_out.w1 = np.asarray(W1, dtype=float).ravel().tolist()
-                msg_out.w2 = np.asarray(W2, dtype=float).ravel().tolist()
-                self.pub_update.publish(msg_out)
-                self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
-                self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, self.person_ekf.agent_id)
-                self.update_msg_count += 1
-                self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
-                self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
-                #self.get_logger().info(f'id_a: {msg_out.id_a}, id_b: {msg_out.id_b}')
+                self.pending_measurements[msg.id_b] = np.array([msg.x, msg.y, msg.dtheta])
 
         if(msg.id_b == self.ekf.agent_id):
             msg_out = Landmark()
@@ -178,15 +169,18 @@ class ExtendedKalmanFilter(Node):
 
     def info_callback(self, msg):
         if(msg.id_a != self.ekf.agent_id): return
+        measurement = self.pending_measurements.pop(msg.id_b, None)
+        if measurement is None: return
         state_b = msg.state
         phi_b = np.array(msg.phi).reshape((msg.dim, msg.dim))
         P_b = np.array(msg.p).reshape((msg.dim, msg.dim))
-        ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(state_b, phi_b, P_b, self.measurement, msg.id_b, AgentType.ROBOT)
+        b_agent_type = AgentType.PERSON if msg.id_b == PERSON_ID else AgentType.ROBOT
+        ra, gamma_a, gamma_b, W1, W2 = self.ekf.measurement(state_b, phi_b, P_b, measurement, msg.id_b, b_agent_type)
         msg_out = Update()
         msg_out.id_a = self.ekf.agent_id
         msg_out.id_b = msg.id_b
         msg_out.dim_a = self.ekf.n
-        msg_out.dim_b = self.ekf.n
+        msg_out.dim_b = msg.dim
         msg_out.ra = np.asarray(ra, dtype=float).ravel().tolist()
         msg_out.gamma_a = np.asarray(gamma_a, dtype=float).ravel().tolist()
         msg_out.gamma_b = np.asarray(gamma_b, dtype=float).ravel().tolist()
@@ -195,9 +189,7 @@ class ExtendedKalmanFilter(Node):
         self.pub_update.publish(msg_out)
         #self.get_logger().info('Publishing on update')
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
-        self.person_ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
-        self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
-        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
+        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
         self.update_msg_count += 1
 
 
@@ -212,26 +204,17 @@ class ExtendedKalmanFilter(Node):
         w2 = np.asarray(msg.w2, dtype=float).reshape((msg.dim_a, measurement_dim))
 
         self.ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
-        self.person_ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
-        self.csv_file_upd.write(f"{self.person_ekf.agent_id},{self.person_ekf.state[0]},{self.person_ekf.state[1]},{0}\n")
-        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{self.ekf.state[2]}\n")
+        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
         #self.get_logger().info('Update callback')
 
     def state_timer_callback(self):
-        msg_limo = State()
-        msg_limo.id = self.ekf.agent_id
-        msg_limo.x = self.ekf.state[0]
-        msg_limo.y = self.ekf.state[1]
-        msg_limo.theta = self.ekf.state[2]
-        msg_person = State()
-        msg_person.id = 3
-        msg_person.x = self.person_ekf.state[0]
-        msg_person.y = self.person_ekf.state[1]
-        msg_person.theta = 0.0
-        self.pub_limo_state.publish(msg_limo)
-        self.pub_person_state.publish(msg_person)
+        msg_out = State()
+        msg_out.id = self.ekf.agent_id
+        msg_out.x = self.ekf.state[0]
+        msg_out.y = self.ekf.state[1]
+        msg_out.theta = 0.0 if self.is_person else self.ekf.state[2]
+        self.pub_state.publish(msg_out)
         #self.get_logger().info('Publishing: "%s"' % self.ekf.state)
-        #self.get_logger().info('Publishing: "%s"' % self.person_ekf.state)
         self.state_msg_count += 1
 
     def destroy_node(self):
@@ -240,21 +223,25 @@ class ExtendedKalmanFilter(Node):
         super().destroy_node()
 
 def main():
-    if len(sys.argv) <= 1:
-        print("Usage: ros2 run localization EKF_node limo_ID [--robot_state x y theta] [--person_state x y vx vy]")
-        return
+    # strip --ros-args and everything after it before parsing our own
+    # arguments, otherwise argparse can mistake a ROS remapping token
+    # (e.g. __node:=...) for the optional agent_id positional
+    own_args = rclpy.utilities.remove_ros_args(sys.argv)[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('agent_id', type=int, help='Integer agent id for this EKF node')
+    parser.add_argument('agent_id', type=int, nargs='?', default=None, help='Integer agent id for this EKF node (omit when using --person)')
+    parser.add_argument('--person', action='store_true', help='Run this node as the person agent instead of a robot')
     parser.add_argument('--robot_state', nargs=3, type=float, default=[0.0, 0.0, 0.0], help='Initial robot state: x y theta')
-    parser.add_argument('--person_state', nargs=4, type=float, default=[0.0, -3.0, 0.0, 0.0], help='Initial person state: x y vx vy')
-    parsed_args, ros_args = parser.parse_known_args(sys.argv[1:])
+    parsed_args = parser.parse_args(own_args)
 
-    rclpy.init(args=ros_args)
+    if not parsed_args.person and parsed_args.agent_id is None:
+        print("Usage: ros2 run localization EKF_node limo_ID [--robot_state x y theta]")
+        print("       ros2 run localization EKF_node --person")
+        return
 
-    initial_robot_state = np.array(parsed_args.robot_state)
-    initial_person_state = np.array(parsed_args.person_state)
-    extended_kalman_filter = ExtendedKalmanFilter(initial_robot_state, initial_person_state, parsed_args.agent_id)
+    rclpy.init(args=sys.argv)
+
+    extended_kalman_filter = ExtendedKalmanFilter(parsed_args.agent_id, is_person=parsed_args.person)
     try:
         rclpy.spin(extended_kalman_filter)
     except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
