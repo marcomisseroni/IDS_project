@@ -10,6 +10,7 @@ from limo_description import conf_limo
 from scipy.optimize import linear_sum_assignment
 from std_msgs.msg import String
 import numpy as np
+import sys
 
 class MPC_node(Node):
 
@@ -34,10 +35,11 @@ class MPC_node(Node):
         self.id = id
         self.id_1 = ids[0]
         self.id_2 = ids[1]
+        self.get_logger().info(f'Limo {id}')
 
         # buffer vector with latest:
         # - self state information
-        self.state = conf_limo.limo_init[id]
+        self.state = conf_limo.limo_init[self.id]
         # - target state information
         self.target = conf_limo.target_init
         # - other limo number 1 state information
@@ -170,8 +172,7 @@ class MPC_node(Node):
  
 def main(args=None):
     rclpy.init()
-    id = 2
-    node = MPC_node(id)
+    node = MPC_node(int(sys.argv[1]))
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

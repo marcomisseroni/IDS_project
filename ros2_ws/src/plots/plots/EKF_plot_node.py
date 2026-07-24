@@ -156,7 +156,7 @@ class EKFPlot(Node):
         elif limo == "limo1":
             self.x_pred1 = msg.x
             self.y_pred1 = msg.y
-        else:
+        elif limo == "limo2":
             self.x_pred2 = msg.x
             self.y_pred2 = msg.y
 

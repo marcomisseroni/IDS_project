@@ -95,4 +95,4 @@ aruco_size = 0.080 # (m)
 aruco_size_target = 0.144 # (m)
 
 # ------------ MEASUREMENT ROUTER -------------------------
-Tm = 0.25
+Tm = 0.1
