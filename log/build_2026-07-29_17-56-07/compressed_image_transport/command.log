@@ -1,0 +1,1 @@
+Invoking command in '/home/marco/marco/uni/magistrale/IDS_project/build/compressed_image_transport': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/marco/marco/uni/magistrale/IDS_project/ros2_ws/src/image_transport_plugins/compressed_image_transport -DCMAKE_INSTALL_PREFIX=/home/marco/marco/uni/magistrale/IDS_project/install/compressed_image_transport

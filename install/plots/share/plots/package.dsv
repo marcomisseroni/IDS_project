@@ -1,0 +1,6 @@
+source;share/plots/hook/pythonpath.ps1
+source;share/plots/hook/pythonpath.dsv
+source;share/plots/hook/pythonpath.sh
+source;share/plots/hook/ament_prefix_path.ps1
+source;share/plots/hook/ament_prefix_path.dsv
+source;share/plots/hook/ament_prefix_path.sh

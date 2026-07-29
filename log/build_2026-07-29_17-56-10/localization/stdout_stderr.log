@@ -1,0 +1,40 @@
+running egg_info
+creating ../../../build/localization/localization.egg-info
+writing ../../../build/localization/localization.egg-info/PKG-INFO
+writing dependency_links to ../../../build/localization/localization.egg-info/dependency_links.txt
+writing entry points to ../../../build/localization/localization.egg-info/entry_points.txt
+writing requirements to ../../../build/localization/localization.egg-info/requires.txt
+writing top-level names to ../../../build/localization/localization.egg-info/top_level.txt
+writing manifest file '../../../build/localization/localization.egg-info/SOURCES.txt'
+reading manifest file '../../../build/localization/localization.egg-info/SOURCES.txt'
+writing manifest file '../../../build/localization/localization.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+copying localization/EKF_node.py -> /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+copying localization/meas_model.py -> /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+copying localization/agent_type.py -> /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+copying localization/localization_system.py -> /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+copying localization/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization
+running install
+running install_lib
+creating /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+copying /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization/EKF_node.py -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+copying /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization/meas_model.py -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+copying /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization/agent_type.py -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+copying /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization/localization_system.py -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+copying /home/marco/marco/uni/magistrale/IDS_project/build/localization/build/lib/localization/__init__.py -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization/EKF_node.py to EKF_node.cpython-310.pyc
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization/meas_model.py to meas_model.cpython-310.pyc
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization/agent_type.py to agent_type.cpython-310.pyc
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization/localization_system.py to localization_system.cpython-310.pyc
+byte-compiling /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/marco/marco/uni/magistrale/IDS_project/install/localization/share/ament_index/resource_index/packages
+copying resource/localization -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/share/ament_index/resource_index/packages
+copying package.xml -> /home/marco/marco/uni/magistrale/IDS_project/install/localization/share/localization
+running install_egg_info
+Copying ../../../build/localization/localization.egg-info to /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/python3.10/site-packages/localization-0.0.0-py3.10.egg-info
+running install_scripts
+Installing EKF_node script to /home/marco/marco/uni/magistrale/IDS_project/install/localization/lib/localization
+writing list of installed files to '/home/marco/marco/uni/magistrale/IDS_project/build/localization/install.log'

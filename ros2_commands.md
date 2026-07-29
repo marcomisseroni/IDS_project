@@ -137,7 +137,7 @@ ros2 topic pub /test std_msgs/msg/Bool "data: false"
 Another example, to start the looping the `EKF_node.py` you can use:
 
 ```
-ros2 topic pub --once --qos-durability transient_local /admin std_msgs/msg/String "{data: 'start_ekf'}"
+ros2 topic pub --once --qos-durability transient_local --qos-reliability reliable /admin std_msgs/msg/String "{data: 'start_mpc'}"
 ```
 It can be also used to stop such node with: `start_ekf`. Similarly for the `MPC_node.py` you can use: `start_mpc` and `stop_mpc`.
 

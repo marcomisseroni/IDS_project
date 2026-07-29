@@ -47,7 +47,7 @@ class MeasurementRouter(Node):
         self.msg_id = 0
 
         # threshold
-        self.th = 1.0
+        self.th = 0.5
 
     def check_th(self, idx, msg):
         if self.meas[idx] is None:

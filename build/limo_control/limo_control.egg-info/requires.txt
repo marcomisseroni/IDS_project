@@ -1,0 +1,5 @@
+setuptools
+casadi
+
+[test]
+pytest
