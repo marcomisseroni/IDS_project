@@ -9,9 +9,9 @@ import numpy as np
 # initial positions
 r_circle = 0.5 # raidus of the circle around the central position
 limo_init = np.array([
-    [-r_circle*np.cos(60*np.pi/180), -r_circle*np.sin(60*np.pi/180), 0.0], #limo0
-    [r_circle, 0.0, 0.0], # limo1
-    [-r_circle*np.cos(60*np.pi/180), r_circle*np.sin(60*np.pi/180), 0.0] #limo2
+    [-r_circle*np.cos(60*np.pi/180), -r_circle*np.sin(60*np.pi/180), 0.0], #limo0 - rear right
+    [r_circle, 0.0, 0.0], # limo1 - center
+    [-r_circle*np.cos(60*np.pi/180), r_circle*np.sin(60*np.pi/180), 0.0] #limo2 - rear left
 ])
 target_init = np.array([2.0,0.0])
 
@@ -91,7 +91,7 @@ fps = 30
 L = 0.1367/2 # half of limo width (along y)
 H = 0.170 # distance from back aruco to center of the limo (along x)
 h = 0.0188 # distance from side arucos to center of the limo (along x)
-aruco_size = 0.080 # (m)
+aruco_size = 0.060 # (m)
 aruco_size_target = 0.144 # (m)
 
 # ------------ MEASUREMENT ROUTER -------------------------
