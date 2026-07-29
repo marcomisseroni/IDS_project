@@ -64,10 +64,20 @@ class ExtendedKalmanFilter(Node):
 
         # csv
         suffix = "person" if is_person else str(agent_id)
+        n = self.ekf.n
+        state_header = ",".join(f"x{i}" for i in range(n))
+        std_header = ",".join(f"std_x{i}" for i in range(n))
         self.csv_file_pred = open(CSV_PATH / f"pred_states_{suffix}.csv", "w")
-        self.csv_file_pred.write(f"id,x,y,theta\n")
+        self.csv_file_pred.write(
+            f"timestamp,dt,{state_header},{std_header},"
+            "trace_P,eig_min_P,sym_err_P,phi_trace,v,w,source\n"
+        )
         self.csv_file_upd = open(CSV_PATH / f"upd_states_{suffix}.csv", "w")
-        self.csv_file_upd.write(f"id,x,y,theta\n")
+        self.csv_file_upd.write(
+            f"id_a,id_b,timestamp,{state_header},{std_header},"
+            "trace_P,trace_P_before,eig_min_P,sym_err_P,phi_trace,"
+            "correction_norm,residual_norm,residual\n"
+        )
 
         # to start
         # pending measurements this agent still needs to complete, keyed by
@@ -127,13 +137,36 @@ class ExtendedKalmanFilter(Node):
 
     def predict_check_callback(self):
         if self.actual_callback_time is None:
-            self._predict(0.0, 0.0)
+            self._predict(0.0, 0.0, source="filler")
             return
         elapsed = (self.get_clock().now() - self.actual_callback_time).nanoseconds * 1e-9
         if elapsed >= conf_kalman.dt:
-            self._predict(0.0, 0.0)
+            self._predict(0.0, 0.0, source="filler")
 
-    def _predict(self, v, w):
+    @staticmethod
+    def _state_stats(state, P):
+        state_str = ",".join(f"{x:.6f}" for x in np.asarray(state).flatten())
+        std = np.sqrt(np.abs(np.diag(P)))
+        std_str = ",".join(f"{x:.6f}" for x in std)
+        trace_P = np.trace(P)
+        eig_min = np.linalg.eigvalsh(P).min()
+        sym_err = np.linalg.norm(P - P.T)
+        return state_str, std_str, trace_P, eig_min, sym_err
+
+    def _log_update(self, id_a, id_b, r_a, old_state, old_trace_P, phi_trace_before):
+        timestamp = self.get_clock().now().nanoseconds * 1e-9
+        state_str, std_str, trace_P, eig_min, sym_err = self._state_stats(self.ekf.state, self.ekf.P)
+        correction_norm = np.linalg.norm(self.ekf.state - old_state)
+        r_a = np.asarray(r_a).flatten()
+        residual_norm = np.linalg.norm(r_a)
+        residual_str = ";".join(f"{x:.6f}" for x in r_a)
+        self.csv_file_upd.write(
+            f"{id_a},{id_b},{timestamp:.6f},{state_str},{std_str},"
+            f"{trace_P:.6f},{old_trace_P:.6f},{eig_min:.6f},{sym_err:.6f},{phi_trace_before:.6f},"
+            f"{correction_norm:.6f},{residual_norm:.6f},{residual_str}\n"
+        )
+
+    def _predict(self, v, w, source="odom"):
         self.last_callback_time = self.actual_callback_time
         self.actual_callback_time = self.get_clock().now()
 
@@ -145,7 +178,14 @@ class ExtendedKalmanFilter(Node):
             self.ekf.state[2] = 0.0
             self.ekf.state[3] = 0.0
         self.ekf.prediction_step([v, w])
-        self.csv_file_pred.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
+
+        timestamp = self.actual_callback_time.nanoseconds * 1e-9
+        state_str, std_str, trace_P, eig_min, sym_err = self._state_stats(self.ekf.state, self.ekf.P)
+        phi_trace = np.trace(self.ekf.phi)
+        self.csv_file_pred.write(
+            f"{timestamp:.6f},{self.ekf.dt:.6f},{state_str},{std_str},"
+            f"{trace_P:.6f},{eig_min:.6f},{sym_err:.6f},{phi_trace:.6f},{v:.6f},{w:.6f},{source}\n"
+        )
 
     def measurement_callback(self, msg):
 
@@ -188,8 +228,11 @@ class ExtendedKalmanFilter(Node):
         msg_out.w2 = np.asarray(W2, dtype=float).ravel().tolist()
         self.pub_update.publish(msg_out)
         #self.get_logger().info('Publishing on update')
+        old_state = self.ekf.state.copy()
+        old_trace_P = np.trace(self.ekf.P)
+        phi_trace_before = np.trace(self.ekf.phi)
         self.ekf.update_step(ra, gamma_a, gamma_b, W1, W2, self.ekf.agent_id, msg.id_b)
-        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
+        self._log_update(self.ekf.agent_id, msg.id_b, ra, old_state, old_trace_P, phi_trace_before)
         self.update_msg_count += 1
 
 
@@ -203,8 +246,11 @@ class ExtendedKalmanFilter(Node):
         w1 = np.asarray(msg.w1, dtype=float).reshape((msg.dim_b, measurement_dim))
         w2 = np.asarray(msg.w2, dtype=float).reshape((msg.dim_a, measurement_dim))
 
+        old_state = self.ekf.state.copy()
+        old_trace_P = np.trace(self.ekf.P)
+        phi_trace_before = np.trace(self.ekf.phi)
         self.ekf.update_step(ra, gamma_a, gamma_b, w1, w2, msg.id_a, msg.id_b)
-        self.csv_file_upd.write(f"{self.ekf.agent_id},{self.ekf.state[0]},{self.ekf.state[1]},{0 if self.is_person else self.ekf.state[2]}\n")
+        self._log_update(msg.id_a, msg.id_b, ra, old_state, old_trace_P, phi_trace_before)
         #self.get_logger().info('Update callback')
 
     def state_timer_callback(self):
