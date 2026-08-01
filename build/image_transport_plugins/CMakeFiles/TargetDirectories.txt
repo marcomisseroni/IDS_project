@@ -1,9 +1,0 @@
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/uninstall.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/image_transport_plugins_uninstall.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/test.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/edit_cache.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/rebuild_cache.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/list_install_components.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/install.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/install/local.dir
-/home/marco/marco/uni/magistrale/IDS_project/build/image_transport_plugins/CMakeFiles/install/strip.dir

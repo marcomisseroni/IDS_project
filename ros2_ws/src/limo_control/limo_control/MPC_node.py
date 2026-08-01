@@ -46,7 +46,6 @@ class MPC_node(Node):
         self.id = id
         self.id_1 = ids[0]
         self.id_2 = ids[1]
-        self.get_logger().info(f'Limo {id}')
 
         # buffer vector with latest:
         # - self state information

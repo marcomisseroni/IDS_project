@@ -119,8 +119,8 @@ class EKFPlot(Node):
             self.ax.plot(self.des1[0], self.des1[1], 'o', color='gray')
             self.ax.plot(self.des2[0], self.des2[1], 'o', color='gray')
 
-        self.ax.set_xlim(-5, 10)
-        self.ax.set_ylim(-5, 10)
+        self.ax.set_xlim(-2, 5)
+        self.ax.set_ylim(-2, 5)
 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.set_title('EKF robot animation')
