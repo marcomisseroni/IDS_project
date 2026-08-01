@@ -12,6 +12,7 @@ from std_msgs.msg import String
 from rclpy.qos import QoSProfile, HistoryPolicy, ReliabilityPolicy, DurabilityPolicy
 import numpy as np
 import sys
+import time
 
 # admin commands must never be missed: reliable delivery + transient_local so a
 # command published before this node starts (or while it's restarting) is still
@@ -52,6 +53,7 @@ class MPC_node(Node):
         self.state = conf_limo.limo_init[self.id]
         # - target state information
         self.target = conf_limo.target_init
+        self.prev_target = self.target
         # - other limo number 1 state information
         self.limo_1 = conf_limo.limo_init[self.id_1]
         self.limo_2 = conf_limo.limo_init[self.id_2]
@@ -67,8 +69,14 @@ class MPC_node(Node):
 
 
     def target_states_callback(self, msg):
-        # updating the target estimated position with the new informations
-        self.target = np.array([msg.x, msg.y])
+        # updating the target estimated position with the new informations (filtered data for smoother control)
+        last = np.array([msg.x, msg.y])
+        prev = self.prev_target
+        # update rate
+        alpha = 0.15
+
+        self.prev_target = self.target
+        self.target = alpha*last + (1-alpha)*prev
     
     def limo_states_callback(self, msg):
         # depending on the limo that sends the message i need to update the buffers
@@ -112,7 +120,7 @@ class MPC_node(Node):
         msg.x = pred_states[:,0].tolist()
         msg.y = pred_states[:,1].tolist()
         msg.theta = pred_states[:,2].tolist()
-        self.pub_predictions.publish(msg)
+        #self.pub_predictions.publish(msg)
         
     def admin_callback(self, msg):
         # used to start/stop the mpc
