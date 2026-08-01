@@ -35,6 +35,8 @@ class EKFPlot(Node):
         self.des2 = []
 
         self.fig, self.ax = plt.subplots(figsize=(8, 8))
+        self.ax.set_xlim(-2, 5)
+        self.ax.set_ylim(-2, 5)
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=100, cache_frame_data=False)
         self._make_window_non_intrusive()
         plt.show(block=False)
@@ -75,7 +77,10 @@ class EKFPlot(Node):
             pass
 
     def update_plot(self, _frame):
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
         self.ax.cla()
+
         states0 = np.asarray(self.limo0_states, dtype=float) if len(self.limo0_states) > 0 else None
         states1 = np.asarray(self.limo1_states, dtype=float) if len(self.limo1_states) > 0 else None
         states2 = np.asarray(self.limo2_states, dtype=float) if len(self.limo2_states) > 0 else None
@@ -119,8 +124,8 @@ class EKFPlot(Node):
             self.ax.plot(self.des1[0], self.des1[1], 'o', color='gray')
             self.ax.plot(self.des2[0], self.des2[1], 'o', color='gray')
 
-        self.ax.set_xlim(-2, 5)
-        self.ax.set_ylim(-2, 5)
+        self.ax.set_xlim(xlim)
+        self.ax.set_ylim(ylim)
 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.set_title('EKF robot animation')
