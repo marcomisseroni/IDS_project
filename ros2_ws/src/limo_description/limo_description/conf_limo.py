@@ -37,8 +37,8 @@ w_min = -w_max
 
 # -------------- KALMAN ----------------------
 # measurement covariance
-R_rr = np.identity(3) * 1
-R_rp = np.identity(2) * 0.1
+R_rr = np.identity(3) * 0.5
+R_rp = np.identity(2) * 0.5
 # model covariance
 Q = np.identity(3) * 0.001
 # time step
@@ -63,7 +63,7 @@ Tp = 0.1
 # distance between target and center
 dist = 0.2
 # time horizon MPC (number of steps)
-N = 20
+N = 50
 # MPC timestep
 dt_MPC = 0.1
 
