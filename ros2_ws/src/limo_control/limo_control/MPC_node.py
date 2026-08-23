@@ -73,7 +73,7 @@ class MPC_node(Node):
         last = np.array([msg.x, msg.y])
         prev = self.prev_target
         # update rate
-        alpha = 0.15
+        alpha = 0.1
 
         self.prev_target = self.target
         self.target = alpha*last + (1-alpha)*prev
