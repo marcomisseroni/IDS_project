@@ -429,6 +429,7 @@ class Vision:
         limo2 = np.array([self.get_point(limo_RF[2])[0], self.get_point(limo_RF[2])[1], self.get_z_angle(limo_RF[2])])     
 
         # --------------- TARGET ----------------------
+        RF_target = np.eye(4)
         # reading the aruco values on the target
         if(aruco_pos[9][0] != 0):
             RF_target = self.T_limo_camera @ self.translate(aruco_pos[9]) @ self.rotate(aruco_rot[9])
@@ -449,7 +450,8 @@ class Vision:
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot0[:3,:3], self.get_point(RF_plot0), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot1[:3,:3], self.get_point(RF_plot1), 0.1)
             cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot2[:3,:3], self.get_point(RF_plot2), 0.1)
-            cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot3[:3,:3], self.get_point(RF_plot3), 0.1)
+            if not np.array_equal(RF_target, np.eye(4)):
+                cv2.drawFrameAxes(output, conf_limo.intrinsic_camera, conf_limo.distortion, RF_plot3[:3,:3], self.get_point(RF_plot3), 0.1)
             # showing the video
             resized = cv2.resize(output, (conf_limo.rx_depth, conf_limo.ry_depth))
             cv2.imshow(f"Limo {id}", resized)

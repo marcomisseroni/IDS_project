@@ -277,7 +277,7 @@ for i in range(N_sim):
 print("Mean computational time for 3 MPC: ", np.median(times))
 
 # PLOT
-fig, ax = plt.subplots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=(20, 8))
 txt0 = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 txt1 = ax.text(0.02, 0.90, '', transform=ax.transAxes)
 txt2 = ax.text(0.02, 0.85, '', transform=ax.transAxes)
@@ -302,10 +302,10 @@ def update(frame):
     ax.plot(state0[0,frame],  state0[1,frame],  'x-', color='b', alpha=1)
     ax.plot(state1[0,frame],  state1[1,frame],  'x-', color='y', alpha=1)
     ax.plot(state2[0,frame],  state2[1,frame],  'x-', color='g', alpha=1)
-    plot_covariance_ellipse(cov0_xy[frame], state0[:2, frame], k=1, ax=ax, color='b', alpha=0.1)
-    plot_covariance_ellipse(cov1_xy[frame], state1[:2, frame], k=1, ax=ax, color='y', alpha=0.1)
-    plot_covariance_ellipse(cov2_xy[frame], state2[:2, frame], k=1, ax=ax, color='g', alpha=0.1)
-    plot_covariance_ellipse(person_cov_xy[frame], person_state[:, frame], k=1, ax=ax, color='m', alpha=0.1)
+    #plot_covariance_ellipse(cov0_xy[frame], state0[:2, frame], k=1, ax=ax, color='b', alpha=0.1)
+    #plot_covariance_ellipse(cov1_xy[frame], state1[:2, frame], k=1, ax=ax, color='y', alpha=0.1)
+    #plot_covariance_ellipse(cov2_xy[frame], state2[:2, frame], k=1, ax=ax, color='g', alpha=0.1)
+    #plot_covariance_ellipse(person_cov_xy[frame], person_state[:, frame], k=1, ax=ax, color='m', alpha=0.1)
     # text with input results
     txt0 = ax.text(0.02, 0.95, f'u0 = {input0[0,frame]:.2f}', transform=ax.transAxes)
     txt1 = ax.text(0.02, 0.90, f'u1 = {input1[0,frame]:.2f}', transform=ax.transAxes)

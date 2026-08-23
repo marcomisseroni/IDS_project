@@ -86,7 +86,7 @@ class MPC_node(Node):
         elif(msg.id == self.id_1):
             self.limo_1 = val
         elif(msg.id == self.id_2):
-            self.limo_2 == val
+            self.limo_2 = val
 
     def MPC_callback(self):
         # checking if the MPC has to start

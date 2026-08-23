@@ -70,7 +70,7 @@ class Vision_node(Node):
         frame = image_msg_to_numpy(rgb_msg)
 
         # elaborating the data
-        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, self.id, visualize=False)
+        target, limo0, limo1, limo2 = self.vision_obj.vision_main(frame, self.id, visualize=True)
 
         # publishing te data in 4 different messages (if we have a measure)
         # limo0 measured
