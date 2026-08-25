@@ -13,7 +13,6 @@ from matplotlib.animation import FuncAnimation
 
 
 class EKFPlot(Node):
-    
     def __init__(self):
 
         super().__init__('ekf_plot')
@@ -99,7 +98,7 @@ class EKFPlot(Node):
             self.ax.plot(states1[-1, 0],states1[-1, 1], 'o', color='tab:orange', label='limo1')
             self.ax.quiver(states1[-1, 0], states1[-1, 1], arrow*np.cos(states1[-1, 2]), arrow*np.sin(states1[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:orange')
         # limo2 plot
-        if states2 is not None: 
+        if states2 is not None:
             self.ax.plot(states2[:, 0], states2[:, 1], '-', color='tab:green', alpha=0.2)
             self.ax.plot(states2[-1, 0],states2[-1, 1], 'o', color='tab:green', label='limo2')
             self.ax.quiver(states2[-1, 0], states2[-1, 1], arrow*np.cos(states2[-1, 2]), arrow*np.sin(states2[-1, 2]), angles='xy', scale_units='xy', scale=0.5, color='tab:green')
@@ -118,7 +117,7 @@ class EKFPlot(Node):
             self.ax.plot(self.x_pred1, self.y_pred1, '--', color='pink')
         if self.x_pred2 is not None:
             self.ax.plot(self.x_pred2, self.y_pred2, '--', color='olive')
-        
+
         if des is not None:
             self.ax.plot(self.des0[0], self.des0[1], 'o', color='gray')
             self.ax.plot(self.des1[0], self.des1[1], 'o', color='gray')

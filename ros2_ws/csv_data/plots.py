@@ -32,12 +32,78 @@ def plot_by_measurer(df, title_prefix):
         fig.tight_layout()
 
 
+AGENT_CSV_SUFFIXES = {"limo0": "0", "limo1": "1", "limo2": "2", "person": "person"}
+
+# fixed set of cross-covariance blocks every agent's pred_states_*.csv logs as
+# separate cc_i_j columns (see EKF_node.py's _CROSS_COV_PAIRS): limo0, limo1,
+# limo2, person(=3), all combinations i<j
+CROSS_COV_PAIRS = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
+
+
+def plot_trace_P(skip_seconds=15):
+    # trace(P) logged by EKF_node.py in pred_states_{0,1,2,person}.csv, one
+    # line per robot/person. skip_seconds discards the initial transient (P
+    # still climbing from its startup value, before the first measurement) so
+    # the steady-state behaviour isn't squashed by the y-axis autoscale.
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    for name, suffix in AGENT_CSV_SUFFIXES.items():
+        path = CSV_DIR / f"pred_states_{suffix}.csv"
+        if not path.exists():
+            continue
+        df = pd.read_csv(path)
+        if df.empty:
+            continue
+        t = df["timestamp"] - df["timestamp"].iloc[0]
+        mask = t >= skip_seconds
+        ax.plot(t[mask], df["trace_P"][mask], label=name)
+
+    ax.set_ylabel("trace(P)")
+    ax.set_xlabel("time [s]")
+    ax.grid(True)
+    ax.legend(fontsize="small")
+
+    fig.suptitle("EKF trace(P)")
+    fig.tight_layout()
+    fig.savefig(CSV_DIR / "trace_P_plot.png")
+
+
+def plot_cross_cov_elements(agent="limo0", skip_seconds=15):
+    # every cross-covariance block Pi_ij (not summed into a single norm), all
+    # taken from one agent's local copy of Pi - the copies kept by the other
+    # agents are similar, so any one of them is representative.
+    suffix = AGENT_CSV_SUFFIXES[agent]
+    path = CSV_DIR / f"pred_states_{suffix}.csv"
+    df = pd.read_csv(path)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    t = df["timestamp"] - df["timestamp"].iloc[0]
+    mask = t >= skip_seconds
+    for i, j in CROSS_COV_PAIRS:
+        col = f"cc_{i}_{j}"
+        if col not in df.columns:
+            continue
+        ax.plot(t[mask], df[col][mask], label=f"{i}-{j}")
+
+    ax.set_ylabel("||Pi_ij||")
+    ax.set_xlabel("time [s]")
+    ax.grid(True)
+    ax.legend(title="coppia", fontsize="small")
+
+    fig.suptitle(f"EKF cross-covariance elements (from {agent})")
+    fig.tight_layout()
+    fig.savefig(CSV_DIR / "cross_cov_plot.png")
+
+
 def main():
     data_raw = pd.read_csv(CSV_DIR / "data.csv")
     data_routed = pd.read_csv(CSV_DIR / "data_routed.csv")
 
     plot_by_measurer(data_raw, "raw")
     plot_by_measurer(data_routed, "routed")
+    plot_trace_P()
+    plot_cross_cov_elements()
     plt.show()
 
 

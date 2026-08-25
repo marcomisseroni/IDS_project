@@ -45,6 +45,10 @@ PERSON_DIM = 4
 
 class ExtendedKalmanFilter(Node):
 
+    # fixed set of agent pairs whose cross-covariance block gets its own csv
+    # column: limo0, limo1, limo2, person(=PERSON_ID=3), all combinations i<j
+    _CROSS_COV_PAIRS = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
+
     def __init__(self, agent_id, is_person=False):
 
         super().__init__('person_ekf_node' if is_person else 'extended_kalman_filter')
@@ -67,15 +71,18 @@ class ExtendedKalmanFilter(Node):
         n = self.ekf.n
         state_header = ",".join(f"x{i}" for i in range(n))
         std_header = ",".join(f"std_x{i}" for i in range(n))
+        # one column per cross_cov pair (0,1),(0,2),(0,3),(1,2),(1,3),(2,3) - fixed
+        # since there are always these 4 agents (limo0, limo1, limo2, person=3)
+        pair_header = ",".join(f"cc_{i}_{j}" for i, j in self._CROSS_COV_PAIRS)
         self.csv_file_pred = open(CSV_PATH / f"pred_states_{suffix}.csv", "w")
         self.csv_file_pred.write(
             f"timestamp,dt,{state_header},{std_header},"
-            "trace_P,eig_min_P,sym_err_P,phi_trace,v,w,source\n"
+            f"trace_P,cross_cov_norm,{pair_header},eig_min_P,sym_err_P,phi_trace,v,w,source\n"
         )
         self.csv_file_upd = open(CSV_PATH / f"upd_states_{suffix}.csv", "w")
         self.csv_file_upd.write(
             f"id_a,id_b,timestamp,{state_header},{std_header},"
-            "trace_P,trace_P_before,eig_min_P,sym_err_P,phi_trace,"
+            f"trace_P,cross_cov_norm,{pair_header},trace_P_before,eig_min_P,sym_err_P,phi_trace,"
             "correction_norm,residual_norm,residual\n"
         )
 
@@ -153,16 +160,37 @@ class ExtendedKalmanFilter(Node):
         sym_err = np.linalg.norm(P - P.T)
         return state_str, std_str, trace_P, eig_min, sym_err
 
+    @staticmethod
+    def _cross_cov_norm(cross_cov):
+        # scalar summary of how correlated this agent's belief is with the
+        # rest of the network: sum of the Frobenius norms of every
+        # off-diagonal cross-covariance block it is tracking.
+        if not cross_cov:
+            return 0.0
+        return float(sum(np.linalg.norm(block) for block in cross_cov.values()))
+
+    @classmethod
+    def _cross_cov_pair_norms_str(cls, cross_cov):
+        # one Frobenius norm per pair (not summed), in the fixed order of
+        # _CROSS_COV_PAIRS, so every csv row has the same columns
+        norms = []
+        for pair in cls._CROSS_COV_PAIRS:
+            block = cross_cov.get(pair)
+            norms.append(np.linalg.norm(block) if block is not None else 0.0)
+        return ",".join(f"{x:.6f}" for x in norms)
+
     def _log_update(self, id_a, id_b, r_a, old_state, old_trace_P, phi_trace_before):
         timestamp = self.get_clock().now().nanoseconds * 1e-9
         state_str, std_str, trace_P, eig_min, sym_err = self._state_stats(self.ekf.state, self.ekf.P)
+        cross_cov_norm = self._cross_cov_norm(self.ekf.cross_cov)
+        pair_norms_str = self._cross_cov_pair_norms_str(self.ekf.cross_cov)
         correction_norm = np.linalg.norm(self.ekf.state - old_state)
         r_a = np.asarray(r_a).flatten()
         residual_norm = np.linalg.norm(r_a)
         residual_str = ";".join(f"{x:.6f}" for x in r_a)
         self.csv_file_upd.write(
             f"{id_a},{id_b},{timestamp:.6f},{state_str},{std_str},"
-            f"{trace_P:.6f},{old_trace_P:.6f},{eig_min:.6f},{sym_err:.6f},{phi_trace_before:.6f},"
+            f"{trace_P:.6f},{cross_cov_norm:.6f},{pair_norms_str},{old_trace_P:.6f},{eig_min:.6f},{sym_err:.6f},{phi_trace_before:.6f},"
             f"{correction_norm:.6f},{residual_norm:.6f},{residual_str}\n"
         )
 
@@ -181,10 +209,12 @@ class ExtendedKalmanFilter(Node):
 
         timestamp = self.actual_callback_time.nanoseconds * 1e-9
         state_str, std_str, trace_P, eig_min, sym_err = self._state_stats(self.ekf.state, self.ekf.P)
+        cross_cov_norm = self._cross_cov_norm(self.ekf.cross_cov)
+        pair_norms_str = self._cross_cov_pair_norms_str(self.ekf.cross_cov)
         phi_trace = np.trace(self.ekf.phi)
         self.csv_file_pred.write(
             f"{timestamp:.6f},{self.ekf.dt:.6f},{state_str},{std_str},"
-            f"{trace_P:.6f},{eig_min:.6f},{sym_err:.6f},{phi_trace:.6f},{v:.6f},{w:.6f},{source}\n"
+            f"{trace_P:.6f},{cross_cov_norm:.6f},{pair_norms_str},{eig_min:.6f},{sym_err:.6f},{phi_trace:.6f},{v:.6f},{w:.6f},{source}\n"
         )
 
     def measurement_callback(self, msg):

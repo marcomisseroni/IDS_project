@@ -29,8 +29,7 @@ This allows consistent multi-agent localization even under partial observability
 ---
 
 ### Perception (Vision)
-- **YOLO-based detection** for human tracking
-- Marker-based detection for inter-robot observations
+- Marker-based detection for inter-robot and robot-person observations
 - Multi-source visual fusion for robust target identification
 
 ---
@@ -49,8 +48,7 @@ This allows consistent multi-agent localization even under partial observability
 Each LIMO robot runs a local pipeline:
 
 1. Perception:
-   - YOLO detection (human)
-   - Marker detection (other robots)
+   - Marker detection 
 
 2. State Estimation:
    - Cooperative EKF with inter-agent measurements
@@ -69,7 +67,6 @@ Communication between agents is handled using ROS2 topics.
 - Python
 - ROS2
 - OpenCV
-- YOLO (object detection)
 - NumPy
 - Nonlinear estimation (EKF)
 - Model Predictive Control (MPC)
@@ -81,7 +78,6 @@ Communication between agents is handled using ROS2 topics.
 
 - Decentralized multi-robot state estimation
 - Cooperative localization using inter-agent measurements
-- Vision-based human tracking (YOLO)
 - Marker-based robot-to-robot detection
 - MPC-based control in dynamic environments
 - Formation-based multi-robot tracking of a moving human
