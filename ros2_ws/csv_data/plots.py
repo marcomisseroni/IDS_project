@@ -58,12 +58,12 @@ def plot_trace_P(skip_seconds=15):
         mask = t >= skip_seconds
         ax.plot(t[mask], df["trace_P"][mask], label=name)
 
-    ax.set_ylabel("trace(P)")
+    ax.set_ylabel("Tr(P)")
     ax.set_xlabel("time [s]")
     ax.grid(True)
     ax.legend(fontsize="small")
 
-    fig.suptitle("EKF trace(P)")
+    fig.suptitle("Covariance trace")
     fig.tight_layout()
     fig.savefig(CSV_DIR / "trace_P_plot.png")
 
@@ -89,9 +89,9 @@ def plot_cross_cov_elements(agent="limo0", skip_seconds=15):
     ax.set_ylabel("||Pi_ij||")
     ax.set_xlabel("time [s]")
     ax.grid(True)
-    ax.legend(title="coppia", fontsize="small")
+    ax.legend(title="Agent pair", fontsize="small")
 
-    fig.suptitle(f"EKF cross-covariance elements (from {agent})")
+    fig.suptitle(f"Cross-covariance norm (from {agent})")
     fig.tight_layout()
     fig.savefig(CSV_DIR / "cross_cov_plot.png")
 
